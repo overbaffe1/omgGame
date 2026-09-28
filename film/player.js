@@ -50,14 +50,21 @@ window.Player={mount(o){
       buf=await oac.startRendering();
       if(o.beforePlay){msg('Готовлю 3D…');await new Promise(r=>setTimeout(r,30));o.beforePlay()}
       msg('')})();
+    rendering.catch(()=>{rendering=null});
     return rendering}
-  const time=()=>playing?Math.min(o.dur,offset+ac.currentTime-startAt):offset;
+  let useAudioClock=false;const now=()=>useAudioClock?ac.currentTime:performance.now()/1000;
+  const time=()=>playing?Math.max(0,Math.min(o.dur,offset+now()-startAt)):offset;
+  // аудио создаём/будим синхронно, прямо в клике — иначе браузер оставит его «спящим»
+  function unlock(){if(!ac){ac=new AudioContext();out=ac.createGain();out.connect(ac.destination)}if(ac.state!=='running')ac.resume();}
+  addEventListener('pointerdown',unlock,true);addEventListener('keydown',unlock,true);
+  let starting=false;
   async function play(){
-    poster=null;await prepare();
-    if(!ac){ac=new AudioContext();out=ac.createGain();out.connect(ac.destination)}
-    if(ac.state==='suspended')await ac.resume();
+    if(starting||playing)return;starting=true;poster=null;unlock();
+    try{await prepare()}catch(e){starting=false;rendering=null;msg('Ошибка звука: '+e.message);return}
+    if(ac.state!=='running'){try{await Promise.race([ac.resume(),new Promise(r=>setTimeout(r,800))])}catch(e){}}
+    starting=false;useAudioClock=ac.state==='running';
     if(offset>=o.dur-.05)offset=0;
-    src=ac.createBufferSource();src.buffer=buf;src.connect(out);startAt=ac.currentTime+.05;src.start(startAt,offset);
+    src=ac.createBufferSource();src.buffer=buf;src.connect(out);src.start(ac.currentTime+.05,offset);startAt=now()+.05;
     playing=true;$('plp').textContent='⏸';$('plbig').style.display='none'}
   function pause(){if(!playing)return;offset=time();try{src.stop()}catch(e){}playing=false;$('plp').textContent='▶';dirty=true;
     if(rec){rec.stop();rec=null;msg('')}}
