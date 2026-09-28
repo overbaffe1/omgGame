@@ -284,7 +284,7 @@ function buildDino(){
     const legs=[];[[-3.6,5],[3.6,5],[-3.6,-5],[3.6,-5]].forEach(([x,z],i)=>{const piv=new T.Group();piv.position.set(x,-1,z);
       const l=new T.Mesh(new T.CylinderGeometry(1.5,1.2,9,12),m);l.position.y=-4.5;l.castShadow=true;piv.add(l);g.add(piv);legs.push({piv,i})});
     g.userData={legs,head,neck};return g}
-  const herd=[];[[0x6a7a58,-60,-140,1],[0x5a6a50,-20,-190,.85],[0x7a7a5a,40,-230,.9],[0x607050,-100,-260,.7]].forEach(([c,x,z,s],i)=>{const d=sauropod(c);d.scale.setScalar(s);d.userData.base=[x,z];d.userData.ph=i*1.3;d.userData.s=s;scene.add(d);herd.push(d)});
+  const herd=[];[[0x6a7a58,-38,-150,1],[0x5a6a50,-8,-190,.85],[0x7a7a5a,22,-230,.9],[0x607050,-55,-250,.75]].forEach(([c,x,z,s],i)=>{const d=sauropod(c);d.scale.setScalar(s);d.userData.base=[x,z];d.userData.ph=i*1.3;d.userData.s=s;scene.add(d);herd.push(d)});
   // тираннозавр
   const tr=new T.Group(),tm=skin(0x5a4a38),tb=skin(0x9a8a68);
   const trBody=ell(2.6,2.8,5.5,tm);trBody.rotation.x=-.25;tr.add(trBody);
@@ -328,12 +328,15 @@ function buildDino(){
     const imp=ss(.66,.74,u);U.uImp.value=imp;scene.fog.color.set(0xcfe0d8).lerp(new T.Color(0x5a1a08),imp);U.uFog.value=scene.fog.color;
     hemi.intensity=.8-imp*.4;sun.color.set(0xfff0d8).lerp(new T.Color(0xff6a30),imp);sun.intensity=2.4-imp*1.4;
     // камера: низкий пролёт сквозь папоротники
-    camera.position.set(-10+u*30,9+Math.sin(t*.4)*.6+imp*6,40-u*40);camera.lookAt(10+u*20,14+imp*20,-160);
+    // камера привязана к рельефу: всегда над землёй, с гребня смотрит вниз в долину
+    {const cx=-10+u*30,cz=40-u*40;let gy=-1e9;for(let dx=-6;dx<=6;dx+=3)for(let dz=-6;dz<=6;dz+=3)gy=Math.max(gy,hgt(cx+dx,cz+dz));
+     camera.position.set(cx,gy+15+Math.sin(t*.4)*.6+imp*8,cz);
+     const lx=-10+u*25,lz=-150;camera.lookAt(lx,hgt(lx,lz)+14+imp*25,lz)}
     if(u>.66&&u<.8){const k=1-(u-.66)/.14;camera.position.x+=(Math.random()-.5)*4*k;camera.position.y+=(Math.random()-.5)*4*k}
     const stopped=Math.max(0,1-imp*1.5);
-    herd.forEach((d,i)=>{const [bx,bz]=d.userData.base;const tt=t*stopped;const x=bx+tt*2.4*d.userData.s,z=bz+Math.sin(tt*.1+i)*6;d.position.set(x,hgt(x,z)+9.5*d.userData.s+Math.abs(Math.sin(tt*1.4))*.3,z);d.rotation.y=Math.PI/2+Math.sin(tt*.1+i)*.1;
+    const lt=u*11;herd.forEach((d,i)=>{const [bx,bz]=d.userData.base;const tt=lt*(u<.66?1:.66/u);const x=bx+tt*2.4*d.userData.s,z=bz+Math.sin(tt*.1+i)*6;d.position.set(x,hgt(x,z)+9.5*d.userData.s+Math.abs(Math.sin(tt*1.4))*.3,z);d.rotation.y=Math.PI/2+Math.sin(tt*.1+i)*.1;
       walk(d,tt,1.4,.35*stopped);d.userData.neck.rotation.x=Math.sin(t*.5+d.userData.ph)*.05-imp*.15;d.userData.head.rotation.y=Math.sin(t*.7)*.2});
-    const tx=45-u*55,tz=-60+Math.sin(u*3)*8;const tb2=Math.abs(Math.sin(t*3.2*stopped))*.5;tr.position.set(tx,hgt(tx,tz)+10.5+tb2,tz);tr.rotation.y=-Math.PI/2-.35+imp*.9;
+    const tx=24-u*42,tz=-72+Math.sin(u*3)*6;const tb2=Math.abs(Math.sin(t*3.2*stopped))*.5;tr.position.set(tx,hgt(tx,tz)+10.5+tb2,tz);tr.rotation.y=-Math.PI/2-.35+imp*.9;
     trLegs.forEach((l,i)=>{const s=Math.sin(t*3.2*stopped+i*Math.PI);l.piv.rotation.x=s*.5*stopped;l.sh.rotation.x=Math.max(0,-s)*.6*stopped});
     trHead.rotation.x=Math.sin(t*1.3)*.08-imp*.3;jaw.rotation.x=Math.max(0,Math.sin(t*.9))*.3+imp*.5;
     pters.forEach(p=>{const d=p.userData,a=t*d.sp+d.ph;p.position.set(Math.cos(a)*d.r,d.h+Math.sin(t*.7+d.ph)*6,d.cz+Math.sin(a)*d.r*.5);p.rotation.y=-a+Math.PI;p.rotation.z=Math.sin(a)*.3;
