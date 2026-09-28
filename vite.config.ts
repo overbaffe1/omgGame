@@ -16,6 +16,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  // Точка входа игры — game/index.html (корневой index.html отдан хабу фильмов)
+  build: {
+    rollupOptions: {
+      input: path.resolve(__dirname, "game/index.html"),
+    },
+  },
   server: {
     host: '0.0.0.0',
     allowedHosts: true,
