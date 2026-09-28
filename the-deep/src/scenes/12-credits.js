@@ -68,7 +68,7 @@ FILM.scene({
     const endO = lib.clamp01((t - 2.2) / 0.35);
     if (endO > 0) {
       ctx.save();
-      ctx.translate(W / 2, H * 0.72);
+      ctx.translate(W / 2, H * 0.79);
       ctx.scale(0.8 + endA * 0.2, 0.8 + endA * 0.2);
       lib.text(ctx, 'КОНЕЦ', 0, 0, {
         size: 96,
