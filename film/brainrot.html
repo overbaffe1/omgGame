@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LIMONINI DINAMITINI — brainrot short</title>
+<style>
+html,body{margin:0;height:100%;background:#111;display:flex;align-items:center;justify-content:center;font-family:Impact,Arial Black,sans-serif;overflow:hidden}
+#wrap{position:relative;height:96vh;aspect-ratio:9/16}
+canvas{width:100%;height:100%;display:block;border-radius:10px}
+#ui{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#000b;border-radius:10px;color:#ff0}
+button{font:inherit;font-size:24px;padding:12px 28px;border-radius:14px;border:4px solid #000;background:#ff0;color:#000;cursor:pointer;box-shadow:6px 6px 0 #f0f}
+</style></head><body>
+<div id="wrap"><canvas id="c" width="1080" height="1920"></canvas>
+<div id="ui"><div style="font-size:40px;text-align:center">LIMONINI<br>DINAMITINI 🍋💣</div>
+<button id="play">▶ СМОТРЕТЬ</button><button id="rec">⏺ ЗАПИСАТЬ .webm</button>
+<div style="color:#fff;font-family:Arial;font-size:14px;opacity:.7">30 сек · 9:16 · для Shorts</div></div></div>
+<script src="fx.js"></script>
+<script src="player.js"></script>
+<script>
+const cv=document.getElementById('c'),g=cv.getContext('2d'),W=1080,H=1920,DUR=30,BPM=140,B=60/BPM;
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)),seg=(t,a,b)=>clamp((t-a)/(b-a));
+const beat=t=>t/B, pump=t=>Math.pow(1-(beat(t)%1),3); // 1 на удар
+const S=[ // сцены
+ {a:0,b:6.9,name:'LIMONINI DINAMITINI',sub:'лимон с динамитом вместо мозга',bg:['#ffe600','#ff7b00'],draw:lemon},
+ {a:6.9,b:13.7,name:'TOSTAPANE BALLERINO',sub:'тостер, который танцует балет',bg:['#ff4fd8','#6a00ff'],draw:toaster},
+ {a:13.7,b:20.6,name:'CACTUSSO BOXERONE',sub:'кактус-боксёр. обнимать нельзя',bg:['#00ff9d','#007a5a'],draw:cactus},
+ {a:20.6,b:30,name:'MEGA FUSIONE',sub:'они объединились. это конец.',bg:['#ff0033','#1a0030'],draw:fusion},
+];
+// ---------- базовые штуки ----------
+function eyes(x,y,s,t,crazy){for(const d of[-1,1]){g.fillStyle='#fff';g.beginPath();g.ellipse(x+d*s,y,s*.8,s*(crazy?1.1:.8),0,0,7);g.fill();g.lineWidth=8;g.strokeStyle='#000';g.stroke();
+ const px=crazy?Math.sin(t*9+d)*s*.35:s*.2,py=crazy?Math.cos(t*7*d)*s*.35:0;g.fillStyle='#000';g.beginPath();g.arc(x+d*s+px,y+py,s*.32,0,7);g.fill()}}
+function mouth(x,y,w,t){const o=20+pump(t)*60;g.fillStyle='#600';g.beginPath();g.ellipse(x,y,w,o,0,0,Math.PI);g.fill();g.lineWidth=8;g.strokeStyle='#000';g.stroke();
+ g.fillStyle='#fff';g.fillRect(x-w*.6,y,w*.5,18);g.fillRect(x+w*.1,y,w*.5,18)}
+function legs(x,y,t,col='#000',len=260){g.strokeStyle=col;g.lineWidth=22;g.lineCap='round';for(const d of[-1,1]){const k=Math.sin(beat(t)*Math.PI+(d>0?Math.PI:0))*60;
+ g.beginPath();g.moveTo(x+d*60,y);g.lineTo(x+d*90+k,y+len*.55);g.lineTo(x+d*70,y+len);g.stroke();g.fillStyle='#fff';g.beginPath();g.ellipse(x+d*85,y+len,55,25,0,0,7);g.fill();g.lineWidth=6;g.stroke();g.lineWidth=22}}
+function ol(){g.lineWidth=12;g.strokeStyle='#000';g.stroke()}
+// ---------- персонажи ----------
+function lemon(t,x,y,s=1){g.save();g.translate(x,y);g.scale(s,s*(1-pump(t)*.12));
+ legs(0,170,t);
+ // фитиль + искры
+ g.strokeStyle='#000';g.lineWidth=14;g.beginPath();g.moveTo(0,-250);g.quadraticCurveTo(60,-340,20,-400);g.stroke();
+ for(let i=0;i<8;i++){const a=t*20+i;g.fillStyle=i%2?'#ff0':'#f60';g.beginPath();g.arc(20+Math.cos(a)*40*Math.random(),-400+Math.sin(a)*40*Math.random(),10,0,7);g.fill()}
+ {const lg=g.createRadialGradient(-80,-110,20,0,0,300);lg.addColorStop(0,'#fffbb0');lg.addColorStop(.5,'#ffe600');lg.addColorStop(1,'#e0a800');g.fillStyle=lg}g.beginPath();g.ellipse(0,0,230,270,0,0,7);g.fill();ol();
+ g.fillStyle='rgba(255,255,255,.7)';g.beginPath();g.ellipse(-110,-150,40,70,-.5,0,7);g.fill();
+ g.beginPath();g.ellipse(0,-265,30,25,0,0,7);g.fillStyle='#ffea00';g.fill();ol();
+ // шашки динамита
+ for(const d of[-1,1]){g.save();g.translate(d*230,-40);g.rotate(d*.3+Math.sin(t*8)*.2*d);g.fillStyle='#e00';g.fillRect(-25,-90,50,180);g.strokeRect(-25,-90,50,180);g.restore()}
+ eyes(0,-60,70,t,true);mouth(0,50,110,t);g.restore()}
+function toaster(t,x,y,s=1){g.save();g.translate(x,y);g.rotate(Math.sin(beat(t)*Math.PI/2)*.25);g.scale(s,s);
+ // пачка
+ g.fillStyle='#ffb3f0';g.beginPath();g.ellipse(0,180,300,70+pump(t)*20,0,0,7);g.fill();ol();
+ // нога на носочке
+ g.strokeStyle='#000';g.lineWidth=22;g.beginPath();g.moveTo(-30,200);g.lineTo(-30,480);g.stroke();
+ g.beginPath();g.moveTo(40,200);g.lineTo(200+Math.sin(t*6)*40,330);g.stroke();
+ {const lg=g.createLinearGradient(-230,0,230,0);lg.addColorStop(0,'#9aa0b8');lg.addColorStop(.3,'#f4f6ff');lg.addColorStop(.55,'#c8ccdd');lg.addColorStop(1,'#80869c');g.fillStyle=lg}g.beginPath();g.roundRect(-230,-200,460,400,70);g.fill();ol();
+ // тосты вылетают на ударе
+ const up=pump(t)*160;for(const d of[-1,1]){g.fillStyle='#d9913a';g.beginPath();g.roundRect(d*95-70,-280-up,140,160,40);g.fill();ol()}
+ g.fillStyle='#ccd';g.fillRect(-229,-200,458,60);
+ eyes(0,-50,60,t,false);mouth(0,60,90,t);
+ // руки над головой
+ g.strokeStyle='#000';g.lineWidth=18;for(const d of[-1,1]){g.beginPath();g.moveTo(d*220,-60);g.quadraticCurveTo(d*330,-300,d*60,-420-up*.3);g.stroke()}
+ g.restore()}
+function cactus(t,x,y,s=1){g.save();g.translate(x,y);g.scale(s,s);
+ legs(0,260,t,'#000',220);
+ const p=pump(t),hit=Math.floor(beat(t))%2?1:-1;
+ g.fillStyle='#2ecc40';
+ for(const d of[-1,1]){const reach=d===hit?p*200:0;g.save();g.translate(d*150,0);g.beginPath();g.roundRect(d>0?0:-160-reach,-60,160+reach,80,40);g.fill();ol();
+  g.fillStyle='#e00';g.beginPath();g.arc(d*(160+reach),-20,70,0,7);g.fill();ol();g.fillStyle='#2ecc40';g.restore()}
+ {const lg=g.createLinearGradient(-150,0,150,0);lg.addColorStop(0,'#1a8a2a');lg.addColorStop(.35,'#5ef070');lg.addColorStop(1,'#128020');g.fillStyle=lg}g.beginPath();g.roundRect(-150,-380,300,660,150);g.fill();ol();g.fillStyle='rgba(255,255,255,.35)';g.beginPath();g.roundRect(-100,-340,40,400,20);g.fill();
+ g.strokeStyle='#000';g.lineWidth=5;for(let i=0;i<30;i++){const a=i*2.4,rx=Math.sin(a)*120,ry=-330+i*20;g.beginPath();g.moveTo(rx,ry);g.lineTo(rx+(rx>0?25:-25),ry-15);g.stroke()}
+ // повязка
+ g.fillStyle='#f00';g.fillRect(-152,-300,304,40);g.beginPath();g.moveTo(150,-280);g.lineTo(240,-240+Math.sin(t*10)*20);g.lineTo(230,-300);g.fill();
+ eyes(0,-180,55,t,false);g.fillStyle='#000';g.fillRect(-120,-250,90,14);g.fillRect(30,-250,90,14);mouth(0,-80,80,t);
+ g.restore()}
+function fusion(t,x,y){const k=seg(t,20.6,23.5),sp=(1-k)*380;
+ if(k<1){lemon(t,x-sp,y,.55+k*.2);toaster(t,x+sp,y-sp*.5,.55);cactus(t,x,y+sp,.5)}
+ else{ // гибрид
+  g.save();g.translate(x,y);const sh=pump(t)*30;g.translate((Math.random()-.5)*sh,(Math.random()-.5)*sh);
+  cactus(t,0,120,.9);lemon(t,0,-230,.75);toaster(t,0,-560,.45);g.restore();
+  if(t>26.5){const e=seg(t,26.5,28.5);g.fillStyle=`rgba(255,255,200,${Math.max(0,1-e*1.2)})`;g.fillRect(0,0,W,H);
+   for(let i=0;i<60;i++){const a=i*2.39,d=e*1400*(0.5+(i%7)/7);g.fillStyle=['#ff0','#f0f','#0ff','#f60'][i%4];g.beginPath();g.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,30*(1-e)+8,0,7);g.fill()}}}}
+// ---------- кадр ----------
+const sticks=[...Array(40)].map((_,i)=>({x:(i*263)%W,y:(i*577)%H,e:['🍋','💣','🍞','🌵','💀','🔥','⭐'][i%7]}));
+function frame(t){
+ const sc=S.find(s=>t>=s.a&&t<s.b)||S[3];g.setTransform(1,0,0,1,0,0);
+ const zoom=1+pump(t)*.04;g.translate(W/2,H/2);g.scale(zoom,zoom);g.rotate(Math.sin(beat(t)*Math.PI)*.015);g.translate(-W/2,-H/2);
+ // фон: лучи
+ g.fillStyle=sc.bg[1];g.fillRect(-100,-100,W+200,H+200);g.save();g.translate(W/2,H*.5);g.rotate(t*.6);g.fillStyle=sc.bg[0];
+ for(let i=0;i<16;i++){g.beginPath();g.moveTo(0,0);g.arc(0,0,2000,i/16*Math.PI*2,(i+.5)/16*Math.PI*2);g.fill()}g.restore();
+ g.font='70px serif';g.globalAlpha=.35;for(const s of sticks){g.fillText(s.e,s.x,(s.y+t*120)%H)}g.globalAlpha=1;
+ // персонаж с въездом
+ const intro=seg(t,sc.a,sc.a+.5),bx=W/2+(1-intro)*(1-intro)*1200;
+ // линии скорости на ударе
+ {const p=pump(t);if(p>.2){g.save();g.translate(W/2,H*.5);g.strokeStyle=`rgba(255,255,255,${p*.5})`;g.lineWidth=6;for(let i=0;i<36;i++){const a=i/36*Math.PI*2+Math.floor(beat(t))*.3,r0=520+((i*97)%200);g.beginPath();g.moveTo(Math.cos(a)*r0,Math.sin(a)*r0);g.lineTo(Math.cos(a)*(r0+300+p*300),Math.sin(a)*(r0+300+p*300));g.stroke()}g.restore()}}
+ // тень на полу
+ {const gs=g.createRadialGradient(bx,H*.52+470,10,bx,H*.52+470,330);gs.addColorStop(0,'rgba(0,0,0,.45)');gs.addColorStop(1,'rgba(0,0,0,0)');g.save();g.fillStyle=gs;g.beginPath();g.ellipse(bx,H*.52+470,330*(1-pump(t)*.15),70,0,0,7);g.fill();g.restore()}
+ // персонаж с «наклеечной» тенью и бликом
+ g.save();g.shadowColor='rgba(0,0,0,.35)';g.shadowOffsetX=16;g.shadowOffsetY=18;g.shadowBlur=0;
+ sc.draw(t,bx,H*.52);g.restore();
+ // надписи
+ const nm=seg(t,sc.a+.4,sc.a+.8);
+ g.save();g.textAlign='center';g.lineJoin='round';
+ const words=sc.name.split(' ');words.forEach((w,i)=>{const s=(1+pump(t)*.08)*(nm<1?nm*1.3:1);g.save();g.translate(W/2,250+i*140);g.scale(s,s);g.rotate((i?.04:-.04));
+  g.font='130px Impact, Arial Black';g.lineWidth=22;g.strokeStyle='#000';g.strokeText(w,0,0);g.fillStyle=i?'#fff':'#ff0';g.fillText(w,0,0);g.restore()});
+ g.font='bold 48px Arial';g.lineWidth=12;g.strokeStyle='#000';g.strokeText(sc.sub,W/2,H-230);g.fillStyle='#fff';g.fillText(sc.sub,W/2,H-230);
+ // слоган-«дип дип»
+ const chant=['BUM','BUM','LIMO','NINI'][Math.floor(beat(t))%4];if(t<27){g.font='90px Impact';g.save();g.translate(W/2,H-360);g.rotate(Math.sin(t*5)*.1);g.scale(.8+pump(t)*.5,.8+pump(t)*.5);
+  g.lineWidth=16;g.strokeText(chant+'!',0,0);g.fillStyle='#0ff';g.fillText(chant+'!',0,0);g.restore()}
+ if(t>28){g.font='110px Impact';g.lineWidth=20;g.strokeText('ПОДПИШИСЬ',W/2,H*.5);g.fillStyle='#ff0';g.fillText('ПОДПИШИСЬ',W/2,H*.5);
+  g.font='60px Impact';g.strokeText('или лимон придёт ночью 🍋',W/2,H*.5+100);g.fillStyle='#fff';g.fillText('или лимон придёт ночью 🍋',W/2,H*.5+100)}
+ g.restore();
+ FX.post(g,t,{bloom:.35,grain:.035,vignette:.4,leak:0,ca:.6+pump(t)*2.5});
+ // вспышка на смене сцены
+ const f=Math.max(0,...S.filter(s=>s.a>0&&t>=s.a).map(s=>1-seg(t,s.a,s.a+.25)));if(f>0){g.setTransform(1,0,0,1,0,0);g.fillStyle=`rgba(255,255,255,${f})`;g.fillRect(0,0,W,H)}
+}
+// ---------- бит 140 BPM ----------
+function score(ac,out){const T=ac.currentTime+.1,M=ac.createGain();M.gain.value=.55;
+ const comp=ac.createDynamicsCompressor();M.connect(comp);comp.connect(out);
+ const nb=ac.createBuffer(1,ac.sampleRate,ac.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+ const kick=(t,v=1)=>{const o=ac.createOscillator(),e=ac.createGain();o.frequency.setValueAtTime(160,T+t);o.frequency.exponentialRampToValueAtTime(35,T+t+.25);
+  e.gain.setValueAtTime(v,T+t);e.gain.exponentialRampToValueAtTime(.001,T+t+.4);o.connect(e);e.connect(M);o.start(T+t);o.stop(T+t+.45)};
+ const noise=(t,d,f,v,type='highpass')=>{const s=ac.createBufferSource();s.buffer=nb;const fl=ac.createBiquadFilter();fl.type=type;fl.frequency.value=f;const e=ac.createGain();
+  e.gain.setValueAtTime(v,T+t);e.gain.exponentialRampToValueAtTime(.001,T+t+d);s.connect(fl);fl.connect(e);e.connect(M);s.start(T+t);s.stop(T+t+d+.05)};
+ const note=(t,f,d,type,v,glide)=>{const o=ac.createOscillator(),e=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,T+t);if(glide)o.frequency.exponentialRampToValueAtTime(glide,T+t+d);
+  e.gain.setValueAtTime(v,T+t);e.gain.exponentialRampToValueAtTime(.001,T+t+d);o.connect(e);e.connect(M);o.start(T+t);o.stop(T+t+d+.05)};
+ const m=n=>440*Math.pow(2,(n-69)/12);
+ const bass=[40,40,43,40,45,43,38,38],lead=[64,67,69,67,64,62,64,-1,72,71,69,67,69,67,64,-1];
+ const beats=Math.floor(26.5/B);
+ for(let i=0;i<beats;i++){const t=i*B,bar=Math.floor(i/4),sec=S.findIndex(s=>t>=s.a&&t<s.b);
+  kick(t);noise(t+B/2,.05,8000,.25);if(i%2)noise(t,.18,1500,.5,'bandpass');
+  const bn=bass[bar%8]+(sec===3?5:0);note(t,m(bn),B*.9,'sawtooth',.18);note(t+B/2,m(bn+12),B*.4,'square',.1);
+  // «vocal chops» — квакающие голоса
+  if(sec>=0){const l=lead[(i*2)%16],l2=lead[(i*2+1)%16],off=[0,5,-3,7][sec];
+   if(l>0)note(t,m(l+off),B*.45,sec===1?'triangle':'square',.08,sec===2?m(l+off-12):0);if(l2>0)note(t+B/2,m(l2+off),B*.45,'square',.07)}
+  // «BRRR» на смене сцены
+  if(S.some(s=>s.a>0&&Math.abs(s.a-t)<B/2))note(t,m(84),.6,'sawtooth',.2,m(36));
+ }
+ // бум на финале
+ const bt=26.5;noise(bt,2.5,400,1.2,'lowpass');note(bt,80,2,'sine',1,20);
+ for(let i=0;i<6;i++)note(28+i*.2,m(72+[0,4,7,12,7,12][i]),.25,'square',.1);
+}
+Player.mount({canvas:cv,frame,score,dur:DUR,name:'limonini-dinamitini.webm',chapters:S.map(s=>({t:s.a,title:s.name})),start:2});
+</script></body></html>

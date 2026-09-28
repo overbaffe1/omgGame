@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Процедурное кино — галерея</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#07070c;color:#eee;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden}
+  .app{display:flex;height:100%}
+  aside{width:340px;flex:none;padding:22px 18px;border-right:1px solid #ffffff14;overflow:auto;background:linear-gradient(#0d0d18,#07070c)}
+  h1{font:italic 26px Georgia,serif;color:#f4d9a0;margin:0 0 4px}
+  .sub{opacity:.55;font-size:13px;margin-bottom:22px}
+  .card{display:flex;gap:12px;padding:12px;border-radius:14px;cursor:pointer;margin-bottom:10px;border:1px solid transparent;transition:.2s;text-decoration:none;color:inherit}
+  .card:hover{background:#ffffff0a}
+  .card.on{background:#f4d9a014;border-color:#f4d9a055}
+  .thumb{width:62px;height:110px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:30px}
+  .card b{display:block;font-size:16px;margin:4px 0}
+  .card p{margin:0;font-size:13px;opacity:.65;line-height:1.35}
+  .tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;background:#ffffff14;margin-top:6px;margin-right:4px}
+  main{flex:1;display:flex;align-items:center;justify-content:center;position:relative;min-width:0}
+  iframe{height:96vh;aspect-ratio:9/16;max-width:100%;border:0;border-radius:12px;background:#000;box-shadow:0 20px 80px #000}
+  .keys{position:absolute;right:18px;bottom:14px;font-size:12px;opacity:.45;text-align:right;line-height:1.6}
+  kbd{background:#ffffff18;border-radius:4px;padding:1px 6px;font:12px monospace}
+  .nav{position:absolute;top:50%;transform:translateY(-50%);font-size:34px;background:#ffffff10;border:0;color:#fff;width:54px;height:54px;border-radius:50%;cursor:pointer}
+  .nav:hover{background:#ffffff25}.prev{left:18px}.next{right:18px}
+  @media (max-width:800px){
+    .app{flex-direction:column}
+    aside{width:auto;display:flex;gap:8px;overflow-x:auto;padding:10px;border:0;border-bottom:1px solid #ffffff14;flex:none}
+    aside h1,aside .sub,.card p,.tag,.keys,.nav{display:none}
+    .card{margin:0;flex:none;padding:6px 10px;align-items:center}.thumb{width:34px;height:34px;font-size:18px}.card b{font-size:14px;margin:0}
+    iframe{height:calc(100vh - 70px)}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>Процедурное кино</h1>
+    <div class="sub">Всё нарисовано и озвучено кодом — никаких видео, картинок и аудиофайлов.</div>
+    <div id="list"></div>
+  </aside>
+  <main>
+    <button class="nav prev" id="prev" title="Предыдущий">‹</button>
+    <iframe id="frame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <button class="nav next" id="next" title="Следующий">›</button>
+    <div class="keys"><kbd>Пробел</kbd> пауза · <kbd>← →</kbd> ±5 сек · <kbd>N</kbd>/<kbd>P</kbd> глава · <kbd>F</kbd> экран<br>кликни по фильму, чтобы управлять клавишами</div>
+  </main>
+</div>
+<script>
+const V=Date.now(); // сброс кэша — всегда свежая версия
+const FILMS=[
+  {id:'universe',file:'universe.html',title:'История Вселенной',emoji:'🌌',bg:'linear-gradient(#1a1040,#401a30)',desc:'От Большого взрыва до искусственного интеллекта. 24 главы, 3D-сцены.',tags:['~4 мин','3D','24 главы']},
+  {id:'star',file:'star.html',title:'Жизнь звезды',emoji:'⭐',bg:'linear-gradient(#10102a,#3a1a10)',desc:'Туманность, рождение, красный гигант, сверхновая — и новое начало.',tags:['30 сек','чернила']},
+  {id:'brainrot',file:'brainrot.html',title:'LIMONINI DINAMITINI',emoji:'🍋',bg:'linear-gradient(#ffe600,#ff4fd8)',desc:'Брейнрот-шортс: лимон с динамитом, тостер-балерина, кактус-боксёр.',tags:['30 сек','140 BPM','Shorts']},
+];
+const list=document.getElementById('list'),frame=document.getElementById('frame');
+FILMS.forEach(f=>{const a=document.createElement('a');a.className='card';a.href='#'+f.id;a.id='c-'+f.id;
+  a.innerHTML=`<div class="thumb" style="background:${f.bg}">${f.emoji}</div><div><b>${f.title}</b><p>${f.desc}</p>${f.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;list.appendChild(a)});
+function show(){const id=location.hash.slice(1)||FILMS[0].id;const f=FILMS.find(x=>x.id===id)||FILMS[0];
+  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('on',c.id==='c-'+f.id));
+  frame.src=f.file+'?v='+V;document.title=f.title+' — процедурное кино';setTimeout(()=>frame.focus(),300)}
+const step=d=>{const i=FILMS.findIndex(x=>'#'+x.id===(location.hash||'#'+FILMS[0].id));location.hash=FILMS[(i+d+FILMS.length)%FILMS.length].id};
+document.getElementById('prev').onclick=()=>step(-1);document.getElementById('next').onclick=()=>step(1);
+addEventListener('hashchange',show);show();
+</script>
+</body>
+</html>
