@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ГЛУБИНА · THE DEEP — процедурный фильм</title>
+<meta name="description" content="Процедурный фильм: каждый кадр нарисован в JavaScript на canvas, каждый звук синтезирован в Web Audio. Ноль медиафайлов." />
+<style>
+  :root {
+    --bg: #05070c;
+    --panel: rgba(12, 18, 30, 0.82);
+    --line: rgba(143, 168, 204, 0.22);
+    --text: #e8eef7;
+    --dim: #8fa8cc;
+    --accent: #e8577f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: radial-gradient(120% 90% at 50% 0%, #0a1220 0%, var(--bg) 60%);
+    color: var(--text);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+  }
+  .film-root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 16px;
+  }
+  .film-stage {
+    position: relative;
+    height: min(calc(100vh - 130px), calc((100vw - 32px) * 16 / 9));
+    aspect-ratio: 9 / 16;
+    max-width: calc(100vw - 32px);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--line);
+    background: #02060e;
+  }
+  .film-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .film-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background: linear-gradient(180deg, rgba(4, 10, 20, 0.35) 0%, rgba(4, 10, 20, 0.72) 100%);
+    text-align: center;
+    padding: 24px;
+    cursor: pointer;
+  }
+  .film-overlay-show { display: flex; }
+  .film-ov-title {
+    font-size: clamp(28px, 6vh, 64px);
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-indent: 0.28em;
+    color: #fdf6e8;
+  }
+  .film-ov-sub {
+    font-size: clamp(11px, 2vh, 18px);
+    letter-spacing: 0.32em;
+    text-indent: 0.32em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .film-ov-btn {
+    margin-top: 8px;
+    padding: 14px 34px;
+    font-size: clamp(14px, 2.2vh, 20px);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #06101e;
+    background: var(--accent);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .film-ov-btn:hover { transform: scale(1.05); filter: brightness(1.08); }
+  .film-ov-btn:disabled { opacity: 0.55; cursor: wait; transform: none; }
+  .film-ov-hint {
+    font-size: clamp(9px, 1.6vh, 13px);
+    letter-spacing: 0.08em;
+    color: rgba(143, 168, 204, 0.75);
+    max-width: 320px;
+    line-height: 1.7;
+  }
+  .film-bar {
+    width: min(720px, calc(100vw - 32px));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 10px 16px;
+    backdrop-filter: blur(10px);
+  }
+  .film-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font-size: 17px;
+    cursor: pointer;
+    flex: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .film-btn:hover { background: rgba(232, 87, 127, 0.22); border-color: var(--accent); }
+  .film-scrub {
+    flex: 1;
+    height: 26px;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  .film-scrub::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(143, 168, 204, 0.25);
+  }
+  .film-scrub::-webkit-slider-thumb {
+    appearance: none;
+    margin-top: -6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid #fff2;
+  }
+  .film-scrub::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(143, 168, 204, 0.25);
+  }
+  .film-scrub::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid #fff2;
+  }
+  .film-time {
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    color: var(--dim);
+    white-space: nowrap;
+  }
+  .film-shot {
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--dim);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    flex: none;
+  }
+  @media (max-width: 560px) {
+    .film-shot { display: none; }
+    .film-time { font-size: 11px; }
+    .film-bar { padding: 8px 10px; gap: 6px; }
+    .film-btn { width: 36px; height: 36px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+  <div id="film"></div>
+  <!-- load order: engine, lib, timeline, scenes, music, player -->
+  <script src="src/engine.js"></script>
+  <script src="src/lib.js"></script>
+  <script src="src/timeline.js"></script>
+  <script src="src/scenes/01-title-surface.js"></script>
+  <script src="src/scenes/02-sunbeams.js"></script>
+  <script src="src/scenes/03-reef.js"></script>
+  <script src="src/scenes/04-descent.js"></script>
+  <script src="src/scenes/05-jelly-bloom.js"></script>
+  <script src="src/scenes/06-depth-chart.js"></script>
+  <script src="src/scenes/07-angler-chart.js"></script>
+  <script src="src/scenes/08-anglerfish.js"></script>
+  <script src="src/scenes/09-whale-fall.js"></script>
+  <script src="src/scenes/10-vent.js"></script>
+  <script src="src/scenes/11-trench.js"></script>
+  <script src="src/scenes/12-credits.js"></script>
+  <script src="src/music.js"></script>
+  <script src="src/player.js"></script>
+</body>
+</html>

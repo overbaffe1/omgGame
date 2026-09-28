@@ -1,0 +1,3691 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ЛИМОННЫЙ БРЕЙНРОТ · процедурный мем-шорт</title>
+<meta name="description" content="Брейнрот-шорт про лимоны: каждый кадр нарисован в JavaScript, каждый звук синтезирован в Web Audio. Можно записать в WebM и залить на YouTube." />
+<style>
+  :root {
+    --bg: #12081e;
+    --panel: rgba(26, 14, 44, 0.88);
+    --line: rgba(255, 225, 77, 0.25);
+    --text: #fff7e8;
+    --dim: #b9a6d8;
+    --accent: #ffe14d;
+    --accent2: #ff3b30;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: radial-gradient(120% 90% at 50% 0%, #2a1246 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+  }
+  .film-root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 16px;
+  }
+  .film-stage {
+    position: relative;
+    height: min(calc(100vh - 130px), calc((100vw - 32px) * 16 / 9));
+    aspect-ratio: 9 / 16;
+    max-width: calc(100vw - 32px);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 0 2px var(--line), 0 0 90px rgba(255, 225, 77, 0.12);
+    background: #02060e;
+  }
+  .film-canvas { display: block; width: 100%; height: 100%; }
+  .film-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background: linear-gradient(180deg, rgba(30, 8, 60, 0.45) 0%, rgba(10, 4, 24, 0.78) 100%);
+    text-align: center;
+    padding: 24px;
+    cursor: pointer;
+  }
+  .film-overlay-show { display: flex; }
+  .film-ov-title {
+    font-size: clamp(24px, 5.4vh, 58px);
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-indent: 0.18em;
+    color: #ffe14d;
+    text-shadow: 0 4px 0 #141118, 0 8px 26px rgba(0, 0, 0, 0.6);
+  }
+  .film-ov-sub {
+    font-size: clamp(11px, 2vh, 17px);
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .film-ov-btn {
+    margin-top: 8px;
+    padding: 14px 34px;
+    font-size: clamp(14px, 2.2vh, 20px);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #141118;
+    background: var(--accent);
+    border: 3px solid #141118;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+    box-shadow: 0 6px 0 #141118;
+  }
+  .film-ov-btn:hover { transform: scale(1.05) rotate(-1deg); filter: brightness(1.06); }
+  .film-ov-btn:disabled { opacity: 0.55; cursor: wait; transform: none; }
+  .film-ov-hint {
+    font-size: clamp(9px, 1.6vh, 13px);
+    letter-spacing: 0.06em;
+    color: var(--dim);
+    max-width: 330px;
+    line-height: 1.8;
+  }
+  .film-bar {
+    width: min(760px, calc(100vw - 32px));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 10px 14px;
+    backdrop-filter: blur(10px);
+  }
+  .film-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    font-size: 17px;
+    cursor: pointer;
+    flex: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .film-btn:hover { background: rgba(255, 225, 77, 0.22); border-color: var(--accent); }
+  .film-rec {
+    flex: none;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 2px solid var(--accent2);
+    background: rgba(255, 59, 48, 0.12);
+    color: #ff8a84;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .film-rec:hover { background: var(--accent2); color: #fff; }
+  .film-rec-on { animation: recpulse 1.1s infinite; }
+  @keyframes recpulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.5); }
+    50% { box-shadow: 0 0 0 9px rgba(255, 59, 48, 0); }
+  }
+  .film-scrub { flex: 1; height: 26px; appearance: none; background: transparent; cursor: pointer; }
+  .film-scrub::-webkit-slider-runnable-track {
+    height: 6px; border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255,225,77,0.6), rgba(255,59,48,0.5));
+  }
+  .film-scrub::-webkit-slider-thumb {
+    appearance: none; margin-top: -6px; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--accent); border: 2px solid #141118;
+  }
+  .film-scrub::-moz-range-track {
+    height: 6px; border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255,225,77,0.6), rgba(255,59,48,0.5));
+  }
+  .film-scrub::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent); border: 2px solid #141118;
+  }
+  .film-time {
+    font-family: "Courier New", monospace;
+    font-size: 13px; color: var(--dim); white-space: nowrap;
+  }
+  @media (max-width: 620px) {
+    .film-time { display: none; }
+    .film-bar { padding: 8px 10px; gap: 6px; }
+    .film-btn { width: 36px; height: 36px; font-size: 14px; }
+    .film-rec { padding: 8px 12px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+  <div id="film"></div>
+  <!-- load order: engine, lib, timeline, scenes, music, player -->
+  <script>
+/*
+ * engine.js : the FILM runtime for «ГЛУБИНА» / THE DEEP.
+ *
+ * Load order everywhere: engine.js, lib.js, timeline.js, scenes (sorted),
+ * music.js, player.js.
+ *
+ * Defines window.FILM: the scene registry, the timeline reader, renderFrame(T),
+ * transitions between shots and the global post pass (boiling grain + vignette).
+ *
+ * Rules for scene code:
+ *   - draw(t, info) is a pure function of time. No state carried between frames.
+ *   - Use ctx.save()/ctx.restore(). Never call ctx.setTransform with absolute
+ *     values: the base transform carries the render scale (FILM.S).
+ *   - Randomness only from FILM.lib.rng(seed) / FILM.lib.hash(...).
+ *   - FILM.lib is frozen. Copy before changing anything.
+ */
+(function () {
+  'use strict';
+
+  const root = typeof window !== 'undefined' ? window : globalThis;
+  const FILM = (root.FILM = root.FILM || {});
+
+  // Frame size: the vertical film.
+  FILM.W = 1080;
+  FILM.H = 1920;
+  FILM.FPS = 24;
+  FILM.BOIL_FPS = 12; // grain re-rolls twice per film frame
+  FILM.GRAIN = 0; // brainrot look: clean, no film grain
+  FILM.S = 1; // render scale: device pixels per logical pixel
+  FILM.registry = {}; // id -> scene definition
+  FILM.registered = []; // [{ id }] in registration order
+  FILM.errors = []; // drawing errors collected by renderFrame
+  FILM.strict = false; // tools set true: renderFrame rethrows after recording
+  FILM.canvas = null;
+  FILM.ctx = null;
+
+  // Global time of the frame being drawn. Read-only for scenes.
+  let frameT = 0;
+  Object.defineProperty(FILM, 'frameT', {
+    get: () => frameT,
+    enumerable: true,
+    configurable: false,
+  });
+
+  // Small self-contained hash so core never depends on lib being healthy.
+  function ihash(a, b, c) {
+    let h = Math.imul(a | 0, 0x27d4eb2d) ^ Math.imul(b | 0, 0x165667b1) ^ Math.imul(c | 0, 0x9e3779b1);
+    h ^= h >>> 15;
+    h = Math.imul(h, 0x85ebca6b);
+    h ^= h >>> 13;
+    h = Math.imul(h, 0xc2b2ae35);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  }
+
+  // -----------------------------------------------------------------------
+  // Scene registry
+  // -----------------------------------------------------------------------
+
+  FILM.scene = function scene(def) {
+    if (!def || typeof def.id !== 'string' || !def.id || typeof def.draw !== 'function') {
+      const msg = 'FILM.scene() needs { id: string, draw: function }';
+      FILM.errors.push({ T: null, shot: def && def.id, message: msg });
+      if (typeof console !== 'undefined') console.error(msg);
+      return def;
+    }
+    if (FILM.registry[def.id]) {
+      const msg = "duplicate scene id '" + def.id + "'";
+      FILM.errors.push({ T: null, shot: def.id, message: msg });
+      if (typeof console !== 'undefined') console.error(msg);
+    }
+    FILM.registry[def.id] = def;
+    FILM.registered.push({ id: def.id });
+    return def;
+  };
+
+  // -----------------------------------------------------------------------
+  // Timeline
+  // -----------------------------------------------------------------------
+
+  function normTransition(tr) {
+    if (!tr) return null;
+    if (typeof tr === 'string') tr = { kind: tr };
+    const kind = String(tr.kind || tr.type || 'cut').toLowerCase();
+    const dur = Number(tr.dur != null ? tr.dur : tr.duration != null ? tr.duration : 0.25);
+    return Object.assign({}, tr, { kind, dur: Math.max(0, dur) });
+  }
+
+  // Accepts start/end or dur-chained shots; writes normalised start/end/dur back.
+  let prepared = null;
+  function prepare() {
+    const tl = FILM.TIMELINE;
+    if (!tl) throw new Error('FILM.TIMELINE is not defined: timeline.js did not load');
+    const shots = tl.shots || [];
+    if (prepared && prepared.tl === tl && prepared.n === shots.length) return prepared;
+
+    let cursor = 0;
+    const out = [];
+    for (let i = 0; i < shots.length; i++) {
+      const s = shots[i];
+      const has = (k) => s[k] != null && isFinite(Number(s[k]));
+      let start = null;
+      let end = null;
+      if (has('start')) start = Number(s.start);
+      else start = cursor;
+      if (has('end')) end = Number(s.end);
+      else if (has('dur')) end = start + Number(s.dur);
+      else end = start + 2;
+      out.push({
+        shot: s,
+        i,
+        id: s.id,
+        start,
+        end,
+        dur: end - start,
+        mode: String(s.mode || 'ink'),
+        transitionIn: normTransition(s.transitionIn),
+      });
+      cursor = end;
+    }
+    prepared = { tl, n: shots.length, shots: out, duration: cursor };
+    return prepared;
+  }
+  FILM.prepare = prepare;
+
+  function shotAt(T) {
+    const p = prepare();
+    for (let i = p.shots.length - 1; i >= 0; i--) {
+      if (T >= p.shots[i].start) return p.shots[i];
+    }
+    return p.shots[0];
+  }
+  FILM.shotAt = shotAt;
+
+  // -----------------------------------------------------------------------
+  // Post: grain + vignette (cached)
+  // -----------------------------------------------------------------------
+
+  let grainTile = null; // canvas
+  let grainPattern = null;
+  let vignetteGrad = null;
+  let vignetteSize = '';
+
+  function buildGrain(size) {
+    const c = document.createElement('canvas');
+    c.width = size;
+    c.height = size;
+    const g = c.getContext('2d');
+    const img = g.createImageData(size, size);
+    const d = img.data;
+    // Fixed tile; the per-frame offset + seed roll makes it boil.
+    let s = 0x9e3779b9;
+    for (let i = 0; i < d.length; i += 4) {
+      s = (Math.imul(s, 0x85ebca6b) ^ (s >>> 13)) >>> 0;
+      const v = 128 + (((s & 255) - 128) * 0.9) | 0;
+      d[i] = d[i + 1] = d[i + 2] = v;
+      d[i + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    return c;
+  }
+
+  function post(ctx, T) {
+    const W = FILM.W;
+    const H = FILM.H;
+
+    // Vignette.
+    const key = W + 'x' + H;
+    if (!vignetteGrad || vignetteSize !== key) {
+      const r = Math.sqrt(W * W + H * H) * 0.62;
+      vignetteGrad = ctx.createRadialGradient(W / 2, H * 0.46, r * 0.32, W / 2, H * 0.5, r);
+      vignetteGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      vignetteGrad.addColorStop(0.62, 'rgba(0,0,0,0.10)');
+      vignetteGrad.addColorStop(1, 'rgba(2,6,14,0.18)');
+      vignetteSize = key;
+    }
+    ctx.fillStyle = vignetteGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Boiling grain, rolled at BOIL_FPS.
+    if (!grainTile) grainTile = buildGrain(256);
+    const boilFrame = Math.floor(T * FILM.BOIL_FPS + 1e-4);
+    const ox = Math.floor(ihash(boilFrame, 1, 7) * 256);
+    const oy = Math.floor(ihash(boilFrame, 2, 9) * 256);
+    if (!grainPattern) grainPattern = ctx.createPattern(grainTile, 'repeat');
+    ctx.save();
+    ctx.globalAlpha = FILM.GRAIN || 0;
+    ctx.globalCompositeOperation = 'overlay';
+    ctx.translate(-ox, -oy);
+    ctx.fillStyle = grainPattern;
+    ctx.fillRect(0, 0, W + 256, H + 256);
+    ctx.restore();
+  }
+
+  // -----------------------------------------------------------------------
+  // renderFrame(T) : draw one frame at global time T seconds. Pure w.r.t. T.
+  // -----------------------------------------------------------------------
+
+  FILM.renderFrame = function renderFrame(T) {
+    const ctx = FILM.ctx;
+    if (!ctx) throw new Error('FILM.ctx is not set: call FILM.attach(canvas) first');
+    const p = prepare();
+
+    // Clamp T into the film.
+    const span = Math.max(0.001, p.duration - 1e-4);
+    T = T < 0 ? 0 : T > span ? span : T;
+    frameT = T;
+
+    const frame = Math.floor(T * FILM.FPS + 1e-4);
+
+    ctx.save();
+    // Base transform: logical 1080x1920 -> device pixels.
+    ctx.setTransform(FILM.S, 0, 0, FILM.S, 0, 0);
+
+    // Clear to black before the scene paints.
+    ctx.fillStyle = '#02060e';
+    ctx.fillRect(0, 0, FILM.W, FILM.H);
+
+    const s = shotAt(T);
+    const t = T - s.start;
+    const info = {
+      shot: s.shot,
+      id: s.id,
+      i: s.i,
+      n: p.shots.length,
+      t,
+      T,
+      frame,
+      progress: s.dur > 0 ? t / s.dur : 1,
+      mode: s.mode,
+    };
+
+    const scene = FILM.registry[s.id];
+    if (scene) {
+      try {
+        scene.draw(t, info);
+      } catch (err) {
+        FILM.errors.push({ T, shot: s.id, message: String(err && err.stack ? err.stack : err) });
+        if (FILM.strict) {
+          ctx.restore();
+          throw err;
+        }
+        // Fallback plate so the film keeps running.
+        ctx.fillStyle = '#0a1e3d';
+        ctx.fillRect(0, 0, FILM.W, FILM.H);
+        ctx.fillStyle = '#e8577f';
+        ctx.fillRect(0, FILM.H * 0.5 - 6, FILM.W, 12);
+      }
+    } else {
+      FILM.errors.push({ T, shot: s.id, message: 'scene not registered: ' + s.id });
+    }
+
+    // Transitions: dip through black at fade boundaries.
+    let black = 0;
+    const trIn = s.transitionIn;
+    if (trIn && trIn.kind === 'fade' && trIn.dur > 0 && t < trIn.dur) {
+      black = Math.max(black, 1 - t / trIn.dur);
+    }
+    const next = p.shots[s.i + 1];
+    if (next) {
+      const trNext = next.transitionIn;
+      const toEnd = s.end - T;
+      if (trNext && trNext.kind === 'fade' && trNext.dur > 0 && toEnd < trNext.dur) {
+        black = Math.max(black, 1 - toEnd / trNext.dur);
+      }
+    }
+    // Head and tail of the whole film also fade from / to black.
+    if (T < 0.08) black = Math.max(black, 1 - T / 0.08);
+    if (T > p.duration - 0.25) black = Math.max(black, (T - (p.duration - 0.25)) / 0.25);
+    if (black > 0) {
+      ctx.fillStyle = 'rgba(0,0,0,' + Math.min(1, black) + ')';
+      ctx.fillRect(0, 0, FILM.W, FILM.H);
+    }
+
+    post(ctx, T);
+    ctx.restore();
+  };
+
+  // Attach a canvas and size it to the device.
+  FILM.attach = function attach(canvas) {
+    FILM.canvas = canvas;
+    FILM.ctx = canvas.getContext('2d', { alpha: false });
+    grainPattern = null;
+    vignetteSize = '';
+    FILM.resize();
+    return FILM.ctx;
+  };
+
+  FILM.resize = function resize() {
+    const canvas = FILM.canvas;
+    if (!canvas) return;
+    const dpr = Math.min(2, (typeof window !== 'undefined' && window.devicePixelRatio) || 1);
+    FILM.S = dpr;
+    canvas.width = Math.round(FILM.W * dpr);
+    canvas.height = Math.round(FILM.H * dpr);
+    grainPattern = null; // pattern is scale-sensitive
+    vignetteSize = '';
+  };
+})();
+
+</script>
+  <script>
+/*
+ * lib.js : the cartoon toolbox for «ЛИМОННЫЙ БРЕЙНРОТ».
+ *
+ * Meme-edit grammar: thick black outlines, saturated colours, impact captions,
+ * sunburst rays, explosions, zoom punches and screen shake. Deterministic:
+ * randomness only from rng(seed) / hash(...). The lib object is frozen.
+ */
+(function () {
+  'use strict';
+  const FILM = (window.FILM = window.FILM || {});
+
+  // ------------------------------------------------------------------
+  // math / noise
+  // ------------------------------------------------------------------
+
+  function hash(a, b, c) {
+    let h = Math.imul(a | 0, 0x27d4eb2d) ^ Math.imul(b | 0, 0x165667b1) ^ Math.imul(c | 0, 0x9e3779b1);
+    h ^= h >>> 15;
+    h = Math.imul(h, 0x85ebca6b);
+    h ^= h >>> 13;
+    h = Math.imul(h, 0xc2b2ae35);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  }
+
+  function rng(seed) {
+    let s = (seed | 0) || 1;
+    return function () {
+      s = (Math.imul(s, 0x85ebca6b) ^ (s >>> 13)) >>> 0;
+      return (s >>> 0) / 4294967296;
+    };
+  }
+
+  const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+  const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const smooth = (k) => k * k * (3 - 2 * k);
+
+  function noise1(x, seed) {
+    const i = Math.floor(x);
+    const f = smooth(x - i);
+    const a = hash(i, seed, 11) * 2 - 1;
+    const b = hash(i + 1, seed, 11) * 2 - 1;
+    return lerp(a, b, f);
+  }
+
+  const ease = {
+    linear: (k) => k,
+    inCubic: (k) => k * k * k,
+    outCubic: (k) => 1 - Math.pow(1 - k, 3),
+    inOutCubic: (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2),
+    outQuart: (k) => 1 - Math.pow(1 - k, 4),
+    inOutSine: (k) => -(Math.cos(Math.PI * k) - 1) / 2,
+    outBack: (k) => 1 + 2.2 * Math.pow(k - 1, 3) + 1.4 * Math.pow(k - 1, 2),
+    outElastic: (k) => (k === 0 || k === 1 ? k : Math.pow(2, -10 * k) * Math.sin((k * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1),
+  };
+
+  // beat pulse: 1 at every 0.5 s beat, 0 between (bpm-agnostic feel)
+  const beat = (t, period) => {
+    const p = period || 0.4;
+    const k = (t % p) / p;
+    return Math.pow(1 - k, 2.2);
+  };
+
+  // ------------------------------------------------------------------
+  // palette
+  // ------------------------------------------------------------------
+
+  const pal = {
+    lemon: '#FFE14D',
+    lemonDark: '#F5B400',
+    lemonLight: '#FFF3A3',
+    ink: '#141118',
+    red: '#FF3B30',
+    orange: '#FF8A00',
+    pink: '#FF4FA3',
+    cyan: '#3ED8FF',
+    green: '#37D67A',
+    purple: '#8E5BFF',
+    blue: '#2E7CFF',
+    cream: '#FFF7E8',
+    white: '#FFFFFF',
+  };
+
+  // ------------------------------------------------------------------
+  // text
+  // ------------------------------------------------------------------
+
+  function textWidth(ctx, str, opts) {
+    opts = opts || {};
+    ctx.save();
+    ctx.font = (opts.weight || '900') + ' ' + (opts.size || 64) + 'px ' + (opts.font || 'Arial Black, Arial, sans-serif');
+    const chars = Array.from(str);
+    const spacing = opts.spacing || 0;
+    let w = 0;
+    for (const ch of chars) w += ctx.measureText(ch).width + spacing;
+    ctx.restore();
+    return w - spacing;
+  }
+
+  // Impact caption: white fill, black outline, hard shadow, auto-fit, slam-ready.
+  // opts: size, maxW, rotate, alpha, scale, align ('center'), fill, strokeW
+  function impact(ctx, str, x, y, opts) {
+    opts = opts || {};
+    const maxW = opts.maxW || FILM.W * 0.9;
+    let size = opts.size || 120;
+    let w = textWidth(ctx, str, Object.assign({}, opts, { size }));
+    if (w > maxW) size = size * (maxW / w);
+
+    ctx.save();
+    ctx.translate(x, y);
+    if (opts.rotate) ctx.rotate(opts.rotate);
+    const s = opts.scale == null ? 1 : opts.scale;
+    if (s !== 1) ctx.scale(s, s);
+    if (opts.alpha != null) ctx.globalAlpha = opts.alpha;
+
+    ctx.font = (opts.weight || '900') + ' ' + size + 'px ' + (opts.font || 'Arial Black, Arial, sans-serif');
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = opts.align || 'center';
+    ctx.lineJoin = 'round';
+    ctx.miterLimit = 2;
+
+    const spacing = opts.spacing || 0;
+    const drawPass = (dx, dy, mode) => {
+      if (spacing <= 0) {
+        if (mode === 'fill') {
+          ctx.fillStyle = opts.fill || pal.white;
+          ctx.fillText(str, dx, dy);
+        } else {
+          ctx.strokeStyle = mode === 'shadow' ? 'rgba(0,0,0,0.45)' : pal.ink;
+          ctx.lineWidth = (opts.strokeW || size * 0.14) * (mode === 'shadow' ? 1.15 : 1);
+          ctx.strokeText(str, dx, dy);
+        }
+        return;
+      }
+      // letter-spaced: manual
+      const chars = Array.from(str);
+      let tw = 0;
+      for (const ch of chars) tw += ctx.measureText(ch).width + spacing;
+      tw -= spacing;
+      let cx = (opts.align || 'center') === 'center' ? -tw / 2 : 0;
+      for (const ch of chars) {
+        if (mode === 'fill') {
+          ctx.fillStyle = opts.fill || pal.white;
+          ctx.fillText(ch, cx + dx, dy);
+        } else {
+          ctx.strokeStyle = mode === 'shadow' ? 'rgba(0,0,0,0.45)' : pal.ink;
+          ctx.lineWidth = (opts.strokeW || size * 0.14) * (mode === 'shadow' ? 1.15 : 1);
+          ctx.strokeText(ch, cx + dx, dy);
+        }
+        cx += ctx.measureText(ch).width + spacing;
+      }
+    };
+
+    drawPass(size * 0.045, size * 0.055, 'shadow');
+    drawPass(0, 0, 'stroke');
+    drawPass(0, 0, 'fill');
+
+    ctx.restore();
+    return w;
+  }
+
+  // ------------------------------------------------------------------
+  // backgrounds & fx
+  // ------------------------------------------------------------------
+
+  // Rotating rainbow sunburst — the meme stage light.
+  function rays(ctx, t, opts) {
+    opts = opts || {};
+    const colors = opts.colors || ['#FF3B30', '#FF8A00', '#FFE14D', '#37D67A', '#3ED8FF', '#8E5BFF', '#FF4FA3'];
+    const n = opts.count || 12;
+    const rot = t * (opts.speed || 0.6);
+    const cx = opts.x == null ? FILM.W / 2 : opts.x;
+    const cy = opts.y == null ? FILM.H / 2 : opts.y;
+    const R = Math.sqrt(FILM.W * FILM.W + FILM.H * FILM.H);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    for (let i = 0; i < n; i++) {
+      const a0 = (i / n) * Math.PI * 2;
+      const a1 = ((i + 0.5) / n) * Math.PI * 2;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.globalAlpha = opts.alpha == null ? 1 : opts.alpha;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, R, a0, a1);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  // Radial speed lines around the frame (zoom focus).
+  function speedLines(ctx, t, opts) {
+    opts = opts || {};
+    const cx = opts.x == null ? FILM.W / 2 : opts.x;
+    const cy = opts.y == null ? FILM.H / 2 : opts.y;
+    const n = opts.count || 40;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.strokeStyle = opts.color || 'rgba(255,255,255,0.8)';
+    ctx.lineCap = 'round';
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + hash(i, 3, 1) * 0.2;
+      const r0 = (opts.r0 || 380) + hash(i, 5, 2) * 120 + Math.sin(t * 6 + i) * 30;
+      const r1 = r0 + (opts.len || 260) * (0.5 + hash(i, 7, 3) * 0.5);
+      ctx.lineWidth = 4 + hash(i, 9, 4) * 8;
+      ctx.globalAlpha = (opts.alpha == null ? 0.7 : opts.alpha) * (0.4 + 0.6 * hash(i, 11, 5));
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
+      ctx.lineTo(Math.cos(a) * r1, Math.sin(a) * r1);
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  // Screen shake offset (seeded per frame).
+  function shake(t, amount, seed) {
+    const f = Math.floor(t * 24 + 1e-4);
+    return {
+      x: (hash(f, seed || 1, 21) - 0.5) * 2 * amount,
+      y: (hash(f, seed || 2, 22) - 0.5) * 2 * amount,
+    };
+  }
+
+  // Zoom punch wrapper: fn draws in film space; z punches around centre.
+  function punch(ctx, z, fn) {
+    ctx.save();
+    ctx.translate(FILM.W / 2, FILM.H / 2);
+    ctx.scale(z, z);
+    ctx.translate(-FILM.W / 2, -FILM.H / 2);
+    fn();
+    ctx.restore();
+  }
+
+  function explosion(ctx, x, y, r, k) {
+    // k in [0,1] over the blast; spiky star + rings + embers
+    const e = ease.outQuart(clamp01(k));
+    const fade = 1 - clamp01((k - 0.55) / 0.45);
+    if (fade <= 0) return;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.globalAlpha = fade;
+
+    // white core
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r * (0.35 + e * 1.1));
+    g.addColorStop(0, 'rgba(255,255,255,0.95)');
+    g.addColorStop(0.35, 'rgba(255,225,80,0.9)');
+    g.addColorStop(0.75, 'rgba(255,90,30,0.55)');
+    g.addColorStop(1, 'rgba(255,60,20,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(-r * 1.6, -r * 1.6, r * 3.2, r * 3.2);
+
+    // spikes
+    const spikes = 12;
+    ctx.fillStyle = '#FFE14D';
+    for (let i = 0; i < spikes; i++) {
+      const a = (i / spikes) * Math.PI * 2 + 0.2;
+      const len = r * (0.5 + e * 1.15) * (0.7 + 0.3 * hash(i, 4, 2));
+      ctx.save();
+      ctx.rotate(a);
+      ctx.beginPath();
+      ctx.moveTo(0, -len * 0.1);
+      ctx.lineTo(len, 0);
+      ctx.lineTo(0, len * 0.1);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // rings
+    for (let i = 0; i < 2; i++) {
+      const rr = r * (0.4 + e * 1.25 + i * 0.35);
+      ctx.strokeStyle = i === 0 ? '#FF8A00' : 'rgba(255,255,255,0.8)';
+      ctx.lineWidth = 14 * (1 - e * 0.5);
+      ctx.beginPath();
+      ctx.arc(0, 0, rr, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // embers
+    for (let i = 0; i < 14; i++) {
+      const a = hash(i, 8, 3) * Math.PI * 2;
+      const d = r * (0.3 + e * 1.5) * (0.5 + hash(i, 9, 4));
+      ctx.fillStyle = i % 2 ? '#FF3B30' : '#FFE14D';
+      ctx.beginPath();
+      ctx.arc(Math.cos(a) * d, Math.sin(a) * d, 10 + hash(i, 10, 5) * 16, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  function sparkle(ctx, x, y, s, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.globalAlpha = alpha == null ? 1 : alpha;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const r = i % 2 === 0 ? s : s * 0.36;
+      const px = Math.cos(a) * r;
+      const py = Math.sin(a) * r;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function checkerFloor(ctx, t, opts) {
+    opts = opts || {};
+    const y0 = opts.y0 == null ? FILM.H * 0.62 : opts.y0;
+    const c1 = opts.c1 || 'rgba(255,255,255,0.16)';
+    const c2 = opts.c2 || 'rgba(0,0,0,0.16)';
+    const rows = 9;
+    const scroll = (t * (opts.speed || 220)) % 120;
+    ctx.save();
+    for (let r = 0; r < rows; r++) {
+      const k = r / rows;
+      const yA = y0 + Math.pow(k, 1.5) * (FILM.H - y0) + scroll * Math.pow(k, 1.5);
+      const yB = y0 + Math.pow((r + 1) / rows, 1.5) * (FILM.H - y0) + scroll * Math.pow((r + 1) / rows, 1.5);
+      const cols = 8 + r * 2;
+      for (let c = 0; c < cols; c++) {
+        const xA = -FILM.W * 0.2 + (FILM.W * 1.4 * c) / cols;
+        const xB = -FILM.W * 0.2 + (FILM.W * 1.4 * (c + 1)) / cols;
+        ctx.fillStyle = (r + c) % 2 === 0 ? c1 : c2;
+        ctx.beginPath();
+        ctx.moveTo(xA, yA);
+        ctx.lineTo(xB, yA);
+        ctx.lineTo(xB + (xB - FILM.W / 2) * 0.12, yB);
+        ctx.lineTo(xA + (xA - FILM.W / 2) * 0.12, yB);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // characters
+  // ------------------------------------------------------------------
+
+  // Sneaker (chunky cartoon shoe).
+  function sneaker(ctx, s, color) {
+    ctx.fillStyle = color || '#FF3B30';
+    ctx.strokeStyle = pal.ink;
+    ctx.lineWidth = 8;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.5, -s * 0.18);
+    ctx.lineTo(s * 0.28, -s * 0.3);
+    ctx.quadraticCurveTo(s * 0.95, -s * 0.22, s * 0.95, s * 0.22);
+    ctx.quadraticCurveTo(s * 0.5, s * 0.42, -s * 0.5, s * 0.3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // sole
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.5, s * 0.16);
+    ctx.quadraticCurveTo(s * 0.4, s * 0.42, s * 0.95, s * 0.22);
+    ctx.quadraticCurveTo(s * 0.5, s * 0.55, -s * 0.5, s * 0.36);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  // Lemon body with cartoon face.
+  // opts: x, y, r, rot, mood ('scream'|'happy'|'angry'|'sus'), blink (0..1),
+  //       sunglasses, crown, laser (0..1), t
+  function lemonHead(ctx, t, opts) {
+    opts = opts || {};
+    const r = opts.r || 160;
+    const mood = opts.mood || 'happy';
+    const rot = opts.rot || 0;
+
+    ctx.save();
+    ctx.translate(opts.x || 0, opts.y || 0);
+    ctx.rotate(rot);
+
+    // body: ellipse with tips at both ends
+    const g = ctx.createLinearGradient(0, -r, 0, r);
+    g.addColorStop(0, pal.lemonLight);
+    g.addColorStop(0.55, pal.lemon);
+    g.addColorStop(1, pal.lemonDark);
+    ctx.fillStyle = g;
+    ctx.strokeStyle = pal.ink;
+    ctx.lineWidth = Math.max(6, r * 0.055);
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-r * 1.28, 0);
+    ctx.quadraticCurveTo(-r * 1.1, -r * 0.42, -r * 0.86, -r * 0.52);
+    ctx.quadraticCurveTo(0, -r * 1.12, r * 0.86, -r * 0.52);
+    ctx.quadraticCurveTo(r * 1.1, -r * 0.42, r * 1.28, 0);
+    ctx.quadraticCurveTo(r * 1.1, r * 0.42, r * 0.86, r * 0.52);
+    ctx.quadraticCurveTo(0, r * 1.12, -r * 0.86, r * 0.52);
+    ctx.quadraticCurveTo(-r * 1.1, r * 0.42, -r * 1.28, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // nubs
+    ctx.fillStyle = pal.lemonDark;
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      ctx.ellipse(side * r * 1.3, 0, r * 0.12, r * 0.09, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // shine
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.35, -r * 0.55, r * 0.28, r * 0.12, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ---- face ----
+    const blink = opts.blink || 0;
+    const eyY = -r * 0.12;
+    const eyDx = r * 0.34;
+    for (const side of [-1, 1]) {
+      // white
+      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = pal.ink;
+      ctx.lineWidth = Math.max(5, r * 0.045);
+      ctx.beginPath();
+      if (blink > 0.5) {
+        ctx.ellipse(side * eyDx, eyY, r * 0.22, r * 0.03, 0, 0, Math.PI * 2);
+      } else {
+        ctx.ellipse(side * eyDx, eyY, r * 0.22, r * 0.26, 0, 0, Math.PI * 2);
+      }
+      ctx.fill();
+      ctx.stroke();
+      if (blink <= 0.5) {
+        // pupil (slightly toward centre)
+        ctx.fillStyle = pal.ink;
+        ctx.beginPath();
+        ctx.arc(side * eyDx - side * r * 0.05, eyY + r * 0.03, r * 0.1, 0, Math.PI * 2);
+        ctx.fill();
+        if (opts.laser > 0) {
+          ctx.fillStyle = pal.red;
+          ctx.beginPath();
+          ctx.arc(side * eyDx - side * r * 0.05, eyY + r * 0.03, r * 0.06, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      // eyebrow
+      ctx.strokeStyle = pal.ink;
+      ctx.lineWidth = Math.max(7, r * 0.06);
+      ctx.lineCap = 'round';
+      const bAng = mood === 'angry' || mood === 'scream' ? side * 0.5 : -side * 0.12;
+      ctx.beginPath();
+      ctx.moveTo(side * eyDx - r * 0.18, eyY - r * 0.34);
+      ctx.lineTo(side * eyDx + r * 0.18, eyY - r * 0.34 + Math.sin(bAng) * r * 0.12);
+      ctx.stroke();
+    }
+
+    // mouth
+    ctx.fillStyle = '#7A1B1B';
+    ctx.strokeStyle = pal.ink;
+    ctx.lineWidth = Math.max(5, r * 0.045);
+    ctx.beginPath();
+    if (mood === 'scream') {
+      ctx.ellipse(r * 0.02, r * 0.42, r * 0.3, r * 0.34, 0, 0, Math.PI * 2);
+    } else if (mood === 'angry') {
+      ctx.moveTo(-r * 0.3, r * 0.48);
+      ctx.quadraticCurveTo(0, r * 0.3, r * 0.3, r * 0.48);
+      ctx.quadraticCurveTo(0, r * 0.62, -r * 0.3, r * 0.48);
+    } else if (mood === 'sus') {
+      ctx.ellipse(r * 0.16, r * 0.4, r * 0.16, r * 0.1, 0, 0, Math.PI * 2);
+    } else {
+      ctx.moveTo(-r * 0.34, r * 0.32);
+      ctx.quadraticCurveTo(0, r * 0.72, r * 0.34, r * 0.32);
+      ctx.quadraticCurveTo(0, r * 0.42, -r * 0.34, r * 0.32);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    if (mood === 'scream') {
+      // tongue
+      ctx.fillStyle = '#E8556D';
+      ctx.beginPath();
+      ctx.ellipse(r * 0.02, r * 0.62, r * 0.18, r * 0.12, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // sunglasses
+    if (opts.sunglasses) {
+      ctx.fillStyle = pal.ink;
+      ctx.beginPath();
+      ctx.roundRect(-r * 0.62, eyY - r * 0.16, r * 0.52, r * 0.3, r * 0.08);
+      ctx.roundRect(r * 0.1, eyY - r * 0.16, r * 0.52, r * 0.3, r * 0.08);
+      ctx.fill();
+      ctx.fillRect(-r * 0.12, eyY - r * 0.05, r * 0.24, r * 0.06);
+    }
+
+    // crown
+    if (opts.crown) {
+      ctx.fillStyle = '#FFD23F';
+      ctx.strokeStyle = pal.ink;
+      ctx.lineWidth = Math.max(5, r * 0.045);
+      ctx.beginPath();
+      ctx.moveTo(-r * 0.5, -r * 0.92);
+      ctx.lineTo(-r * 0.34, -r * 1.32);
+      ctx.lineTo(-r * 0.12, -r * 1.02);
+      ctx.lineTo(0, -r * 1.42);
+      ctx.lineTo(r * 0.12, -r * 1.02);
+      ctx.lineTo(r * 0.34, -r * 1.32);
+      ctx.lineTo(r * 0.5, -r * 0.92);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  // Full character: lemon head + arms + legs + sneakers, bouncing on the beat.
+  // opts: x, y, r, t, phase, mood, sunglasses, armSwing, bounce
+  function lemonChar(ctx, t, opts) {
+    opts = opts || {};
+    const r = opts.r || 150;
+    const x = opts.x || 0;
+    const y = opts.y || 0;
+    const phase = opts.phase || 0;
+    const bounce = Math.abs(Math.sin((t + phase) * Math.PI * 2 * 2)) * (opts.bounce == null ? 1 : opts.bounce);
+    const yy = y - bounce * r * 0.16;
+    const swing = Math.sin((t + phase) * Math.PI * 4) * (opts.armSwing == null ? 1 : opts.armSwing);
+
+    // legs
+    ctx.strokeStyle = pal.ink;
+    ctx.lineWidth = r * 0.14;
+    ctx.lineCap = 'round';
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(x + side * r * 0.42, yy + r * 0.82);
+      ctx.lineTo(x + side * r * 0.52, yy + r * 1.42 - bounce * r * 0.1);
+      ctx.stroke();
+      ctx.save();
+      ctx.translate(x + side * r * 0.52, yy + r * 1.55 - bounce * r * 0.1);
+      ctx.rotate(side * 0.12);
+      sneaker(ctx, r * 0.52, side > 0 ? pal.red : pal.blue);
+      ctx.restore();
+    }
+
+    // arms
+    for (const side of [-1, 1]) {
+      ctx.save();
+      ctx.translate(x + side * r * 1.02, yy + r * 0.12);
+      ctx.rotate(side * (0.6 + swing * 0.55 * side));
+      ctx.strokeStyle = pal.ink;
+      ctx.lineWidth = r * 0.13;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(side * r * 0.62, r * 0.34);
+      ctx.stroke();
+      // hand
+      ctx.fillStyle = pal.lemon;
+      ctx.beginPath();
+      ctx.arc(side * r * 0.68, r * 0.38, r * 0.16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = r * 0.045;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    lemonHead(ctx, t, {
+      x,
+      y: yy,
+      r,
+      mood: opts.mood,
+      sunglasses: opts.sunglasses,
+      crown: opts.crown,
+      blink: opts.blink,
+      laser: opts.laser,
+      rot: swing * 0.04,
+    });
+  }
+
+  // Ceramic toilet (skibidi grammar).
+  function toilet(ctx, t, opts) {
+    opts = opts || {};
+    const x = opts.x || FILM.W / 2;
+    const y = opts.y || FILM.H * 0.72;
+    const s = opts.s || 1;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(s, s);
+    ctx.strokeStyle = pal.ink;
+    ctx.lineWidth = 12;
+    ctx.lineJoin = 'round';
+
+    // tank
+    ctx.fillStyle = '#F2F6FA';
+    ctx.beginPath();
+    ctx.roundRect(-150, -430, 300, 220, 24);
+    ctx.fill();
+    ctx.stroke();
+    // flush button
+    ctx.fillStyle = '#C9D6E2';
+    ctx.beginPath();
+    ctx.arc(0, -360, 26, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // bowl
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.moveTo(-190, -210);
+    ctx.quadraticCurveTo(-210, 40, -120, 120);
+    ctx.lineTo(120, 120);
+    ctx.quadraticCurveTo(210, 40, 190, -210);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // seat (open)
+    ctx.fillStyle = '#E8F0F6';
+    ctx.beginPath();
+    ctx.ellipse(0, -215, 205, 58, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#2A3440';
+    ctx.beginPath();
+    ctx.ellipse(0, -215, 150, 38, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // base
+    ctx.fillStyle = '#F2F6FA';
+    ctx.beginPath();
+    ctx.roundRect(-90, 110, 180, 120, 16);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.roundRect(-130, 215, 260, 46, 14);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // Lemoncopter: lemon body, rotor, tail, windows.
+  function lemoncopter(ctx, t, opts) {
+    opts = opts || {};
+    const x = opts.x || 0;
+    const y = opts.y || 0;
+    const s = opts.s || 1;
+    const rotor = t * 22;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(s, s);
+    if (opts.flip) ctx.scale(-1, 1);
+
+    // rotor blur
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = '#CBD5E1';
+    ctx.lineWidth = 16;
+    ctx.beginPath();
+    ctx.moveTo(-320, -190);
+    ctx.lineTo(320, -190);
+    ctx.stroke();
+    ctx.restore();
+    // rotor blades
+    ctx.fillStyle = '#8FA0B0';
+    ctx.strokeStyle = pal.ink;
+    ctx.lineWidth = 8;
+    for (const side of [-1, 1]) {
+      ctx.save();
+      ctx.translate(0, -185);
+      ctx.rotate(Math.sin(rotor) * 0.12 * side);
+      ctx.beginPath();
+      ctx.roundRect(side > 0 ? 10 : -260, -14, 250, 26, 10);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+    // mast
+    ctx.fillStyle = '#8FA0B0';
+    ctx.fillRect(-18, -190, 36, 60);
+    ctx.strokeRect(-18, -190, 36, 60);
+
+    // body = lemon
+    lemonHead(ctx, t, {
+      x: 0,
+      y: 20,
+      r: 130,
+      mood: opts.mood || 'happy',
+      sunglasses: true,
+    });
+
+    // tail boom
+    ctx.fillStyle = pal.lemonDark;
+    ctx.strokeStyle = pal.ink;
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(150, 0);
+    ctx.lineTo(330, -40);
+    ctx.lineTo(330, 20);
+    ctx.lineTo(150, 60);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // tail rotor
+    ctx.save();
+    ctx.translate(330, -12);
+    ctx.rotate(rotor * 1.4);
+    ctx.fillStyle = '#8FA0B0';
+    for (let i = 0; i < 3; i++) {
+      ctx.rotate((Math.PI * 2) / 3);
+      ctx.fillRect(-8, -70, 16, 70);
+    }
+    ctx.restore();
+
+    // skids
+    ctx.strokeStyle = pal.ink;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(-120, 150);
+    ctx.lineTo(120, 150);
+    ctx.moveTo(-80, 120);
+    ctx.lineTo(-80, 150);
+    ctx.moveTo(80, 120);
+    ctx.lineTo(80, 150);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // Simple city block.
+  function building(ctx, x, y, w, h, color, seed) {
+    ctx.fillStyle = color;
+    ctx.strokeStyle = pal.ink;
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.rect(x, y - h, w, h);
+    ctx.fill();
+    ctx.stroke();
+    const cols = Math.max(2, Math.floor(w / 70));
+    const rows = Math.max(2, Math.floor(h / 90));
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const lit = hash(r, c, seed || 1) > 0.45;
+        ctx.fillStyle = lit ? '#FFE14D' : '#22303E';
+        ctx.fillRect(x + 18 + c * (w - 36) / cols, y - h + 18 + r * (h - 36) / rows, (w - 36) / cols * 0.62, (h - 36) / rows * 0.5);
+      }
+    }
+  }
+
+  const lib = {
+    hash,
+    rng,
+    clamp,
+    clamp01,
+    lerp,
+    smooth,
+    noise1,
+    ease,
+    beat,
+    pal,
+    impact,
+    textWidth,
+    rays,
+    speedLines,
+    shake,
+    punch,
+    explosion,
+    sparkle,
+    checkerFloor,
+    sneaker,
+    lemonHead,
+    lemonChar,
+    toilet,
+    lemoncopter,
+    building,
+  };
+  FILM.lib = Object.freeze(lib);
+})();
+
+</script>
+  <script>
+// FILM.TIMELINE: the shot list for «ЛИМОННЫЙ БРЕЙНРОТ».
+// 150 bpm: a beat is 0.4 s. Every cut sits on the beat grid.
+(function () {
+  'use strict';
+  const FILM = window.FILM;
+
+  FILM.TIMELINE = {
+    title: 'ЛИМОННЫЙ БРЕЙНРОТ',
+    bpm: 150,
+    duration: 38,
+    fps: 24,
+    width: 1080,
+    height: 1920,
+    shots: [
+      {
+        id: 'hook',
+        start: 0,
+        end: 1.2,
+        title: 'Хук',
+        brief: 'Скриминг-лимон в упор, лучи, тряска. «БУ!!!» и «ЭТО СКИБИДИ?!» влетают ударами.',
+      },
+      {
+        id: 'title',
+        start: 1.2,
+        end: 2.8,
+        title: 'Титры',
+        brief: 'Слэм-титр ЛИМОННЫЙ БРЕЙНРОТ на радужных лучах и диско-полу.',
+      },
+      {
+        id: 'lemonello',
+        start: 2.8,
+        end: 6.0,
+        title: 'Лимонелло',
+        brief: 'ЛИМОНЕЛЛО КАПУЧИНЕЛЛО танцует на сцене, имя влетает по слогам.',
+      },
+      {
+        id: 'toilet',
+        start: 6.0,
+        end: 9.2,
+        title: 'Туалет',
+        brief: 'Скибиди-дань: лимонная голова выскакивает из унитаза на каждый «доп-доп».',
+      },
+      {
+        id: 'parrot',
+        start: 9.2,
+        end: 12.0,
+        title: 'Попугай',
+        brief: 'ЛИМОНЧЕЛЛО ПАРОТТО летит над городом и бомбит соком.',
+      },
+      {
+        id: 'kaiju',
+        start: 12.0,
+        end: 15.6,
+        title: 'Кайдзю',
+        brief: 'Гигантский лимон идёт по городу, каждый шаг — тряска и удар.',
+      },
+      {
+        id: 'battle',
+        start: 15.6,
+        end: 19.2,
+        title: 'Битва',
+        brief: 'ЛИМОНКОПТЕР против кайдзю: лазерные глаза, взрывы, вспышки.',
+      },
+      {
+        id: 'sixseven',
+        start: 19.2,
+        end: 21.2,
+        title: '6-7',
+        brief: 'Магия шести-семи: цифры влетают под два сабовых удара.',
+      },
+      {
+        id: 'factory',
+        start: 21.2,
+        end: 24.4,
+        title: 'Завод',
+        brief: 'Конвейер лимонов, среди них лимон в костюме апельсина. ПАЛИМ ЕГО.',
+      },
+      {
+        id: 'dance',
+        start: 24.4,
+        end: 28,
+        title: 'Танцы',
+        brief: 'Все три персонажа пляшут под диско-шаром: ТАНЦУЙ КАК ЛИМОН.',
+      },
+      {
+        id: 'aura',
+        start: 28,
+        end: 31.2,
+        title: 'Форма',
+        brief: 'Предельная форма: корона, лазерные глаза, радужная аура, молнии.',
+      },
+      {
+        id: 'versus',
+        start: 31.2,
+        end: 33.6,
+        title: 'VS',
+        brief: 'Лимон против апельсина. КТО ПОБЕДИЛ? В КОММЕНТЫ.',
+      },
+      {
+        id: 'outro',
+        start: 33.6,
+        end: 38,
+        title: 'Финал',
+        brief: 'ПОДПИШИСЬ — или лимон найдёт тебя. Финальный чант.',
+      },
+    ],
+  };
+})();
+
+</script>
+  <script>
+// 01-hook : screaming lemon in your face. Скрим-хук первые полторы секунды.
+FILM.scene({
+  id: 'hook',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    // Red-hot radial background over rainbow rays.
+    lib.rays(ctx, t, { speed: 1.6, count: 14, alpha: 0.9 });
+    const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 4);
+    const g = ctx.createRadialGradient(W / 2, H * 0.45, 80, W / 2, H * 0.45, W * 0.9);
+    g.addColorStop(0, 'rgba(255,60,30,' + (0.25 + 0.2 * pulse) + ')');
+    g.addColorStop(0.55, 'rgba(255,30,60,0.32)');
+    g.addColorStop(1, 'rgba(120,0,40,0.75)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    const sh = lib.shake(t, 22, 5);
+    const zoom = 1.35 + lib.beat(t, 0.4) * 0.1;
+
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+    lib.punch(ctx, zoom, () => {
+      lib.speedLines(ctx, t, { count: 34, r0: 420, len: 320, color: 'rgba(255,255,255,0.55)', alpha: 0.5 });
+      lib.lemonHead(ctx, t, {
+        x: W / 2,
+        y: H * 0.46,
+        r: 360,
+        mood: 'scream',
+        blink: Math.floor(t * 6) % 2 === 0 && t > 0.8 ? 0.6 : 0,
+      });
+    });
+    ctx.restore();
+
+    // Captions slam in.
+    const s1 = lib.ease.outBack(lib.clamp01(t / 0.18));
+    lib.impact(ctx, 'БУ!!!', W / 2, H * 0.16, {
+      size: 200,
+      scale: 0.4 + s1 * 0.6,
+      rotate: -0.06,
+      fill: lib.pal.red,
+      maxW: W * 0.7,
+    });
+
+    if (t > 0.55) {
+      const s2 = lib.ease.outBack(lib.clamp01((t - 0.55) / 0.22));
+      lib.impact(ctx, 'ЭТО СКИБИДИ?!', W / 2, H * 0.86, {
+        size: 128,
+        scale: 0.3 + s2 * 0.7,
+        rotate: 0.04,
+        maxW: W * 0.86,
+      });
+    }
+
+    // star sparks on the beats
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 + t * 2;
+      const r = 380 + lib.beat(t, 0.4) * 80;
+      lib.sparkle(ctx, W / 2 + Math.cos(a) * r, H * 0.46 + Math.sin(a) * r, 34 + lib.hash(i, 3, 1) * 22, 0.9);
+    }
+  },
+});
+
+</script>
+  <script>
+// 02-title : slam title on the meme stage.
+FILM.scene({
+  id: 'title',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    lib.rays(ctx, t, { speed: 0.55, count: 16, alpha: 1 });
+    lib.checkerFloor(ctx, t, { y0: H * 0.62, speed: 260 });
+
+    const sh = lib.shake(t, 8, 3);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // two slam lines: «ЛИМОННЫЙ» then «БРЕЙНРОТ»
+    const s1 = lib.ease.outElastic(lib.clamp01(t / 0.45));
+    lib.impact(ctx, 'ЛИМОННЫЙ', W / 2, H * 0.38, {
+      size: 210,
+      scale: 1.6 - s1 * 0.6,
+      rotate: -0.05 + s1 * 0.02,
+      fill: lib.pal.lemon,
+      maxW: W * 0.88,
+    });
+
+    if (t > 0.35) {
+      const s2 = lib.ease.outElastic(lib.clamp01((t - 0.35) / 0.45));
+      lib.impact(ctx, 'БРЕЙНРОТ', W / 2, H * 0.52, {
+        size: 210,
+        scale: 1.6 - s2 * 0.6,
+        rotate: 0.05 - s2 * 0.02,
+        fill: lib.pal.orange,
+        maxW: W * 0.88,
+      });
+    }
+
+    // ribbon with the formula
+    if (t > 0.9) {
+      const a = lib.clamp01((t - 0.9) / 0.3);
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.translate(0, lib.ease.outBack(a) * 30 - 30);
+      ctx.fillStyle = lib.pal.ink;
+      ctx.fillRect(W * 0.08, H * 0.585, W * 0.84, 128);
+      lib.impact(ctx, 'СКИБИДИ ДОП ДОП · ДА ДА ЕС ЕС', W / 2, H * 0.585 + 92, {
+        size: 58,
+        fill: lib.pal.cyan,
+        maxW: W * 0.78,
+        strokeW: 8,
+      });
+      ctx.restore();
+    }
+    ctx.restore();
+
+    // orbiting sparks
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2 + t * 1.4;
+      const r = 320 + 60 * Math.sin(t * 2 + i);
+      lib.sparkle(ctx, W / 2 + Math.cos(a) * r * 1.6, H * 0.45 + Math.sin(a) * r, 26 + lib.hash(i, 9, 2) * 26, 0.95);
+    }
+  },
+});
+
+</script>
+  <script>
+// 03-lemonello : LEMONELLO KAPUCHINELLO dances on stage, his name slams in.
+FILM.scene({
+  id: 'lemonello',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    lib.rays(ctx, t, { speed: 0.8, count: 18, alpha: 1 });
+    lib.checkerFloor(ctx, t, { y0: H * 0.66, speed: 320 });
+
+    // stage glow
+    const g = ctx.createRadialGradient(W / 2, H * 0.62, 60, W / 2, H * 0.62, W * 0.7);
+    g.addColorStop(0, 'rgba(255,255,255,0.35)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    const sh = lib.shake(t, 6, 7);
+    const zoom = 1 + lib.beat(t, 0.8) * 0.05;
+
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+    lib.punch(ctx, zoom, () => {
+      // the man himself
+      lib.lemonChar(ctx, t, {
+        x: W / 2,
+        y: H * 0.56,
+        r: 190,
+        mood: 'happy',
+        sunglasses: t > 2.2,
+        bounce: 1,
+      });
+
+      // steam cup in his raised hand — капучино!
+      const swing = Math.sin(t * Math.PI * 4);
+      ctx.save();
+      ctx.translate(W / 2 + 190 * 1.02 + 0.62 * 190, H * 0.56 - Math.abs(swing) * 30 + 0.34 * 190);
+      ctx.rotate(-0.3 + swing * 0.2);
+      ctx.fillStyle = '#FFF7E8';
+      ctx.strokeStyle = lib.pal.ink;
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(-46, -40);
+      ctx.lineTo(46, -40);
+      ctx.lineTo(34, 52);
+      ctx.lineTo(-34, 52);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      // foam + steam
+      ctx.fillStyle = '#C98A4B';
+      ctx.beginPath();
+      ctx.ellipse(0, -38, 48, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      ctx.lineWidth = 10;
+      for (let i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * 26, -56);
+        ctx.quadraticCurveTo(i * 26 + 18, -96, i * 26 - 6, -132);
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
+    ctx.restore();
+
+    // name slam
+    const n1 = lib.ease.outBack(lib.clamp01((t - 0.15) / 0.3));
+    lib.impact(ctx, 'ЛИМОНЕЛЛО', W / 2, H * 0.16, {
+      size: 150,
+      scale: 2 - n1,
+      rotate: -0.03,
+      fill: lib.pal.lemon,
+      maxW: W * 0.9,
+    });
+    if (t > 0.55) {
+      const n2 = lib.ease.outBack(lib.clamp01((t - 0.55) / 0.3));
+      lib.impact(ctx, 'КАПУЧИНЕЛЛО', W / 2, H * 0.235, {
+        size: 118,
+        scale: 2 - n2,
+        rotate: 0.03,
+        fill: lib.pal.orange,
+        maxW: W * 0.9,
+      });
+    }
+    if (t > 1.6) {
+      const a = lib.clamp01((t - 1.6) / 0.3);
+      lib.impact(ctx, 'лимон + капучино = скибиди', W / 2, H * 0.93, {
+        size: 56,
+        alpha: a,
+        fill: lib.pal.cyan,
+        maxW: W * 0.82,
+        strokeW: 8,
+      });
+    }
+  },
+});
+
+</script>
+  <script>
+// 04-toilet : the skibidi homage — a lemon head popping out of a toilet on every ДОП.
+FILM.scene({
+  id: 'toilet',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    // bathroom tile wall
+    lib.rays(ctx, t * 0.15, { speed: 0.1, count: 2, alpha: 1, colors: ['#BFE8F2', '#A8DDEE'] });
+    const tile = 120;
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    for (let y = 0; y < H * 0.72; y += tile) {
+      for (let x = ((y / tile) % 2) * tile; x < W; x += tile * 2) {
+        ctx.fillRect(x, y, tile, tile);
+      }
+    }
+    ctx.strokeStyle = 'rgba(70,130,160,0.35)';
+    ctx.lineWidth = 4;
+    for (let y = 0; y <= H * 0.72; y += tile) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+    for (let x = 0; x <= W; x += tile) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H * 0.72);
+      ctx.stroke();
+    }
+    // floor
+    ctx.fillStyle = '#7FB6C9';
+    ctx.fillRect(0, H * 0.72, W, H * 0.28);
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.fillRect(0, H * 0.72, W, 26);
+
+    const sh = lib.shake(t, 7 + lib.beat(t, 0.8) * 10, 11);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // toilet
+    lib.toilet(ctx, t, { x: W / 2, y: H * 0.62, s: 1.35 });
+
+    // head pops on every 0.8 s (the ДОП-ДОП)
+    const pop = lib.beat(t, 0.8);
+    const headY = H * 0.62 - 300 - pop * 260;
+    const zoom = 1 + pop * 0.07;
+    lib.punch(ctx, zoom, () => {
+      // water splash when he is down
+      if (pop < 0.35) {
+        ctx.fillStyle = 'rgba(160,220,255,0.75)';
+        for (let i = 0; i < 8; i++) {
+          const a = -Math.PI / 2 + (i / 8 - 0.5) * 2.2;
+          const d = (1 - pop / 0.35) * 130;
+          ctx.beginPath();
+          ctx.arc(W / 2 + Math.cos(a) * (90 + d), H * 0.62 - 260 + Math.sin(a) * d * 0.6, 26, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      lib.lemonHead(ctx, t, {
+        x: W / 2,
+        y: headY,
+        r: 175,
+        mood: pop > 0.6 ? 'scream' : 'happy',
+        blink: pop < 0.25 ? 0.8 : 0,
+      });
+    });
+    ctx.restore();
+
+    // captions alternate ДОП ДОП / ДА ДА
+    const phrase = Math.floor(t / 0.8) % 2 === 0 ? 'ДОП ДОП' : 'ДА ДА';
+    const cs = lib.ease.outBack(pop);
+    lib.impact(ctx, phrase, W / 2, H * 0.17, {
+      size: 170,
+      scale: 0.6 + cs * 0.5,
+      rotate: (lib.hash(Math.floor(t / 0.8), 2, 1) - 0.5) * 0.14,
+      fill: Math.floor(t / 0.8) % 2 === 0 ? lib.pal.red : lib.pal.cyan,
+      maxW: W * 0.75,
+    });
+
+    if (t > 2.2) {
+      lib.impact(ctx, 'он в унитазе. это нормально.', W / 2, H * 0.94, {
+        size: 52,
+        alpha: lib.clamp01((t - 2.2) / 0.3),
+        fill: lib.pal.white,
+        maxW: W * 0.85,
+        strokeW: 7,
+      });
+    }
+  },
+});
+
+</script>
+  <script>
+// 05-parrot : LIMONCHELLO PAROTTO flies over the city dropping juice bombs.
+FILM.scene({
+  id: 'parrot',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    // sky
+    lib.rays(ctx, t * 0.3, { speed: 0.18, count: 10, alpha: 1, colors: ['#3ED8FF', '#7FE9FF', '#2E7CFF', '#9FF0FF'] });
+    // clouds
+    for (let i = 0; i < 5; i++) {
+      const r = lib.hash(i, 21, 1);
+      const x = ((t * (40 + r * 50) + r * W * 1.7) % (W * 1.5)) - W * 0.2;
+      const y = H * (0.1 + r * 0.28);
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      for (let c = 0; c < 4; c++) {
+        ctx.beginPath();
+        ctx.arc(x + c * 60 - 90, y + Math.sin(c * 2) * 18, 55 + lib.hash(c, i, 2) * 30, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    // city bottom
+    const colors = ['#37485C', '#2C3A4C', '#41566E', '#243244'];
+    for (let i = 0; i < 6; i++) {
+      lib.building(ctx, i * 200 - 40, H * 0.97, 170, 260 + lib.hash(i, 31, 1) * 320, colors[i % 4], i);
+    }
+
+    // fly path: arc across the frame
+    const k = lib.clamp01(t / 2.8);
+    const fx = -200 + k * (W + 400);
+    const fy = H * 0.3 + Math.sin(k * Math.PI * 1.2) * 120 + Math.sin(t * 6) * 22;
+    const flap = Math.sin(t * 9);
+
+    const sh = lib.shake(t, 5, 13);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // speed lines behind
+    lib.speedLines(ctx, t, { x: fx, y: fy, count: 26, r0: 220, len: 260, color: 'rgba(255,255,255,0.7)', alpha: 0.5 });
+
+    // wings
+    for (const side of [-1, 1]) {
+      ctx.save();
+      ctx.translate(fx, fy + 20);
+      ctx.rotate(side * (0.5 + flap * 0.55));
+      ctx.fillStyle = '#FFB100';
+      ctx.strokeStyle = lib.pal.ink;
+      ctx.lineWidth = 12;
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(side * 210, -110);
+      ctx.lineTo(side * 320, -40);
+      ctx.lineTo(side * 180, 60);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      // feathers
+      for (let f = 0; f < 3; f++) {
+        ctx.beginPath();
+        ctx.moveTo(side * (120 + f * 50), -60 + f * 12);
+        ctx.lineTo(side * (150 + f * 60), 20 + f * 10);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // body = lemon with parrot beak
+    lib.lemonHead(ctx, t, { x: fx, y: fy, r: 150, mood: 'angry' });
+    // beak
+    ctx.fillStyle = '#FF8A00';
+    ctx.strokeStyle = lib.pal.ink;
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(fx + 150, fy - 10);
+    ctx.quadraticCurveTo(fx + 300, fy + 20, fx + 160, fy + 80);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // crest
+    for (let f = 0; f < 3; f++) {
+      ctx.fillStyle = '#FF4FA3';
+      ctx.beginPath();
+      ctx.moveTo(fx - 20 + f * 40, fy - 150);
+      ctx.lineTo(fx + 10 + f * 40, fy - 240 - f * 20);
+      ctx.lineTo(fx + 46 + f * 40, fy - 140);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // juice bombs falling on beats
+    for (let i = 0; i < 4; i++) {
+      const bt = 0.5 + i * 0.7;
+      const dt = t - bt;
+      if (dt > 0 && dt < 1.1) {
+        const bx = fx - 120 - i * 60;
+        const by = fy + 120 + dt * dt * 2400;
+        if (by < H * 0.86) {
+          // droplet
+          ctx.fillStyle = '#FFE14D';
+          ctx.strokeStyle = lib.pal.ink;
+          ctx.lineWidth = 8;
+          ctx.beginPath();
+          ctx.ellipse(bx, by, 34, 46, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          lib.explosion(ctx, bx, H * 0.86, 120, dt - 0.28);
+        }
+      }
+    }
+    ctx.restore();
+
+    // captions
+    const words = ['ФИУ', 'ФИУ', 'БАМ!'];
+    const wi = Math.min(2, Math.floor(t / 0.9));
+    const cs = lib.ease.outBack(lib.beat(t, 0.9));
+    lib.impact(ctx, words[wi], W / 2, H * 0.86, {
+      size: wi === 2 ? 220 : 150,
+      scale: 0.5 + cs * 0.6,
+      rotate: (wi - 1) * 0.05,
+      fill: wi === 2 ? lib.pal.red : lib.pal.white,
+      maxW: W * 0.6,
+    });
+    if (t > 1.8) {
+      lib.impact(ctx, 'ЛИМОНЧЕЛЛО ПАРОТТО', W / 2, H * 0.13, {
+        size: 92,
+        alpha: lib.clamp01((t - 1.8) / 0.3),
+        fill: lib.pal.lemon,
+        maxW: W * 0.88,
+        strokeW: 10,
+      });
+    }
+  },
+});
+
+</script>
+  <script>
+// 06-kaiju : a giant lemon walks through the city. Every step shakes the frame.
+FILM.scene({
+  id: 'kaiju',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    // angry sky
+    lib.rays(ctx, t * 0.4, { speed: 0.12, count: 12, alpha: 1, colors: ['#FF5A2A', '#FF8A00', '#FFB300', '#FF4FA3'] });
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, 'rgba(120,20,60,0.35)');
+    sky.addColorStop(0.6, 'rgba(255,90,40,0.12)');
+    sky.addColorStop(1, 'rgba(60,10,40,0.5)');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    // step beat: 0.8 s
+    const step = lib.beat(t, 0.8);
+    const sh = lib.shake(t, 10 + step * 26, 17);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // giant lemon behind the skyline
+    const gx = W * 0.52 + Math.sin(t * 0.7) * 90;
+    const gy = H * 0.34 + step * 40;
+    lib.punch(ctx, 1 + step * 0.03, () => {
+      lib.lemonHead(ctx, t, {
+        x: gx,
+        y: gy,
+        r: 470,
+        mood: 'angry',
+        blink: 0,
+      });
+    });
+
+    // fleeing cars on the ground line
+    for (let i = 0; i < 4; i++) {
+      const r = lib.hash(i, 41, 1);
+      const dir = i % 2 === 0 ? -1 : 1;
+      const speed = 320 + r * 200;
+      const x = dir > 0 ? ((t * speed + r * W * 2) % (W * 1.6)) - W * 0.3 : W + W * 0.3 - ((t * speed + r * W * 2) % (W * 1.6));
+      const y = H * 0.885 - (i % 2) * 60;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(dir, 1);
+      ctx.fillStyle = ['#FF3B30', '#3ED8FF', '#FFD23F', '#37D67A'][i];
+      ctx.strokeStyle = lib.pal.ink;
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.roundRect(-90, -46, 180, 66, 18);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.roundRect(-46, -86, 108, 48, 12);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = lib.pal.ink;
+      ctx.beginPath();
+      ctx.arc(-52, 26, 24, 0, Math.PI * 2);
+      ctx.arc(52, 26, 24, 0, Math.PI * 2);
+      ctx.fill();
+      // panic smoke
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.beginPath();
+      ctx.arc(-110, -30, 22, 0, Math.PI * 2);
+      ctx.arc(-140, -52, 16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // foreground buildings (the lemon stands among them)
+    const colors = ['#37485C', '#2C3A4C', '#41566E', '#243244'];
+    for (let i = 0; i < 7; i++) {
+      const w = 180;
+      const x = i * 175 - 60 + Math.sin(t * 0.7) * 20;
+      lib.building(ctx, x, H * 1.02, w, 300 + lib.hash(i, 51, 1) * 380, colors[i % 4], i + 3);
+    }
+    ctx.restore();
+
+    // captions
+    const c1 = lib.ease.outBack(lib.clamp01(t / 0.25));
+    lib.impact(ctx, 'ГИГАНТСКИЙ ЛИМОН', W / 2, H * 0.13, {
+      size: 118,
+      scale: 1.8 - c1 * 0.8,
+      rotate: -0.03,
+      fill: lib.pal.lemon,
+      maxW: W * 0.9,
+    });
+    if (t > 1.2) {
+      const c2 = lib.ease.outBack(lib.beat(t - 1.2, 1.6));
+      lib.impact(ctx, 'ОН В ОГАЙО', W / 2, H * 0.9, {
+        size: 140,
+        alpha: lib.clamp01((t - 1.2) / 0.2),
+        scale: 0.7 + c2 * 0.4,
+        fill: lib.pal.red,
+        maxW: W * 0.7,
+      });
+    }
+  },
+});
+
+</script>
+  <script>
+// 07-battle : LEMONCOPTER vs kaiju — laser eyes, explosions, flashes.
+FILM.scene({
+  id: 'battle',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    // comic-book split background
+    lib.rays(ctx, t, { speed: 1.1, count: 20, alpha: 1 });
+    ctx.fillStyle = 'rgba(20,10,40,0.35)';
+    ctx.fillRect(0, 0, W, H);
+    // diagonal white bolts
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = '#FFFFFF';
+    for (let i = 0; i < 5; i++) {
+      const x = i * 260 + ((t * 140) % 260) - 200;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + 110, 0);
+      ctx.lineTo(x - 220, H);
+      ctx.lineTo(x - 330, H);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+
+    const sh = lib.shake(t, 12, 19);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // kaiju lemon on the right
+    const kx = W * 0.72;
+    const ky = H * 0.42;
+    lib.lemonHead(ctx, t, { x: kx, y: ky, r: 330, mood: 'angry', laser: 1 });
+
+    // laser eyes — beams toward the copter
+    const cx = W * 0.24 + Math.sin(t * 2.2) * 60;
+    const cy = H * 0.3 + Math.cos(t * 1.8) * 70;
+    for (const ey of [ky - 40, ky + 10]) {
+      const g = ctx.createLinearGradient(kx, ey, cx, cy);
+      g.addColorStop(0, 'rgba(255,40,30,0.95)');
+      g.addColorStop(1, 'rgba(255,120,60,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(kx - 240, ey);
+      ctx.lineTo(cx - 40, cy - 30);
+      ctx.lineTo(cx - 40, cy + 30);
+      ctx.closePath();
+      ctx.fill();
+      // hot core
+      ctx.strokeStyle = 'rgba(255,220,200,0.9)';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(kx - 250, ey);
+      ctx.lineTo(cx, cy);
+      ctx.stroke();
+    }
+
+    // lemoncopter banking away
+    lib.lemoncopter(ctx, t, { x: cx, y: cy, s: 0.62, flip: true, mood: 'scream' });
+
+    // explosions on the off-beats
+    for (let i = 0; i < 5; i++) {
+      const bt = 0.4 + i * 0.72;
+      const dt = t - bt;
+      if (dt >= 0 && dt < 1.0) {
+        const ex = W * (0.35 + lib.hash(i, 61, 1) * 0.5);
+        const ey = H * (0.35 + lib.hash(i, 62, 2) * 0.4);
+        lib.explosion(ctx, ex, ey, 170 + lib.hash(i, 63, 3) * 90, dt);
+      }
+    }
+    ctx.restore();
+
+    // flash frames
+    const fl = lib.beat(t, 1.44);
+    if (fl > 0.82) {
+      ctx.fillStyle = 'rgba(255,255,255,' + (fl - 0.82) * 3 + ')';
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // caption
+    const cs = lib.ease.outBack(lib.clamp01(t / 0.3));
+    lib.impact(ctx, 'БИТВА ВЕКА', W / 2, H * 0.16, {
+      size: 165,
+      scale: 2 - cs,
+      rotate: -0.04,
+      fill: lib.pal.red,
+      maxW: W * 0.85,
+    });
+    if (t > 3) {
+      lib.impact(ctx, 'кто победит? жми на лайк', W / 2, H * 0.92, {
+        size: 54,
+        alpha: lib.clamp01((t - 3) / 0.3),
+        fill: lib.pal.white,
+        maxW: W * 0.85,
+        strokeW: 7,
+      });
+    }
+  },
+});
+
+</script>
+  <script>
+// 08-sixseven : the 6-7 gag. Two numbers, two sub-bass hits.
+FILM.scene({
+  id: 'sixseven',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    // dark hypnotic backdrop
+    ctx.fillStyle = '#0B0616';
+    ctx.fillRect(0, 0, W, H);
+    lib.rays(ctx, t, { speed: -0.7, count: 24, alpha: 0.35, colors: ['#8E5BFF', '#3ED8FF', '#FF4FA3', '#8E5BFF'] });
+    const g = ctx.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.8);
+    g.addColorStop(0, 'rgba(142,91,255,0.35)');
+    g.addColorStop(1, 'rgba(11,6,22,0.9)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    const hit1 = t; // number 6 lands at 0
+    const hit2 = t - 0.8; // number 7 lands at 0.8
+    const sh = lib.shake(t, t < 0.35 ? 30 : t < 1.15 ? 22 : 8, 23);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // «6»
+    const s6 = lib.ease.outElastic(lib.clamp01(hit1 / 0.4));
+    lib.impact(ctx, '6', W * 0.32, H * 0.52, {
+      size: 620,
+      scale: 3 - s6 * 2,
+      rotate: -0.12 + s6 * 0.06,
+      fill: lib.pal.cyan,
+      alpha: hit2 > 0 && t > 1.2 ? 0.95 : 1,
+    });
+
+    // «7»
+    if (hit2 > -0.05) {
+      const s7 = lib.ease.outElastic(lib.clamp01(hit2 / 0.4));
+      lib.impact(ctx, '7', W * 0.68, H * 0.55, {
+        size: 620,
+        scale: 3 - s7 * 2,
+        rotate: 0.12 - s7 * 0.06,
+        fill: lib.pal.pink,
+      });
+    }
+
+    // dash between
+    if (t > 0.5 && t < 1.6) {
+      lib.impact(ctx, '—', W * 0.5, H * 0.5, { size: 220, fill: lib.pal.white, maxW: 300 });
+    }
+
+    // together
+    if (t > 1.25) {
+      const s8 = lib.ease.outBack(lib.clamp01((t - 1.25) / 0.35));
+      lib.impact(ctx, 'СИКС СЕВЕН!!!', W / 2, H * 0.74, {
+        size: 150,
+        scale: 1.7 - s8 * 0.7,
+        rotate: -0.03,
+        fill: lib.pal.lemon,
+        maxW: W * 0.88,
+      });
+    }
+    ctx.restore();
+
+    // small print
+    if (t > 0.9) {
+      lib.impact(ctx, 'это уже невозможно', W / 2, H * 0.12, {
+        size: 58,
+        alpha: lib.clamp01((t - 0.9) / 0.25),
+        fill: lib.pal.white,
+        maxW: W * 0.7,
+        strokeW: 8,
+      });
+    }
+  },
+});
+
+</script>
+  <script>
+// 09-factory : the lemon conveyor. One of them is an orange impostor.
+FILM.scene({
+  id: 'factory',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    // factory wall
+    lib.rays(ctx, t * 0.2, { speed: 0.06, count: 2, alpha: 1, colors: ['#8A93A5', '#7B8496'] });
+    ctx.fillStyle = 'rgba(30,36,50,0.25)';
+    for (let y = 0; y < H * 0.6; y += 180) {
+      for (let x = 0; x < W; x += 220) {
+        ctx.fillRect(x + ((y / 180) % 2) * 110, y, 200, 160);
+      }
+    }
+    // pipes
+    ctx.strokeStyle = '#5A6478';
+    ctx.lineWidth = 46;
+    ctx.beginPath();
+    ctx.moveTo(-20, H * 0.2);
+    ctx.lineTo(W * 0.3, H * 0.2);
+    ctx.lineTo(W * 0.3, H * 0.42);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W + 20, H * 0.14);
+    ctx.lineTo(W * 0.68, H * 0.14);
+    ctx.lineTo(W * 0.68, H * 0.38);
+    ctx.stroke();
+
+    const sh = lib.shake(t, 5, 29);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // conveyor belt
+    const beltY = H * 0.72;
+    ctx.fillStyle = '#2A3140';
+    ctx.strokeStyle = lib.pal.ink;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.roundRect(-60, beltY, W + 120, 150, 40);
+    ctx.fill();
+    ctx.stroke();
+    // belt rollers / stripes
+    ctx.fillStyle = 'rgba(255,255,255,0.16)';
+    const scroll = (t * 380) % 160;
+    for (let x = -160 + scroll; x < W + 160; x += 160) {
+      ctx.fillRect(x, beltY + 18, 70, 114);
+    }
+
+    // lemons marching on the belt
+    for (let i = 0; i < 5; i++) {
+      const r = lib.hash(i, 71, 1);
+      const x = ((t * 380 + i * 240) % (W + 400)) - 200;
+      const y = beltY - 110 + Math.sin(t * 7 + i) * 10;
+      const impostor = i === 2;
+      if (impostor) {
+        // ORANGE COSTUME: same shape, orange colour, fake leaf
+        lib.lemonHead(ctx, t, {
+          x,
+          y,
+          r: 105,
+          mood: 'sus',
+          blink: 0,
+        });
+        // repaint body orange over the lemon (costume)
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.fillStyle = '#FF8A00';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 140, 118, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        lib.lemonHead(ctx, t, { x, y, r: 105, mood: 'sus', blink: 0 });
+        ctx.save();
+        ctx.translate(x, y);
+        // orange skin tone overlay (a bit darker circle pack)
+        ctx.fillStyle = 'rgba(255,138,0,0.85)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 132, 110, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // leaf
+        ctx.fillStyle = '#37D67A';
+        ctx.strokeStyle = lib.pal.ink;
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.ellipse(40, -120, 46, 20, -0.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+        // face again on top (sus)
+        ctx.save();
+        ctx.translate(x, y);
+        // eyes (suspicious, narrowed)
+        for (const side of [-1, 1]) {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.strokeStyle = lib.pal.ink;
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.ellipse(side * 36, -14, 24, 15, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = lib.pal.ink;
+          ctx.beginPath();
+          ctx.arc(side * 30, -12, 8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      } else {
+        lib.lemonHead(ctx, t, {
+          x,
+          y,
+          r: 105,
+          mood: 'happy',
+          blink: (Math.floor(t * 3 + i) % 5 === 0) ? 0.7 : 0,
+        });
+      }
+    }
+
+    // red arrow pointing at the impostor at t>2
+    if (t > 2) {
+      const k = lib.clamp01((t - 2) / 0.3);
+      const ax = ((t * 380 + 2 * 240) % (W + 400)) - 200;
+      ctx.save();
+      ctx.globalAlpha = k;
+      ctx.translate(ax, beltY - 320);
+      ctx.rotate(0.5 + Math.sin(t * 5) * 0.12);
+      ctx.fillStyle = lib.pal.red;
+      ctx.strokeStyle = lib.pal.ink;
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.moveTo(0, -120);
+      ctx.lineTo(90, 20);
+      ctx.lineTo(34, 20);
+      ctx.lineTo(34, 130);
+      ctx.lineTo(-34, 130);
+      ctx.lineTo(-34, 20);
+      ctx.lineTo(-90, 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+
+    // captions
+    const cs = lib.ease.outBack(lib.clamp01(t / 0.3));
+    lib.impact(ctx, 'ЛИМОН ПРЕТВОРЯЕТСЯ', W / 2, H * 0.13, {
+      size: 108,
+      scale: 1.6 - cs * 0.6,
+      fill: lib.pal.lemon,
+      maxW: W * 0.9,
+    });
+    lib.impact(ctx, 'АПЕЛЬСИНОМ', W / 2, H * 0.205, {
+      size: 108,
+      scale: 1.6 - cs * 0.6,
+      fill: lib.pal.orange,
+      maxW: W * 0.8,
+    });
+    if (t > 2) {
+      lib.impact(ctx, 'ПАЛИМ ЕГО!', W / 2, H * 0.92, {
+        size: 120,
+        alpha: lib.clamp01((t - 2) / 0.25),
+        scale: 0.7 + lib.beat(t - 2, 0.4) * 0.3,
+        fill: lib.pal.red,
+        maxW: W * 0.6,
+      });
+    }
+  },
+});
+
+</script>
+  <script>
+// 10-dance : everyone dances under the disco ball. ТАНЦУЙ КАК ЛИМОН.
+FILM.scene({
+  id: 'dance',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    lib.rays(ctx, t, { speed: 1.2, count: 22, alpha: 1 });
+    const shade = ctx.createLinearGradient(0, 0, 0, H);
+    shade.addColorStop(0, 'rgba(40,10,80,0.25)');
+    shade.addColorStop(1, 'rgba(20,5,50,0.45)');
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, 0, W, H);
+    lib.checkerFloor(ctx, t, { y0: H * 0.68, speed: 420 });
+
+    // disco ball
+    ctx.save();
+    ctx.translate(W / 2, H * 0.12);
+    const br = 110;
+    const bg = ctx.createRadialGradient(-br * 0.3, -br * 0.3, 10, 0, 0, br);
+    bg.addColorStop(0, '#FFFFFF');
+    bg.addColorStop(0.5, '#B9D2E8');
+    bg.addColorStop(1, '#5A6E88');
+    ctx.fillStyle = bg;
+    ctx.strokeStyle = lib.pal.ink;
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.arc(0, 0, br, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // facets
+    for (let i = -2; i <= 2; i++) {
+      for (let j = -2; j <= 2; j++) {
+        ctx.fillStyle = (i + j) % 2 === 0 ? 'rgba(255,255,255,0.75)' : 'rgba(90,110,140,0.6)';
+        ctx.fillRect(i * 42 - 18, j * 42 - 18, 36, 36);
+      }
+    }
+    ctx.restore();
+    // light spots sweeping the floor
+    for (let i = 0; i < 6; i++) {
+      const a = t * 1.2 + (i / 6) * Math.PI * 2;
+      const x = W / 2 + Math.cos(a) * W * 0.42;
+      const y = H * 0.62 + Math.sin(a * 1.4) * H * 0.18;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, 190);
+      g.addColorStop(0, 'rgba(255,255,255,0.30)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x - 190, y - 190, 380, 380);
+    }
+
+    const sh = lib.shake(t, 8, 31);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // three dancers, phases offset
+    lib.lemonChar(ctx, t, {
+      x: W * 0.22,
+      y: H * 0.6,
+      r: 120,
+      mood: 'happy',
+      phase: 0,
+      bounce: 1.1,
+    });
+    // parrot-lemon mini
+    const flap = Math.sin(t * Math.PI * 4 + 2);
+    ctx.save();
+    ctx.translate(W * 0.5, H * 0.58 - Math.abs(Math.sin(t * Math.PI * 2)) * 40);
+    for (const side of [-1, 1]) {
+      ctx.save();
+      ctx.rotate(side * (0.5 + flap * 0.5));
+      ctx.fillStyle = '#FFB100';
+      ctx.strokeStyle = lib.pal.ink;
+      ctx.lineWidth = 9;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(side * 120, -60);
+      ctx.lineTo(side * 170, -10);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+    lib.lemonHead(ctx, t, { x: 0, y: 0, r: 105, mood: 'happy', blink: Math.floor(t * 4) % 6 === 0 ? 0.7 : 0 });
+    ctx.restore();
+    // mini toilet-head
+    ctx.save();
+    ctx.translate(W * 0.78, H * 0.6);
+    lib.toilet(ctx, t, { x: 0, y: 60, s: 0.42 });
+    lib.lemonHead(ctx, t, {
+      x: 0,
+      y: -110 - lib.beat(t, 0.8) * 70,
+      r: 78,
+      mood: 'happy',
+      blink: 0,
+    });
+    ctx.restore();
+
+    ctx.restore();
+
+    // caption
+    const cs = lib.ease.outBack(lib.beat(t, 1.6));
+    lib.impact(ctx, 'ТАНЦУЙ', W / 2, H * 0.235, {
+      size: 140,
+      scale: 0.8 + cs * 0.3,
+      rotate: -0.04,
+      fill: lib.pal.white,
+      maxW: W * 0.6,
+    });
+    lib.impact(ctx, 'КАК ЛИМОН', W / 2, H * 0.315, {
+      size: 140,
+      scale: 0.8 + cs * 0.3,
+      rotate: 0.04,
+      fill: lib.pal.lemon,
+      maxW: W * 0.75,
+    });
+  },
+});
+
+</script>
+  <script>
+// 11-aura : ЛИМОН ПРЕДЕЛЬНОЙ ФОРМЫ — crown, laser eyes, rainbow aura, lightning.
+FILM.scene({
+  id: 'aura',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    // dark power background
+    ctx.fillStyle = '#0A0616';
+    ctx.fillRect(0, 0, W, H);
+    lib.rays(ctx, t, { speed: 1.4, count: 16, alpha: 0.5, colors: ['#8E5BFF', '#FFD23F', '#FF4FA3', '#3ED8FF'] });
+    const g = ctx.createRadialGradient(W / 2, H * 0.46, 40, W / 2, H * 0.46, W * 0.85);
+    g.addColorStop(0, 'rgba(255,210,63,0.28)');
+    g.addColorStop(0.5, 'rgba(142,91,255,0.22)');
+    g.addColorStop(1, 'rgba(10,6,22,0.85)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    const power = 0.5 + 0.5 * Math.sin(t * Math.PI * 2); // breathing
+    const sh = lib.shake(t, 6 + power * 10, 37);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // aura flames (wavy spikes)
+    const ax = W / 2;
+    const ay = H * 0.5;
+    for (let ring = 0; ring < 3; ring++) {
+      ctx.fillStyle = ['rgba(255,210,63,0.35)', 'rgba(255,120,60,0.30)', 'rgba(142,91,255,0.28)'][ring];
+      ctx.beginPath();
+      const n = 26;
+      for (let i = 0; i <= n; i++) {
+        const a = (i / n) * Math.PI * 2;
+        const wob = 0.8 + 0.2 * Math.sin(a * 7 + t * (7 + ring * 2));
+        const r = (330 + ring * 70) * wob * (1 + power * 0.12);
+        const x = ax + Math.cos(a) * r;
+        const y = ay + Math.sin(a) * r * 1.18;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // floating rock shards
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 + t * 0.9;
+      const r = 340 + Math.sin(t * 1.4 + i * 2) * 36;
+      const x = ax + Math.cos(a) * r;
+      const y = ay + Math.sin(a) * r * 1.15;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(t + i);
+      ctx.fillStyle = '#4A3A78';
+      ctx.strokeStyle = lib.pal.ink;
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(0, -34);
+      ctx.lineTo(28, 12);
+      ctx.lineTo(-6, 34);
+      ctx.lineTo(-30, 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // the lemon: crown + lasers
+    lib.lemonChar(ctx, t, {
+      x: ax,
+      y: ay,
+      r: 200,
+      mood: 'angry',
+      crown: true,
+      laser: 1,
+      armSwing: 0.4,
+      bounce: 0.5,
+    });
+
+    // laser eye beams upward-outward
+    for (const side of [-1, 1]) {
+      const ex = ax + side * 68;
+      const ey = ay - 24;
+      const g2 = ctx.createLinearGradient(ex, ey, ex + side * 700, ey - 300);
+      g2.addColorStop(0, 'rgba(255,60,40,0.95)');
+      g2.addColorStop(1, 'rgba(255,120,60,0)');
+      ctx.fillStyle = g2;
+      ctx.beginPath();
+      ctx.moveTo(ex, ey);
+      ctx.lineTo(ex + side * 760, ey - 380 - power * 60);
+      ctx.lineTo(ex + side * 760, ey - 120 + power * 40);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // lightning bolts on the beats
+    for (let i = 0; i < 4; i++) {
+      const bt = i * 0.8;
+      const dt = t - bt;
+      if (dt >= 0 && dt < 0.18) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+        ctx.lineWidth = 16;
+        ctx.beginPath();
+        let x = W * (0.15 + lib.hash(i, 81, 1) * 0.7);
+        let y = 0;
+        ctx.moveTo(x, y);
+        while (y < H) {
+          x += (lib.hash(i, y | 0, 2) - 0.5) * 220;
+          y += 120;
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+    // captions
+    const cs = lib.ease.outBack(lib.clamp01(t / 0.3));
+    lib.impact(ctx, 'ПРЕДЕЛЬНАЯ', W / 2, H * 0.13, {
+      size: 128,
+      scale: 1.8 - cs * 0.8,
+      fill: lib.pal.white,
+      maxW: W * 0.85,
+    });
+    lib.impact(ctx, 'ФОРМА ЛИМОНА', W / 2, H * 0.21, {
+      size: 128,
+      scale: 1.8 - cs * 0.8,
+      fill: lib.pal.lemon,
+      maxW: W * 0.88,
+    });
+  },
+});
+
+</script>
+  <script>
+// 12-versus : ЛИМОН vs АПЕЛЬСИН. Кто победил — в комменты.
+FILM.scene({
+  id: 'versus',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    // split backgrounds
+    ctx.fillStyle = '#2E7CFF';
+    ctx.fillRect(0, 0, W / 2, H);
+    ctx.fillStyle = '#FF3B30';
+    ctx.fillRect(W / 2, 0, W / 2, H);
+    lib.rays(ctx, t, { x: W * 0.25, y: H * 0.5, speed: 0.7, count: 10, alpha: 0.25 });
+    lib.rays(ctx, -t, { x: W * 0.75, y: H * 0.5, speed: 0.7, count: 10, alpha: 0.25 });
+
+    const sh = lib.shake(t, 7, 41);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // lemon fighter (left)
+    const bounceL = Math.abs(Math.sin(t * Math.PI * 3));
+    lib.lemonChar(ctx, t, {
+      x: W * 0.26,
+      y: H * 0.52 - bounceL * 46,
+      r: 165,
+      mood: 'angry',
+      bounce: 0,
+    });
+
+    // orange fighter (right) — round cousin
+    const bounceR = Math.abs(Math.sin(t * Math.PI * 3 + Math.PI));
+    ctx.save();
+    ctx.translate(W * 0.74, H * 0.52 - bounceR * 46);
+    // body
+    const g = ctx.createRadialGradient(-40, -60, 20, 0, 0, 190);
+    g.addColorStop(0, '#FFB86B');
+    g.addColorStop(0.6, '#FF8A00');
+    g.addColorStop(1, '#E06A00');
+    ctx.fillStyle = g;
+    ctx.strokeStyle = lib.pal.ink;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.arc(0, 0, 170, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // leaf
+    ctx.fillStyle = '#37D67A';
+    ctx.beginPath();
+    ctx.ellipse(30, -175, 52, 22, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // angry face
+    for (const side of [-1, 1]) {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.lineWidth = 9;
+      ctx.beginPath();
+      ctx.ellipse(side * 58, -20, 38, 42, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = lib.pal.ink;
+      ctx.beginPath();
+      ctx.arc(side * 48, -14, 17, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.moveTo(side * 22, -78);
+      ctx.lineTo(side * 88, -52);
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#7A1B1B';
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(-52, 68);
+    ctx.quadraticCurveTo(0, 40, 52, 68);
+    ctx.quadraticCurveTo(0, 102, -52, 68);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // fists up
+    for (const side of [-1, 1]) {
+      ctx.fillStyle = '#FF8A00';
+      ctx.beginPath();
+      ctx.arc(side * 190, 40 - bounceR * 18, 52, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // VS bolt
+    const vs = lib.ease.outElastic(lib.beat(t, 1.2));
+    ctx.save();
+    ctx.translate(W / 2, H * 0.5);
+    ctx.rotate(-0.08);
+    ctx.scale(0.8 + vs * 0.35, 0.8 + vs * 0.35);
+    ctx.fillStyle = lib.pal.lemon;
+    ctx.strokeStyle = lib.pal.ink;
+    ctx.lineWidth = 18;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-150, -170);
+    ctx.lineTo(60, -170);
+    ctx.lineTo(-10, -40);
+    ctx.lineTo(140, -40);
+    ctx.lineTo(-150, 190);
+    ctx.lineTo(-50, 20);
+    ctx.lineTo(-170, 20);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    lib.impact(ctx, 'VS', 0, 30, { size: 150, fill: lib.pal.red, maxW: 260, strokeW: 16 });
+    ctx.restore();
+    ctx.restore();
+
+    // captions
+    const cs = lib.ease.outBack(lib.clamp01(t / 0.25));
+    lib.impact(ctx, 'КТО ПОБЕДИЛ?', W / 2, H * 0.12, {
+      size: 132,
+      scale: 1.7 - cs * 0.7,
+      fill: lib.pal.white,
+      maxW: W * 0.88,
+    });
+    if (t > 0.8) {
+      lib.impact(ctx, 'ПИШИ В КОММЕНТЫ', W / 2, H * 0.9, {
+        size: 104,
+        alpha: lib.clamp01((t - 0.8) / 0.25),
+        scale: 0.8 + lib.beat(t - 0.8, 0.8) * 0.25,
+        fill: lib.pal.lemon,
+        maxW: W * 0.85,
+      });
+    }
+  },
+});
+
+</script>
+  <script>
+// 13-outro : ПОДПИШИСЬ — или лимон найдёт тебя. Финальный чант.
+FILM.scene({
+  id: 'outro',
+  draw(t, info) {
+    const ctx = FILM.ctx;
+    const W = FILM.W;
+    const H = FILM.H;
+    const lib = FILM.lib;
+
+    lib.rays(ctx, t, { speed: 0.5, count: 18, alpha: 1 });
+    const shade = ctx.createRadialGradient(W / 2, H * 0.45, 120, W / 2, H * 0.45, W * 0.95);
+    shade.addColorStop(0, 'rgba(255,225,77,0.15)');
+    shade.addColorStop(1, 'rgba(60,20,80,0.5)');
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, 0, W, H);
+    lib.checkerFloor(ctx, t, { y0: H * 0.72, speed: 200 });
+
+    const sh = lib.shake(t, 5, 43);
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+
+    // the witness — lemon with sunglasses, bobbing
+    const bob = Math.sin(t * 2) * 18;
+    lib.lemonHead(ctx, t, {
+      x: W / 2,
+      y: H * 0.52 + bob,
+      r: 240,
+      mood: t > 3.2 ? 'happy' : 'sus',
+      sunglasses: true,
+      blink: 0,
+    });
+
+    // sparkles
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2 + t * 0.8;
+      const r = 420 + 70 * Math.sin(t * 2 + i * 1.7);
+      lib.sparkle(ctx, W / 2 + Math.cos(a) * r, H * 0.52 + Math.sin(a) * r * 0.9, 30 + lib.hash(i, 91, 1) * 30, 0.9);
+    }
+    ctx.restore();
+
+    // chant line
+    const words = ['СКИБИДИ', 'ДОП ДОП', 'ДА ДА', 'ЕС ЕС'];
+    const wi = Math.min(3, Math.floor(t / 0.8));
+    const cs = lib.ease.outBack(lib.beat(t, 0.8));
+    lib.impact(ctx, words[wi], W / 2, H * 0.16, {
+      size: 130,
+      scale: 0.6 + cs * 0.45,
+      rotate: (lib.hash(wi, 2, 1) - 0.5) * 0.1,
+      fill: [lib.pal.cyan, lib.pal.lemon, lib.pal.pink, lib.pal.white][wi],
+      maxW: W * 0.7,
+    });
+
+    // SUBSCRIBE slam
+    if (t > 1.6) {
+      const s = lib.ease.outElastic(lib.clamp01((t - 1.6) / 0.5));
+      lib.impact(ctx, 'ПОДПИШИСЬ', W / 2, H * 0.87, {
+        size: 190,
+        scale: 2.2 - s * 1.2,
+        rotate: -0.03,
+        fill: lib.pal.red,
+        maxW: W * 0.85,
+      });
+    }
+    if (t > 2.6) {
+      lib.impact(ctx, 'или лимон найдёт тебя', W / 2, H * 0.945, {
+        size: 56,
+        alpha: lib.clamp01((t - 2.6) / 0.3),
+        fill: lib.pal.white,
+        maxW: W * 0.8,
+        strokeW: 8,
+      });
+    }
+
+    // final yellow flash into the tail
+    if (t > 3.9) {
+      const f = lib.clamp01((t - 3.9) / 0.5) * 0.55;
+      ctx.fillStyle = 'rgba(255,225,77,' + f + ')';
+      ctx.fillRect(0, 0, W, H);
+    }
+  },
+});
+
+</script>
+  <script>
+// music.js : the score for «ЛИМОННЫЙ БРЕЙНРОТ».
+// Hardbass-turbo at 150 bpm + robotic formant chants ("СКИ-БИ-ДИ ДОП ДОП
+// ДА ДА ЕС ЕС"). Everything synthesised in Web Audio — oscillators, filtered
+// noise and vowel formants. Rendered once offline, played back afterwards.
+(function () {
+  'use strict';
+  const FILM = (window.FILM = window.FILM || {});
+
+  const N = {
+    E2: 82.41, F2: 87.31, G2: 98.0, A2: 110.0, B2: 123.47, C3: 130.81,
+    D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.0, A3: 220.0, B3: 246.94,
+    C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.0, A4: 440.0,
+    B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.26,
+  };
+
+  const BPM = 150;
+  const BEAT = 60 / BPM; // 0.4 s
+  const BAR = BEAT * 4; // 1.6 s
+  const DURATION = 38;
+
+  // vowel formants [F1, F2, F3]
+  const V = {
+    EE: [270, 2300, 3000],
+    AH: [700, 1200, 2600],
+    OH: [500, 900, 2500],
+    EH: [530, 1800, 2600],
+  };
+
+  function whiteNoise(oc, seconds) {
+    const len = Math.ceil(oc.sampleRate * seconds);
+    const buf = oc.createBuffer(1, len, oc.sampleRate);
+    const d = buf.getChannelData(0);
+    let s = 0x27d4eb2d;
+    for (let i = 0; i < len; i++) {
+      s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+      d[i] = (s / 2147483648 - 1) * 0.9;
+    }
+    return buf;
+  }
+
+  function impulse(oc, seconds, decay) {
+    const len = Math.ceil(oc.sampleRate * seconds);
+    const buf = oc.createBuffer(2, len, oc.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const d = buf.getChannelData(c);
+      let s = 42424242 + c * 777;
+      for (let i = 0; i < len; i++) {
+        s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+        d[i] = (s / 2147483648 - 1) * Math.pow(1 - i / len, decay);
+      }
+    }
+    return buf;
+  }
+
+  function renderScore(sampleRate) {
+    const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    if (!OC) return Promise.reject(new Error('OfflineAudioContext is not available'));
+    const oc = new OC(2, Math.ceil(DURATION * sampleRate), sampleRate);
+
+    // ---- buses ----
+    const master = oc.createGain();
+    master.gain.value = 0.92;
+    const comp = oc.createDynamicsCompressor();
+    comp.threshold.value = -12;
+    comp.ratio.value = 6;
+    comp.attack.value = 0.003;
+    comp.release.value = 0.12;
+    master.connect(comp);
+    comp.connect(oc.destination);
+
+    const dry = oc.createGain();
+    dry.connect(master);
+
+    const verb = oc.createConvolver();
+    verb.buffer = impulse(oc, 1.1, 3.2);
+    const verbGain = oc.createGain();
+    verbGain.gain.value = 0.32;
+    verb.connect(verbGain);
+    verbGain.connect(master);
+    const send = oc.createGain();
+    send.connect(verb);
+
+    const white = whiteNoise(oc, 6);
+
+    // ---- voices ----
+
+    function kick(t, gain) {
+      const o = oc.createOscillator();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(155, t);
+      o.frequency.exponentialRampToValueAtTime(42, t + 0.11);
+      const g = oc.createGain();
+      g.gain.setValueAtTime(gain || 0.9, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.24);
+      o.connect(g);
+      g.connect(dry);
+      o.start(t);
+      o.stop(t + 0.3);
+      // click
+      const src = oc.createBufferSource();
+      src.buffer = white;
+      const hp = oc.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 1800;
+      const cg = oc.createGain();
+      cg.gain.setValueAtTime(0.22, t);
+      cg.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+      src.connect(hp);
+      hp.connect(cg);
+      cg.connect(dry);
+      src.start(t, (t * 7) % 4, 0.04);
+    }
+
+    function donk(t, freq, gain) {
+      const o = oc.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = freq;
+      const f = oc.createBiquadFilter();
+      f.type = 'bandpass';
+      f.frequency.value = freq * 2.2;
+      f.Q.value = 2.2;
+      const g = oc.createGain();
+      g.gain.setValueAtTime(gain || 0.5, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.17);
+      o.connect(f);
+      f.connect(g);
+      g.connect(dry);
+      o.start(t);
+      o.stop(t + 0.22);
+    }
+
+    function sub(t, freq, dur, gain) {
+      const o = oc.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      const g = oc.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g);
+      g.connect(dry);
+      o.start(t);
+      o.stop(t + dur + 0.05);
+    }
+
+    function clap(t, gain) {
+      for (const [dt, lvl] of [[0, 1], [0.012, 0.7], [0.024, 0.5]]) {
+        const src = oc.createBufferSource();
+        src.buffer = white;
+        const f = oc.createBiquadFilter();
+        f.type = 'bandpass';
+        f.frequency.value = 1700;
+        f.Q.value = 1.1;
+        const g = oc.createGain();
+        g.gain.setValueAtTime((gain || 0.35) * lvl, t + dt);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dt + 0.09);
+        src.connect(f);
+        f.connect(g);
+        g.connect(dry);
+        const s = oc.createGain();
+        s.gain.value = 0.6;
+        g.connect(s);
+        s.connect(send);
+        src.start(t + dt, (t * 3) % 4, 0.12);
+      }
+    }
+
+    function hat(t, gain, open) {
+      const src = oc.createBufferSource();
+      src.buffer = white;
+      const f = oc.createBiquadFilter();
+      f.type = 'highpass';
+      f.frequency.value = 7200;
+      const g = oc.createGain();
+      g.gain.setValueAtTime(gain || 0.12, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + (open ? 0.14 : 0.035));
+      src.connect(f);
+      f.connect(g);
+      g.connect(dry);
+      src.start(t, (t * 5) % 3, 0.18);
+    }
+
+    function tom(t, freq, gain) {
+      const o = oc.createOscillator();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq * 1.5, t);
+      o.frequency.exponentialRampToValueAtTime(freq, t + 0.12);
+      const g = oc.createGain();
+      g.gain.setValueAtTime(gain || 0.5, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      o.connect(g);
+      g.connect(dry);
+      o.start(t);
+      o.stop(t + 0.35);
+    }
+
+    function lead(t, freq, dur, gain) {
+      for (const det of [-7, 7]) {
+        const o = oc.createOscillator();
+        o.type = 'square';
+        o.frequency.value = freq;
+        o.detune.value = det;
+        const f = oc.createBiquadFilter();
+        f.type = 'lowpass';
+        f.frequency.value = 3600;
+        const g = oc.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(gain, t + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(f);
+        f.connect(g);
+        g.connect(dry);
+        const s = oc.createGain();
+        s.gain.value = 0.22;
+        g.connect(s);
+        s.connect(send);
+        o.start(t);
+        o.stop(t + dur + 0.03);
+      }
+    }
+
+    function zap(t, f0, f1, dur, gain) {
+      const o = oc.createOscillator();
+      o.type = 'square';
+      o.frequency.setValueAtTime(f0, t);
+      o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      const g = oc.createGain();
+      g.gain.setValueAtTime(gain || 0.3, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g);
+      g.connect(dry);
+      const s = oc.createGain();
+      s.gain.value = 1.1;
+      g.connect(s);
+      s.connect(send);
+      o.start(t);
+      o.stop(t + dur + 0.05);
+    }
+
+    function riser(t, dur, gain) {
+      const src = oc.createBufferSource();
+      src.buffer = white;
+      const f = oc.createBiquadFilter();
+      f.type = 'bandpass';
+      f.Q.value = 1.4;
+      f.frequency.setValueAtTime(320, t);
+      f.frequency.exponentialRampToValueAtTime(4200, t + dur);
+      const g = oc.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + dur * 0.85);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.connect(f);
+      f.connect(g);
+      g.connect(dry);
+      src.start(t, (t * 1.7) % 3, dur + 0.1);
+    }
+
+    function boom(t, gain) {
+      sub(t, 55, 0.9, gain || 0.9);
+      const src = oc.createBufferSource();
+      src.buffer = white;
+      const f = oc.createBiquadFilter();
+      f.type = 'lowpass';
+      f.frequency.value = 900;
+      const g = oc.createGain();
+      g.gain.setValueAtTime(0.32, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      src.connect(f);
+      f.connect(g);
+      g.connect(dry);
+      src.start(t, 1.1, 0.35);
+    }
+
+    // robotic syllable: consonant burst + formant vowel
+    function vox(t, dur, cons, vowel, freq, gain) {
+      if (cons) {
+        const src = oc.createBufferSource();
+        src.buffer = white;
+        const f = oc.createBiquadFilter();
+        f.type = 'bandpass';
+        f.frequency.value = cons === 's' ? 5200 : cons === 'y' ? 2400 : 1650;
+        f.Q.value = 2.4;
+        const g = oc.createGain();
+        g.gain.setValueAtTime(cons === 's' ? 0.09 : 0.15, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.032);
+        src.connect(f);
+        f.connect(g);
+        g.connect(dry);
+        src.start(t, (t * 3.1) % 4, 0.05);
+      }
+      const o = oc.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(freq * 1.045, t);
+      o.frequency.linearRampToValueAtTime(freq, t + 0.05);
+      const amp = oc.createGain();
+      amp.gain.setValueAtTime(0.0001, t);
+      amp.gain.exponentialRampToValueAtTime(gain, t + 0.014);
+      amp.gain.setValueAtTime(gain, t + dur * 0.62);
+      amp.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(amp);
+      const levels = [1, 0.62, 0.3];
+      for (let i = 0; i < 3; i++) {
+        const bp = oc.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.value = vowel[i];
+        bp.Q.value = 7.5;
+        const vg = oc.createGain();
+        vg.gain.value = levels[i];
+        amp.connect(bp);
+        bp.connect(vg);
+        vg.connect(dry);
+        const s = oc.createGain();
+        s.gain.value = 0.28;
+        vg.connect(s);
+        s.connect(send);
+      }
+      const body = oc.createGain();
+      body.gain.value = 0.10;
+      amp.connect(body);
+      body.connect(dry);
+      o.start(t);
+      o.stop(t + dur + 0.03);
+    }
+
+    // СКИ-БИ-ДИ-ДОП-ДОП-ДА-ДА-ЕС-ЕС over one bar (8 eighths)
+    function chantBar(t0, baseFreq, gain) {
+      const seq = [
+        ['s', V.EE], ['b', V.EE], ['d', V.EE], ['d', V.OH],
+        ['d', V.OH], ['d', V.AH], ['d', V.AH], ['y', V.EH],
+      ];
+      for (let i = 0; i < 8; i++) {
+        vox(t0 + i * (BAR / 8), BAR / 8 * 0.82, seq[i][0], seq[i][1], baseFreq, gain);
+      }
+    }
+
+    // =====================================================================
+    // THE SCORE
+    // =====================================================================
+
+    const T0 = 0;
+
+    // -- 0–1.2 hook : riser + boom
+    riser(0, 1.15, 0.3);
+    boom(0, 0.95);
+    for (let i = 0; i < 3; i++) vox(0.4 + i * 0.2, 0.16, 'd', V.AH, N.A3, 0.26);
+
+    // -- 1.2–2.8 title : the beat drops
+    for (let b = 0; b < 4; b++) {
+      const t = 1.2 + b * BEAT;
+      kick(t, 1.0);
+      donk(t + BEAT / 2, N.A2, 0.5);
+    }
+    boom(1.2, 0.6);
+    for (let i = 0; i < 8; i++) lead(1.2 + i * 0.2, [N.A4, N.A4, N.C5, N.A4, N.E5, N.D5, N.C5, N.A4][i], 0.19, 0.16);
+
+    // -- generic groove builder for the long stretches
+    function groove(t0, t1, opts) {
+      opts = opts || {};
+      const steps = Math.round((t1 - t0) / BEAT);
+      for (let b = 0; b < steps; b++) {
+        const t = t0 + b * BEAT;
+        kick(t, opts.kick || 0.95);
+        donk(t + BEAT / 2, opts.root || N.A2, 0.48);
+        if (opts.claps && b % 2 === 1) clap(t, 0.32);
+        if (opts.hats) {
+          hat(t + BEAT / 2, 0.1);
+          hat(t + BEAT / 4, 0.055);
+        }
+        if (opts.sub && b % 2 === 0) sub(t, (opts.root || N.A2) / 2, 0.34, 0.55);
+      }
+    }
+
+    // -- 2.8–6.0 lemonello : groove + first chant + melody
+    groove(2.8, 6.0, { root: N.A2, hats: true });
+    chantBar(2.8, N.A3, 0.3);
+    chantBar(4.4, N.C4, 0.3);
+    for (let i = 0; i < 16; i++) {
+      lead(2.8 + i * 0.2, [N.A4, N.A4, N.C5, N.A4, N.D5, N.C5, N.A4, N.E4, N.A4, N.A4, N.C5, N.D5, N.E5, N.D5, N.C5, N.A4][i], 0.19, 0.15);
+    }
+
+    // -- 6.0–9.2 toilet : heavier, clap-driven
+    groove(6.0, 9.2, { root: N.A2, hats: true, claps: true, sub: true, kick: 1.0 });
+    chantBar(6.0, N.A3, 0.32);
+    chantBar(7.6, N.A3, 0.32);
+    for (let i = 0; i < 8; i++) tom(6.0 + i * 0.4, [N.A2, N.A2, N.G2, N.G2, N.F2, N.F2, N.E2, N.E2][i], 0.4);
+
+    // -- 9.2–12.0 parrot : lighter, playful lead
+    groove(9.2, 12.0, { root: N.C3, hats: true, claps: true });
+    chantBar(9.2, N.C4, 0.28);
+    for (let i = 0; i < 14; i++) {
+      lead(9.2 + i * 0.2, [N.E5, N.D5, N.C5, N.D5, N.E5, N.E5, N.E5, 0, N.D5, N.D5, N.D5, 0, N.C5, N.E5][i] || N.A4, 0.18, 0.14);
+    }
+
+    // -- 12.0–15.6 kaiju : big stomps (half-time toms) + heavy kick
+    for (let b = 0; b < 9; b++) {
+      const t = 12.0 + b * BEAT;
+      if (b % 2 === 0) {
+        kick(t, 1.05);
+        tom(t, N.A2 * 0.75, 0.62);
+        sub(t, N.A2 / 2, 0.4, 0.6);
+      }
+      hat(t + BEAT / 2, 0.1, b % 4 === 3);
+    }
+    chantBar(12.0, N.A3, 0.3);
+    chantBar(13.6, N.G3, 0.3);
+    zap(15.2, 900, 160, 0.35, 0.28);
+
+    // -- 15.6–19.2 battle : half-time, zaps, explosion hits
+    for (let b = 0; b < 9; b++) {
+      const t = 15.6 + b * BEAT;
+      if (b % 2 === 0) kick(t, 1.0);
+      donk(t + BEAT / 2, b < 4 ? N.F2 : N.E2, 0.5);
+    }
+    boom(15.6, 0.85);
+    zap(16.0, 1200, 180, 0.3, 0.3);
+    boom(16.32, 0.7);
+    zap(16.72, 1400, 160, 0.28, 0.28);
+    boom(17.44, 0.75);
+    zap(17.84, 1100, 140, 0.32, 0.3);
+    boom(18.56, 0.8);
+    for (let i = 0; i < 4; i++) vox(15.6 + i * 0.8, 0.5, 'd', V.AH, N.A3 * (i % 2 ? 0.75 : 1), 0.3);
+
+    // -- 19.2–21.2 six-seven : two sacred hits
+    boom(19.2, 1.0);
+    sub(19.2, N.A2 / 2, 1.1, 0.7);
+    vox(19.25, 0.6, 's', V.EH, N.C4, 0.3);
+    boom(20.0, 1.0);
+    sub(20.0, N.G2 / 2, 1.1, 0.7);
+    vox(20.05, 0.6, 's', V.EH, N.B3 * 0.94, 0.3);
+    riser(20.6, 0.55, 0.2);
+
+    // -- 21.2–24.4 factory : bouncy groove
+    groove(21.2, 24.4, { root: N.D3, hats: true, claps: true, sub: true });
+    chantBar(21.2, N.D4, 0.26);
+    chantBar(22.8, N.D4, 0.26);
+    for (let i = 0; i < 16; i++) {
+      lead(21.2 + i * 0.2, [N.D5, 0, N.A4, N.D5, 0, N.A4, N.F4, N.A4, N.D5, 0, N.A4, N.D5, N.E5, N.D5, N.C5, N.A4][i] || N.A4, 0.18, 0.13);
+    }
+
+    // -- 24.4–28.0 dance : full chorus
+    groove(24.4, 28.0, { root: N.A2, hats: true, claps: true, sub: true, kick: 1.05 });
+    chantBar(24.4, N.A3, 0.32);
+    chantBar(26.0, N.C4, 0.32);
+    for (let i = 0; i < 18; i++) {
+      lead(24.4 + i * 0.2, [N.A4, N.A4, N.C5, N.A4, N.E5, N.D5, N.C5, N.A4, N.A4, N.A4, N.C5, N.D5, N.E5, N.D5, N.C5, N.A4, N.E5, N.A4][i], 0.19, 0.15);
+    }
+
+    // -- 28.0–31.2 aura : build — snare roll + riser
+    for (let i = 0; i < 32; i++) {
+      const t = 28.0 + i * 0.1;
+      clap(t, 0.1 + (i / 32) * 0.3);
+      if (i % 2 === 0) kick(t, 0.7);
+    }
+    riser(28.0, 3.0, 0.32);
+    chantBar(28.0, N.A3, 0.26);
+    chantBar(29.6, N.A3 * 1.12, 0.28);
+    for (let i = 0; i < 8; i++) vox(30.4 + i * 0.1, 0.09, 'd', V.EE, N.A3 * 1.2, 0.22);
+
+    // -- 31.2–33.6 versus : final drop
+    groove(31.2, 33.6, { root: N.F2, hats: true, claps: true, sub: true, kick: 1.1 });
+    chantBar(31.2, N.A3, 0.34);
+    boom(31.2, 0.9);
+    zap(32.0, 1300, 200, 0.3, 0.26);
+    zap(32.8, 1500, 180, 0.3, 0.26);
+
+    // -- 33.6–38 outro : chant slows, final hit
+    groove(33.6, 36.8, { root: N.A2, hats: true, claps: true, sub: true });
+    chantBar(33.6, N.A3, 0.32);
+    chantBar(35.2, N.A3, 0.3);
+    for (let i = 0; i < 8; i++) {
+      lead(35.2 + i * 0.2, [N.A4, N.A4, N.C5, N.A4, N.E5, N.D5, N.C5, N.A4][i], 0.2, 0.14);
+    }
+    boom(36.8, 0.85);
+    vox(36.85, 0.55, 'y', V.EH, N.A3, 0.3);
+    vox(37.45, 0.5, 'd', V.AH, N.A3, 0.28);
+    sub(37.6, N.A2 / 2, 0.5, 0.55);
+
+    void T0;
+    // render: Promise (modern), oncomplete (old Safari), никогда не бросаем синхронно
+    return new Promise(function (resolve, reject) {
+      let done = false;
+      function finish(buf) { if (!done) { done = true; resolve(buf); } }
+      function fail(e) { if (!done) { done = true; reject(e); } }
+      try {
+        if ('oncomplete' in oc) {
+          oc.oncomplete = function (e) {
+            finish((e && e.renderedBuffer) || (e && e.target && e.target.result) || null);
+          };
+        }
+        const r = oc.startRendering();
+        if (r && typeof r.then === 'function') {
+          r.then(finish, fail);
+        } else if (!('oncomplete' in oc)) {
+          fail(new Error('startRendering не вернул Promise'));
+        }
+        // иначе ждём oncomplete
+      } catch (e) { fail(e); }
+    });
+  }
+
+  FILM.MUSIC = {
+    duration: DURATION,
+    bpm: BPM,
+    beat: BEAT,
+    render: function (sampleRate) {
+      return renderScore(sampleRate || 44100);
+    },
+  };
+})();
+
+</script>
+  <script>
+// player.js : the player chrome + a WebM recorder so the film can go straight
+// to YouTube. Playback clock follows the audio clock; recording captures the
+// canvas stream + the score through MediaRecorder in real time.
+(function () {
+  'use strict';
+  const FILM = window.FILM;
+
+  function fmt(s) {
+    s = Math.max(0, Math.floor(s));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return m + ':' + (r < 10 ? '0' : '') + r;
+  }
+
+  function el(tag, cls, parent) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  function init() {
+    const root = document.getElementById('film');
+    if (!root) return;
+
+    root.classList.add('film-root');
+    const stage = el('div', 'film-stage', root);
+    const canvas = el('canvas', 'film-canvas', stage);
+    FILM.attach(canvas);
+
+    const overlay = el('div', 'film-overlay', stage);
+    overlay.classList.add('film-overlay-show');
+    const ovTitle = el('div', 'film-ov-title', overlay);
+    ovTitle.textContent = 'ЛИМОННЫЙ БРЕЙНРОТ';
+    const ovSub = el('div', 'film-ov-sub', overlay);
+    ovSub.textContent = 'СКИБИДИ ДОП ДОП · ДА ДА ЕС ЕС';
+    const ovBtn = el('button', 'film-ov-btn', overlay);
+    ovBtn.textContent = 'Синтезирую бит…';
+    ovBtn.disabled = true;
+    const ovHint = el('div', 'film-ov-hint', overlay);
+    ovHint.textContent = 'нарисовано в JavaScript · озвучено в Web Audio · можно записать в WebM и залить на YouTube';
+
+    const bar = el('div', 'film-bar', root);
+    const btnPlay = el('button', 'film-btn', bar);
+    btnPlay.textContent = '▶';
+    const btnReplay = el('button', 'film-btn', bar);
+    btnReplay.textContent = '⟲';
+
+    const scrub = el('input', 'film-scrub', bar);
+    scrub.type = 'range';
+    scrub.min = '0';
+    scrub.max = '10000';
+    scrub.value = '0';
+
+    const time = el('div', 'film-time', bar);
+    time.textContent = '0:00 / 0:00';
+
+    const btnMute = el('button', 'film-btn', bar);
+    btnMute.textContent = '♪';
+    const btnRec = el('button', 'film-rec', bar);
+    btnRec.textContent = '⏺ Записать WebM';
+    const btnFull = el('button', 'film-btn', bar);
+    btnFull.textContent = '⛶';
+
+    // ---- audio state ----
+    const AC = window.AudioContext || window.webkitAudioContext;
+    let actx = null;
+    let buffer = null;
+    let source = null;
+    let gain = null;
+    let playing = false;
+    let playhead = 0;
+    let startedAt = 0;
+    let startOffset = 0;
+    let muted = false;
+    let ready = false;
+    let ended = false;
+
+    const DURATION = FILM.TIMELINE ? FILM.prepare().duration : FILM.MUSIC.duration;
+
+    function currentT() {
+      if (!playing) return playhead;
+      const now = actx ? actx.currentTime : performance.now() / 1000;
+      return Math.min(DURATION, startOffset + (now - startedAt));
+    }
+
+    function stopSource() {
+      if (source) {
+        try {
+          source.onended = null;
+          source.stop();
+        } catch (e) { /* already stopped */ }
+        source = null;
+      }
+    }
+
+    function startSource() {
+      if (!buffer || !actx) return;
+      stopSource();
+      source = actx.createBufferSource();
+      source.buffer = buffer;
+      if (!gain) {
+        gain = actx.createGain();
+        gain.connect(actx.destination);
+      }
+      gain.gain.value = muted ? 0 : 1;
+      source.connect(gain);
+      source.start(0, Math.min(startOffset, DURATION - 0.01));
+      startedAt = actx.currentTime;
+    }
+
+    function play() {
+      if (!ready) {
+        // still synthesising — say so instead of doing nothing
+        ovBtn.textContent = '⏳ Синтезирую бит… секунду';
+        return;
+      }
+      ensureCtx(); // safe here: play() always runs from a user gesture
+      if (ended || playhead >= DURATION - 0.02) {
+        playhead = 0;
+        ended = false;
+      }
+      startOffset = playhead;
+      startedAt = actx ? actx.currentTime : performance.now() / 1000;
+      startSource();
+      playing = true;
+      btnPlay.textContent = '❚❚';
+      overlay.classList.remove('film-overlay-show');
+    }
+
+    function pause() {
+      if (!playing) return;
+      playhead = currentT();
+      playing = false;
+      stopSource();
+      btnPlay.textContent = '▶';
+    }
+
+    function toggle() {
+      if (playing) pause();
+      else play();
+    }
+
+    function seek(t) {
+      t = Math.max(0, Math.min(DURATION, t));
+      if (playing) {
+        startOffset = t;
+        playhead = t;
+        ended = false;
+        startSource();
+      } else {
+        playhead = t;
+        ended = t >= DURATION - 0.02;
+        FILM.renderFrame(t);
+        updateChrome();
+      }
+    }
+
+    function replay() {
+      seek(0);
+      play();
+    }
+
+    // ---- recorder ----
+    let rec = null;
+    let chunks = [];
+
+    function pickMime() {
+      const list = [
+        'video/webm;codecs=vp9,opus',
+        'video/webm;codecs=vp8,opus',
+        'video/webm;codecs=vp9',
+        'video/webm',
+      ];
+      for (const m of list) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+      }
+      return '';
+    }
+
+    function finishRecording() {
+      if (!rec) return;
+      const r = rec;
+      rec = null;
+      if (r.state !== 'inactive') r.stop();
+      btnRec.textContent = '⏺ Записать WebM';
+      btnRec.classList.remove('film-rec-on');
+    }
+
+    function startRecording() {
+      if (!window.MediaRecorder || !canvas.captureStream) {
+        btnRec.textContent = 'запись не поддерживается';
+        return;
+      }
+      if (!ready) return;
+      ensureCtx();
+      const mime = pickMime();
+      const stream = canvas.captureStream(60);
+      if (gain && actx) {
+        const dest = actx.createMediaStreamDestination();
+        gain.connect(dest);
+        for (const tr of dest.stream.getAudioTracks()) stream.addTrack(tr);
+      }
+      chunks = [];
+      try {
+        rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 8000000 } : undefined);
+      } catch (e) {
+        rec = new MediaRecorder(stream);
+      }
+      rec.ondataavailable = function (e) {
+        if (e.data && e.data.size) chunks.push(e.data);
+      };
+      rec.onstop = function () {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'lemon-brainrot.webm';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+          URL.revokeObjectURL(url);
+          a.remove();
+        }, 4000);
+      };
+      rec.start(250);
+      btnRec.textContent = '⏹ Стоп и скачать';
+      btnRec.classList.add('film-rec-on');
+      seek(0);
+      play();
+    }
+
+    btnRec.addEventListener('click', function () {
+      if (rec) {
+        finishRecording();
+        pause();
+      } else {
+        startRecording();
+      }
+    });
+
+    // ---- chrome sync ----
+    let scrubbing = false;
+    function updateChrome() {
+      const T = currentT();
+      if (!scrubbing) scrub.value = String(Math.round((T / DURATION) * 10000));
+      time.textContent = fmt(T) + ' / ' + fmt(DURATION);
+    }
+
+    // ---- frame loop ----
+    function frame() {
+      const T = currentT();
+      FILM.renderFrame(T);
+      updateChrome();
+      if (playing && T >= DURATION - 0.01) {
+        playing = false;
+        ended = true;
+        playhead = DURATION;
+        btnPlay.textContent = '▶';
+        ovBtn.textContent = 'Смотреть снова';
+        overlay.classList.add('film-overlay-show');
+        if (rec) finishRecording();
+      }
+      requestAnimationFrame(frame);
+    }
+
+    // ---- events ----
+    btnPlay.addEventListener('click', toggle);
+    btnReplay.addEventListener('click', replay);
+    ovBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (ended) replay();
+      else play();
+    });
+    // click anywhere on the card to start
+    overlay.addEventListener('click', function () {
+      if (ended) replay();
+      else play();
+    });
+    btnMute.addEventListener('click', function () {
+      muted = !muted;
+      if (gain) gain.gain.value = muted ? 0 : 1;
+      btnMute.textContent = muted ? '✕' : '♪';
+    });
+    btnFull.addEventListener('click', function () {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (root.requestFullscreen) root.requestFullscreen();
+    });
+
+    scrub.addEventListener('input', function () {
+      scrubbing = true;
+      const t = (Number(scrub.value) / 10000) * DURATION;
+      if (!playing) {
+        playhead = t;
+        FILM.renderFrame(t);
+      }
+    });
+    scrub.addEventListener('change', function () {
+      const t = (Number(scrub.value) / 10000) * DURATION;
+      scrubbing = false;
+      seek(t);
+    });
+
+    window.addEventListener('keydown', function (e) {
+      if (e.target === scrub) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggle();
+      } else if (e.code === 'ArrowRight') {
+        seek(currentT() + 2);
+      } else if (e.code === 'ArrowLeft') {
+        seek(currentT() - 2);
+      } else if (e.key === 'm' || e.key === 'M' || e.key === 'ь' || e.key === 'Ь') {
+        btnMute.click();
+      } else if (e.key === 'r' || e.key === 'R' || e.key === 'к' || e.key === 'К') {
+        replay();
+      } else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') {
+        btnFull.click();
+      }
+    });
+
+    window.addEventListener('resize', function () {
+      FILM.resize();
+      FILM.renderFrame(currentT());
+    });
+
+    // ---- boot: nothing here may ever break the buttons ----
+    window.addEventListener('pointerdown', function () { ensureCtx(); }, { once: true });
+    window.addEventListener('keydown', function () { ensureCtx(); }, { once: true });
+
+    FILM.renderFrame(0);
+    updateChrome();
+    requestAnimationFrame(frame);
+
+    // synthesize the score; failure must not kill the player
+    (function bootAudio() {
+      // some browsers throw if an AudioContext is created before a gesture
+      let sr = 44100;
+      try {
+        if (AC) sr = new AC().sampleRate || 44100;
+      } catch (e) { sr = 44100; }
+      let p;
+      try {
+        p = FILM.MUSIC.render(sr);
+      } catch (e) {
+        p = Promise.reject(e);
+      }
+      Promise.resolve(p).then(function (buf) {
+        buffer = buf || null;
+        ready = true;
+        ovBtn.disabled = false;
+        ovBtn.textContent = '▶ Смотреть';
+      }, function (err) {
+        ready = true; // visuals still play without audio
+        ovBtn.disabled = false;
+        ovBtn.textContent = '▶ Смотреть без звука';
+        if (window.console) console.error(err);
+      });
+    })();
+
+    function ensureCtx() {
+      if (!AC) return null;
+      try {
+        if (!actx) {
+          actx = new AC();
+          gain = actx.createGain();
+          gain.gain.value = muted ? 0 : 1;
+          gain.connect(actx.destination);
+        }
+        if (actx.state === 'suspended') actx.resume();
+      } catch (e) {
+        actx = null; // no audio support: video still plays via rAF
+      }
+      return actx;
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+</script>
+</body>
+</html>
