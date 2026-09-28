@@ -14,7 +14,7 @@
   .card{display:flex;gap:12px;padding:12px;border-radius:14px;cursor:pointer;margin-bottom:10px;border:1px solid transparent;transition:.2s;text-decoration:none;color:inherit}
   .card:hover{background:#ffffff0a}
   .card.on{background:#f4d9a014;border-color:#f4d9a055}
-  .thumb{width:62px;height:110px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:30px}
+  .thumb{width:62px;height:110px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:30px;text-shadow:0 2px 8px #000}
   .card b{display:block;font-size:16px;margin:4px 0}
   .card p{margin:0;font-size:13px;opacity:.65;line-height:1.35}
   .tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;background:#ffffff14;margin-top:6px;margin-right:4px}
@@ -52,6 +52,9 @@ const V=Date.now(); // сброс кэша — всегда свежая вер�
 const FILMS=[
   {id:'universe',file:'universe.html',title:'История Вселенной',emoji:'🌌',bg:'linear-gradient(#1a1040,#401a30)',desc:'От Большого взрыва до искусственного интеллекта. 24 главы, 3D-сцены.',tags:['~4 мин','3D','24 главы']},
   {id:'star',file:'star.html',title:'Жизнь звезды',emoji:'⭐',bg:'linear-gradient(#10102a,#3a1a10)',desc:'Туманность, рождение, красный гигант, сверхновая — и новое начало.',tags:['30 сек','чернила']},
+  {id:'citro',file:'video.html?src=../exports/citro-dopdop-ep01.mp4&poster=../exports/citro-thumbnail.jpg',title:'Цитро доп-доп',emoji:'🦜',bg:'url(../exports/citro-thumbnail.jpg) center/cover',desc:'Шортс 1: жёлтый попугай в кедах, чайник сказал «нет», лимоны победили.',tags:['25 сек','MP4','Shorts']},
+  {id:'syrok',file:'video.html?src=../exports/syrok-vzhuh-ep01.mp4&poster=../exports/syrok-thumbnail.jpg',title:'Сырко вжух-вжух',emoji:'🧀',bg:'url(../exports/syrok-thumbnail.jpg) center/cover',desc:'Шортс 2: сырок против холодильника.',tags:['MP4','Shorts']},
+  {id:'tapok',file:'video.html?src=../exports/tapok-shlep-ep01.mp4&poster=../exports/tapok-thumbnail.jpg',title:'Тапок шлёп-шлёп',emoji:'🩴',bg:'url(../exports/tapok-thumbnail.jpg) center/cover',desc:'Шортс 3: тапок, веник и таракан.',tags:['MP4','Shorts']},
   {id:'brainrot',file:'brainrot.html',title:'LIMONINI DINAMITINI',emoji:'🍋',bg:'linear-gradient(#ffe600,#ff4fd8)',desc:'Брейнрот-шортс: лимон с динамитом, тостер-балерина, кактус-боксёр.',tags:['30 сек','140 BPM','Shorts']},
 ];
 const list=document.getElementById('list'),frame=document.getElementById('frame');
@@ -59,7 +62,7 @@ FILMS.forEach(f=>{const a=document.createElement('a');a.className='card';a.href=
   a.innerHTML=`<div class="thumb" style="background:${f.bg}">${f.emoji}</div><div><b>${f.title}</b><p>${f.desc}</p>${f.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;list.appendChild(a)});
 function show(){const id=location.hash.slice(1)||FILMS[0].id;const f=FILMS.find(x=>x.id===id)||FILMS[0];
   document.querySelectorAll('.card').forEach(c=>c.classList.toggle('on',c.id==='c-'+f.id));
-  frame.src=f.file+'?v='+V;document.title=f.title+' — процедурное кино';setTimeout(()=>frame.focus(),300)}
+  frame.src=f.file+(f.file.includes('?')?'&':'?')+'v='+V;document.title=f.title+' — процедурное кино';setTimeout(()=>frame.focus(),300)}
 const step=d=>{const i=FILMS.findIndex(x=>'#'+x.id===(location.hash||'#'+FILMS[0].id));location.hash=FILMS[(i+d+FILMS.length)%FILMS.length].id};
 document.getElementById('prev').onclick=()=>step(-1);document.getElementById('next').onclick=()=>step(1);
 addEventListener('hashchange',show);show();

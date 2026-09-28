@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Видео</title>
+<style>html,body{margin:0;height:100%;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+video{height:96vh;aspect-ratio:9/16;max-width:100%;border-radius:10px;background:#000}</style></head>
+<body><video id="v" controls playsinline preload="metadata"></video>
+<script>
+const q=new URLSearchParams(location.search),v=document.getElementById('v');
+v.src=q.get('src');if(q.get('poster'))v.poster=q.get('poster');
+addEventListener('keydown',e=>{if(e.target===v)return;if(e.code==='Space'){e.preventDefault();v.paused?v.play():v.pause()}
+  if(e.code==='ArrowLeft')v.currentTime-=5;if(e.code==='ArrowRight')v.currentTime+=5;if(e.code==='KeyF')v.requestFullscreen?.()});
+</script></body></html>
