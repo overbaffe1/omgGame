@@ -1,0 +1,41 @@
+import { FilmSpec } from '../types';
+
+// Reference film: life of a lone robot - 32 seconds, 17 shots, 120bpm, 1080x1920
+export const robotFilm: FilmSpec = {
+  id: 'robot',
+  title: 'THE LONE ROBOT',
+  titleRu: 'ОДИНОКИЙ РОБОТ',
+  logline: 'A small robot wakes up in an empty world, finds a seed, and grows a forest.',
+  loglineRu: 'Маленький робот просыпается в пустом мире, находит семечко и выращивает лес.',
+  duration: 32,
+  fps: 24,
+  bpm: 120,
+  width: 1080,
+  height: 1920,
+  palette: {
+    paper: '#fdf6e3',
+    ink: '#1a1a1a',
+    accent: '#ff6b35',
+    blueprint: '#0a1931',
+    blueprintInk: '#a8d0ff',
+  },
+  shots: [
+    { id: 's1', title: 'VOID', titleRu: 'ПУСТОТА', duration: 1.8, mode: 'paper', action: 'empty world, wind lines', seed: 101, intensity: 0.15 },
+    { id: 's2', title: 'AWAKEN', titleRu: 'ПРОБУЖДЕНИЕ', duration: 1.9, mode: 'blueprint', action: 'robot schematic, eye blinks', seed: 102, intensity: 0.25 },
+    { id: 's3', title: 'FIRST STEP', titleRu: 'ПЕРВЫЙ ШАГ', duration: 2.0, mode: 'paper', action: 'robot stands, wobbly', seed: 103, intensity: 0.35 },
+    { id: 's4', title: 'WALK', titleRu: 'ПРОГУЛКА', duration: 2.2, mode: 'paper', action: 'robot walks across empty plain', seed: 104, intensity: 0.4 },
+    { id: 's5', title: 'FLOWER', titleRu: 'ЦВЕТОК', duration: 1.8, mode: 'memory', action: 'finds last flower', seed: 105, intensity: 0.55 },
+    { id: 's6', title: 'STORM', titleRu: 'БУРЯ', duration: 2.0, mode: 'blueprint', action: 'wind, flower breaks', seed: 106, intensity: 0.85 },
+    { id: 's7', title: 'SEED', titleRu: 'СЕМЕЧКО', duration: 1.6, mode: 'paper', action: 'seed in robot hands', seed: 107, intensity: 0.45 },
+    { id: 's8', title: 'NIGHT', titleRu: 'НОЧЬ', duration: 2.1, mode: 'night', action: 'robot looks at stars, blueprint constellations', seed: 108, intensity: 0.3 },
+    { id: 's9', title: 'PLAN', titleRu: 'ПЛАН', duration: 1.7, mode: 'blueprint', action: 'robot draws plan to plant', seed: 109, intensity: 0.5 },
+    { id: 's10', title: 'DIG', titleRu: 'КОПАЕТ', duration: 1.9, mode: 'paper', action: 'digs hole', seed: 110, intensity: 0.6 },
+    { id: 's11', title: 'PLANT', titleRu: 'САЖАЕТ', duration: 1.5, mode: 'paper', action: 'places seed, waters', seed: 111, intensity: 0.55 },
+    { id: 's12', title: 'WAIT', titleRu: 'ОЖИДАНИЕ', duration: 1.8, mode: 'memory', action: 'sits, time passes, sun moves', seed: 112, intensity: 0.35 },
+    { id: 's13', title: 'SPROUT', titleRu: 'РОСТОК', duration: 2.0, mode: 'paper', action: 'seed sprouts', seed: 113, intensity: 0.7 },
+    { id: 's14', title: 'GROWTH', titleRu: 'РОСТ', duration: 2.3, mode: 'paper', action: 'fast growth to tree', seed: 114, intensity: 0.8 },
+    { id: 's15', title: 'FOREST', titleRu: 'ЛЕС', duration: 2.2, mode: 'paper', action: 'forest appears, robot old', seed: 115, intensity: 0.9 },
+    { id: 's16', title: 'REST', titleRu: 'ПОКОЙ', duration: 1.7, mode: 'memory', action: 'robot rests under tree', seed: 116, intensity: 0.5 },
+    { id: 's17', title: 'CYCLE', titleRu: 'ЦИКЛ', duration: 1.5, mode: 'blueprint', action: 'seed flies away, loop', seed: 117, intensity: 0.6 },
+  ],
+};

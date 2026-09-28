@@ -1,0 +1,38 @@
+import { FilmSpec } from '../types';
+
+export const signalFilm: FilmSpec = {
+  id: 'signal',
+  title: 'THE SIGNAL',
+  titleRu: 'СИГНАЛ',
+  logline: 'A lonely signal travels across dead satellites searching for a listener.',
+  loglineRu: 'Одинокий сигнал летит через мёртвые спутники в поисках слушателя.',
+  duration: 31,
+  fps: 24,
+  bpm: 128,
+  width: 1080,
+  height: 1920,
+  palette: {
+    paper: '#f8fafc',
+    ink: '#0f172a',
+    accent: '#06b6d4',
+    blueprint: '#020617',
+    blueprintInk: '#67e8f9',
+  },
+  shots: [
+    { id: 's1', title: 'SILENCE', titleRu: 'ТИШИНА', duration: 1.8, mode: 'night', action: 'empty space', seed: 301, intensity: 0.15 },
+    { id: 's2', title: 'ORIGIN', titleRu: 'ИСТОК', duration: 1.9, mode: 'blueprint', action: 'old antenna sends', seed: 302, intensity: 0.3 },
+    { id: 's3', title: 'LAUNCH', titleRu: 'ЗАПУСК', duration: 1.7, mode: 'paper', action: 'signal as light dot launches', seed: 303, intensity: 0.5 },
+    { id: 's4', title: 'DEBRIS', titleRu: 'ОБЛОМКИ', duration: 2.0, mode: 'blueprint', action: 'through satellite graveyard', seed: 304, intensity: 0.6 },
+    { id: 's5', title: 'ECHO', titleRu: 'ЭХО', duration: 1.8, mode: 'paper', action: 'bounces, echoes', seed: 305, intensity: 0.7 },
+    { id: 's6', title: 'LOST', titleRu: 'ПОТЕРЯН', duration: 2.1, mode: 'night', action: 'signal dims', seed: 306, intensity: 0.25 },
+    { id: 's7', title: 'MEMORY', titleRu: 'ПАМЯТЬ', duration: 1.9, mode: 'memory', action: 'flashback of Earth', seed: 307, intensity: 0.4 },
+    { id: 's8', title: 'PULSE', titleRu: 'ПУЛЬС', duration: 1.6, mode: 'blueprint', action: 'regains strength', seed: 308, intensity: 0.8 },
+    { id: 's9', title: 'ACCEL', titleRu: 'УСКОРЕНИЕ', duration: 1.8, mode: 'paper', action: 'fast travel', seed: 309, intensity: 0.9 },
+    { id: 's10', title: 'VOID2', titleRu: 'ПУСТОТА', duration: 1.7, mode: 'night', action: 'long void', seed: 310, intensity: 0.3 },
+    { id: 's11', title: 'RECEIVER', titleRu: 'ПРИЁМНИК', duration: 2.0, mode: 'blueprint', action: 'distant dish, faint', seed: 311, intensity: 0.55 },
+    { id: 's12', title: 'APPROACH', titleRu: 'ПРИБЛИЖЕНИЕ', duration: 2.2, mode: 'paper', action: 'approaches', seed: 312, intensity: 0.75 },
+    { id: 's13', title: 'CONTACT', titleRu: 'КОНТАКТ', duration: 2.0, mode: 'memory', action: 'dish lights up', seed: 313, intensity: 0.85 },
+    { id: 's14', title: 'ANSWER', titleRu: 'ОТВЕТ', duration: 1.9, mode: 'paper', action: 'reply signal sent', seed: 314, intensity: 0.9 },
+    { id: 's15', title: 'BOTH', titleRu: 'ВДВОЁМ', duration: 2.6, mode: 'blueprint', action: 'two signals dance', seed: 315, intensity: 0.7 },
+  ],
+};

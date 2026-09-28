@@ -1,0 +1,38 @@
+import { FilmSpec } from '../types';
+
+export const sporeFilm: FilmSpec = {
+  id: 'spore',
+  title: 'THE LAST SPORE',
+  titleRu: 'ПОСЛЕДНЯЯ СПОРА',
+  logline: 'A mushroom spore travels through the city, desert and ocean to become a forest.',
+  loglineRu: 'Спора гриба летит через город, пустыню и океан, чтобы стать лесом.',
+  duration: 30,
+  fps: 24,
+  bpm: 112,
+  width: 1080,
+  height: 1920,
+  palette: {
+    paper: '#fef9ef',
+    ink: '#2b1d11',
+    accent: '#7c3aed',
+    blueprint: '#0f172a',
+    blueprintInk: '#c4b5fd',
+  },
+  shots: [
+    { id: 's1', title: 'RELEASE', titleRu: 'ВЫБРОС', duration: 1.6, mode: 'paper', action: 'mushroom releases spore', seed: 201, intensity: 0.2 },
+    { id: 's2', title: 'CITY', titleRu: 'ГОРОД', duration: 2.0, mode: 'blueprint', action: 'spore over blueprint city', seed: 202, intensity: 0.4 },
+    { id: 's3', title: 'WIND', titleRu: 'ВЕТЕР', duration: 1.8, mode: 'paper', action: 'wind carries', seed: 203, intensity: 0.6 },
+    { id: 's4', title: 'DESERT', titleRu: 'ПУСТЫНЯ', duration: 2.1, mode: 'paper', action: 'desert, dry', seed: 204, intensity: 0.35 },
+    { id: 's5', title: 'OCEAN', titleRu: 'ОКЕАН', duration: 2.2, mode: 'blueprint', action: 'ocean cross-section', seed: 205, intensity: 0.7 },
+    { id: 's6', title: 'RAIN', titleRu: 'ДОЖДЬ', duration: 1.7, mode: 'paper', action: 'rain, spore falls', seed: 206, intensity: 0.85 },
+    { id: 's7', title: 'SOIL', titleRu: 'ПОЧВА', duration: 1.5, mode: 'blueprint', action: 'soil layers, seed lands', seed: 207, intensity: 0.3 },
+    { id: 's8', title: 'DARK', titleRu: 'ТЬМА', duration: 1.9, mode: 'night', action: 'underground, waiting', seed: 208, intensity: 0.25 },
+    { id: 's9', title: 'MYCELIUM', titleRu: 'МИЦЕЛИЙ', duration: 2.0, mode: 'blueprint', action: 'mycelium network grows', seed: 209, intensity: 0.5 },
+    { id: 's10', title: 'BREAK', titleRu: 'ПРОРЫВ', duration: 1.6, mode: 'paper', action: 'breaks through soil', seed: 210, intensity: 0.75 },
+    { id: 's11', title: 'FIRST LIGHT', titleRu: 'ПЕРВЫЙ СВЕТ', duration: 1.8, mode: 'memory', action: 'first sun', seed: 211, intensity: 0.6 },
+    { id: 's12', title: 'GROW', titleRu: 'РОСТ', duration: 2.2, mode: 'paper', action: 'grows to mushroom', seed: 212, intensity: 0.8 },
+    { id: 's13', title: 'SPREAD', titleRu: 'РАСПРОСТРАНЕНИЕ', duration: 2.0, mode: 'paper', action: 'forest of mushrooms', seed: 213, intensity: 0.9 },
+    { id: 's14', title: 'CYCLE', titleRu: 'ЦИКЛ', duration: 1.8, mode: 'memory', action: 'releases new spores', seed: 214, intensity: 0.65 },
+    { id: 's15', title: 'END', titleRu: 'КОНЕЦ', duration: 1.8, mode: 'blueprint', action: 'map of spread', seed: 215, intensity: 0.4 },
+  ],
+};
