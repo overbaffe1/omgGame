@@ -1,0 +1,17 @@
+name: subs
+on:
+  push:
+    paths: ['.github/workflows/subs.yml', 'body51/want.txt']
+jobs:
+  subs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: pip install -q yt-dlp
+      - run: |
+          mkdir out
+          yt-dlp --flat-playlist --print "%(id)s	%(duration_string)s	%(title)s" "https://www.youtube.com/playlist?list=UULVF-I2CGL_0yeqCujjnuwYqg" > out/all_streams.tsv || true
+          wc -l out/all_streams.tsv
+          yt-dlp --skip-download --write-auto-subs --sub-langs ru --sub-format vtt -o "out/%(id)s.%(ext)s" "https://youtu.be/BSh2rLNaZ14" || true
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with: {name: subs, path: out}
