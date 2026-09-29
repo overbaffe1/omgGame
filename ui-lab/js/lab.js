@@ -88,6 +88,7 @@ function initStage(atlas) {
     kills: 7,
     hover: -1, selected: 0,
     shake: 0, flash: 0, toast: null, toastT: 0,
+    pressedAct: null,
     floaters: [], // {x,y,vy,text,color,t}
     mouse: { x: -99, y: -99, inside: false },
   };
@@ -134,7 +135,11 @@ function initStage(atlas) {
   cv.addEventListener('mousedown', (e) => {
     const m = toStage(e);
     for (const b of buttons) {
-      if (m.x >= b.x && m.x < b.x + b.w && m.y >= b.y && m.y < b.y + b.h) { act(b.act); return; }
+      if (m.x >= b.x && m.x < b.x + b.w && m.y >= b.y && m.y < b.y + b.h) {
+        state.pressedAct = b.act;
+        act(b.act);
+        return;
+      }
     }
     for (let i = 0; i < BELT.length; i++) {
       const sx = 208 + i * 40;
@@ -236,9 +241,10 @@ function initStage(atlas) {
     const m = state.mouse;
     for (const b of buttons) {
       const hov = m.inside && m.x >= b.x && m.x < b.x + b.w && m.y >= b.y && m.y < b.y + b.h;
-      const name = hov ? 'btn_hover' : 'btn_normal';
+      const pressed = hov && state.pressedAct === b.act;
+      const name = pressed ? 'btn_pressed' : hov ? 'btn_hover' : 'btn_normal';
       atlas.draw9(ctx, name, b.x, b.y, b.w, b.h);
-      drawText(ctx, b.label, b.x + b.w / 2 - textWidth(b.label) / 2, b.y + 12, hov ? P.gold4 : P.ink);
+      drawText(ctx, b.label, b.x + b.w / 2 - textWidth(b.label) / 2, b.y + 12 + (pressed ? 1 : 0), pressed ? P.inkDim : hov ? P.gold4 : P.ink);
     }
   }
 
