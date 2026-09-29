@@ -93,8 +93,8 @@ ANIM=r"""function anim(s,id,lt,t,u){
     if(id==='geo'){const g4=L('e5geo4');return {o:g4.p>0?{reach:1}:{up:Math.sin(t*6)>0,jy:-Math.abs(Math.sin(t*6))*20}}}
     return {o:{up:Math.sin(t*6+id.length)>0,jy:-Math.abs(Math.sin(t*6+id.length))*20}}}
   if(k==='car'){const b3=L('e5bai3');if(id==='bai'){const e=ease(seg(b3.p,-0.6,0));const back=ease(seg(b3.p,1,1.6));return {x:lerp(-200,300,e)-back*500,o:e<1&&e>0||back>0?{walk:true,flip:back>0}:{reach:1}}}
-    if(id==='mer'||id==='der'){return {x:id==='mer'?760:900,o:{reach:id==='mer'?1:-1},fx:id==='mer'&&b3.p<0?()=>heartShape(830,FL-560+Math.sin(t*4)*10,22,'#f36'):null}}}
-  if(k==='kiss'){if(id==='bur'){const e=ease(seg(L('e5bur7').p,.6,1));return {x:lerp(1140,900,e),o:e>0?{reach:-1}:{}}}if(id==='cri'&&L('e5cri3').p>0)return {o:{reach:1}}}
+    if(id==='mer'||id==='der'){return {x:id==='mer'?730:950,o:{reach:id==='mer'?1:-1},fx:id==='mer'&&b3.p<0?()=>heartShape(830,FL-560+Math.sin(t*4)*10,22,'#f36'):null}}}
+  if(k==='kiss'){if(id==='bur'){const e=ease(seg(L('e5bur7').p,.6,1));return {x:lerp(1140,960,e),o:e>0?{reach:-1}:{}}}if(id==='cri'&&L('e5cri3').p>0)return {o:{reach:1}}}
   return null}
 """
 e.between("function nailsOn(","\nfunction defibCart",ANIM)
