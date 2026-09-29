@@ -63,7 +63,7 @@ e.R("P.vip={","P.liz={n:'Лиз Фэллон',s:'Лиз',r:'операционн
 EXTRA=r"""function extra(kind,u,t,s,lt){
   if(kind==='nails'){g.fillStyle='#111';rr(1420,110,420,360,14);g.fill();g.fillStyle='#ddd';g.beginPath();g.ellipse(1630,290,140,160,0,0,TAU);g.fill();g.fillStyle='#999';g.beginPath();g.ellipse(1630,290,118,138,0,0,TAU);g.fill();
     g.strokeStyle='#fff';g.lineWidth=5;for(let i=0;i<16;i++){const a=-2.6+i*.33,r0=150,r1=95;g.beginPath();g.moveTo(1630+Math.cos(a)*r0,290+Math.sin(a)*r0*1.1);g.lineTo(1630+Math.cos(a)*r1,290+Math.sin(a)*r1*1.1);g.stroke()}
-    g.fillStyle='#fff';g.font='bold 24px system-ui';g.textAlign='center';g.fillText('РЕНТГЕН · 16 гвоздей',1630,500)}
+    g.fillStyle='#fff';g.font='bold 24px system-ui';g.textAlign='center';g.fillText('РЕНТГЕН · 16 гвоздей',1630,140)}
   if(kind==='posters'){const k=ease(seg(u,0,.1));for(let i=0;i<7;i++){g.save();g.translate(200+i*250,300+(i%2)*90);g.rotate((i%3-1)*.08);g.scale(k,k);g.fillStyle='#fff';g.fillRect(-80,-105,160,210);
     g.fillStyle=['#f6c1d0','#c9e4ff','#ffe3a8'][i%3];g.fillRect(-70,-95,140,160);g.fillStyle='#f0cd6a';g.beginPath();g.arc(0,-40,34,0,TAU);g.fill();g.fillStyle='#f6d6be';g.beginPath();g.arc(0,-30,26,0,TAU);g.fill();
     g.fillStyle='#e05a8a';rr(-30,-2,60,60,20);g.fill();g.fillStyle='#333';g.font='bold 18px system-ui';g.textAlign='center';g.fillText('ДОКТОР МОДЕЛЬ',0,90);g.restore()}}
