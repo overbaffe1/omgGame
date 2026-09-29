@@ -7,7 +7,8 @@ F=os.environ.get('FFMPEG','/tmp/r/node_modules/@ffmpeg-installer/linux-x64/ffmpe
 CAST={'mer':('xenia','medium','medium'),'kat':('kseniya','high','fast'),'izz':('baya','medium','medium'),
  'cri':('silero/cri.pt','medium','fast'),'bai':('silero/bai.pt','low','medium'),'ell':('silero/ell.pt','low','slow'),
  'der':('aidar','medium','medium'),'web':('eugene','low','slow'),'bur':('eugene','medium','fast'),
- 'geo':('aidar','high','fast'),'alx':('aidar','low','fast'),'pat':('eugene','high','medium')}
+ 'geo':('aidar','high','fast'),'alx':('aidar','low','fast'),'pat':('eugene','high','medium'),
+ 'ali':('baya','high','slow'),'lu':('kseniya','low','slow'),'rap':('eugene','x-low','medium')}
 imp=torch.package.PackageImporter(MODEL);model=imp.load_pickle('tts_models','model')
 L=json.load(open(sys.argv[1]));out=sys.argv[2] if len(sys.argv)>2 else HERE
 for vo,(who,txt) in L.items():

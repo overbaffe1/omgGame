@@ -1,7 +1,123 @@
-{"_note":"Голоса «Анатомии страсти» — одинаковые во всех сериях. Движок: Silero TTS v3.1 ru (нейросеть), модель: github.com/AlexArutiunian/tts_silero/model.pt. Скрипт: film/voices/synth_silero.py. Формат: [диктор или файл голоса, pitch, rate].",
- "mer":{"name":"Мередит Грей","voice":["xenia","medium","medium"]},"kat":{"name":"Кэти Брайс","voice":["kseniya","high","fast"]},
- "izz":{"name":"Иззи Стивенс","voice":["baya","medium","medium"]},"cri":{"name":"Кристина Янг","voice":["silero/cri.pt","medium","fast"]},
- "bai":{"name":"Миранда Бейли","voice":["silero/bai.pt","low","medium"]},"ell":{"name":"Эллис Грей","voice":["silero/ell.pt","low","slow"]},
- "der":{"name":"Дерек Шепард","voice":["aidar","medium","medium"]},"web":{"name":"Ричард Уэббер","voice":["eugene","low","slow"]},
- "bur":{"name":"Престон Бёрк","voice":["eugene","medium","fast"]},"geo":{"name":"Джордж О’Мэлли","voice":["aidar","high","fast"]},
- "alx":{"name":"Алекс Карев","voice":["aidar","low","fast"]},"pat":{"name":"пациент","voice":["eugene","high","medium"]}}
+{
+"_note": "Голоса «Анатомии страсти» — одинаковые во всех сериях. Движок: Silero TTS v3.1 ru (нейросеть), модель: github.com/AlexArutiunian/tts_silero/model.pt. Скрипт: film/voices/synth_silero.py. Формат: [диктор или файл голоса, pitch, rate].",
+"mer": {
+"name": "Мередит Грей",
+"voice": [
+"xenia",
+"medium",
+"medium"
+]
+},
+"kat": {
+"name": "Кэти Брайс",
+"voice": [
+"kseniya",
+"high",
+"fast"
+]
+},
+"izz": {
+"name": "Иззи Стивенс",
+"voice": [
+"baya",
+"medium",
+"medium"
+]
+},
+"cri": {
+"name": "Кристина Янг",
+"voice": [
+"silero/cri.pt",
+"medium",
+"fast"
+]
+},
+"bai": {
+"name": "Миранда Бейли",
+"voice": [
+"silero/bai.pt",
+"low",
+"medium"
+]
+},
+"ell": {
+"name": "Эллис Грей",
+"voice": [
+"silero/ell.pt",
+"low",
+"slow"
+]
+},
+"der": {
+"name": "Дерек Шепард",
+"voice": [
+"aidar",
+"medium",
+"medium"
+]
+},
+"web": {
+"name": "Ричард Уэббер",
+"voice": [
+"eugene",
+"low",
+"slow"
+]
+},
+"bur": {
+"name": "Престон Бёрк",
+"voice": [
+"eugene",
+"medium",
+"fast"
+]
+},
+"geo": {
+"name": "Джордж О’Мэлли",
+"voice": [
+"aidar",
+"high",
+"fast"
+]
+},
+"alx": {
+"name": "Алекс Карев",
+"voice": [
+"aidar",
+"low",
+"fast"
+]
+},
+"pat": {
+"name": "пациент",
+"voice": [
+"eugene",
+"high",
+"medium"
+]
+},
+"ali": {
+"name": "Эллисон",
+"voice": [
+"baya",
+"high",
+"slow"
+]
+},
+"lu": {
+"name": "Миссис Лу",
+"voice": [
+"kseniya",
+"low",
+"slow"
+]
+},
+"rap": {
+"name": "Нападавший",
+"voice": [
+"eugene",
+"x-low",
+"medium"
+]
+}
+}
