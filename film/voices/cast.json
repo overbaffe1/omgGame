@@ -1,7 +1,7 @@
-{"_note":"Голоса «Анатомии страсти» — одинаковые во всех сериях. Движок: RHVoice (локально, film/voices/synth.py). Профиль: [голос, сдвиг высоты в полутонах, темп].",
- "mer":{"name":"Мередит Грей","prof":["elena",0,1.0]},"cri":{"name":"Кристина Янг","prof":["irina",1,1.1]},
- "izz":{"name":"Иззи Стивенс","prof":["anna",1.5,1.0]},"bai":{"name":"Миранда Бейли","prof":["irina",-2,0.97]},
- "kat":{"name":"Кэти Брайс","prof":["anna",3.5,1.1]},"ell":{"name":"Эллис Грей","prof":["elena",-2.5,0.88]},
- "der":{"name":"Дерек Шепард","prof":["aleksandr",-1,0.98]},"web":{"name":"Ричард Уэббер","prof":["aleksandr",-4,0.9]},
- "bur":{"name":"Престон Бёрк","prof":["aleksandr",-2.5,1.05]},"geo":{"name":"Джордж О’Мэлли","prof":["aleksandr",2,1.08]},
- "alx":{"name":"Алекс Карев","prof":["aleksandr",0.5,1.12]},"pat":{"name":"пациент","prof":["aleksandr",3,0.95]}}
+{"_note":"Голоса «Анатомии страсти» — одинаковые во всех сериях. Движок: Silero TTS v3.1 ru (нейросеть), модель: github.com/AlexArutiunian/tts_silero/model.pt. Скрипт: film/voices/synth_silero.py. Формат: [диктор или файл голоса, pitch, rate].",
+ "mer":{"name":"Мередит Грей","voice":["xenia","medium","medium"]},"kat":{"name":"Кэти Брайс","voice":["kseniya","high","fast"]},
+ "izz":{"name":"Иззи Стивенс","voice":["baya","medium","medium"]},"cri":{"name":"Кристина Янг","voice":["silero/cri.pt","medium","fast"]},
+ "bai":{"name":"Миранда Бейли","voice":["silero/bai.pt","low","medium"]},"ell":{"name":"Эллис Грей","voice":["silero/ell.pt","low","slow"]},
+ "der":{"name":"Дерек Шепард","voice":["aidar","medium","medium"]},"web":{"name":"Ричард Уэббер","voice":["eugene","low","slow"]},
+ "bur":{"name":"Престон Бёрк","voice":["eugene","medium","fast"]},"geo":{"name":"Джордж О’Мэлли","voice":["aidar","high","fast"]},
+ "alx":{"name":"Алекс Карев","voice":["aidar","low","fast"]},"pat":{"name":"пациент","voice":["eugene","high","medium"]}}
