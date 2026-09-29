@@ -24,7 +24,7 @@
     <button id="rec">⏺ Записать в .webm</button>
   </div>
 </div>
-<script src="voices/durations.js"></script>
+<script src="voices/durations.js?v=rh1"></script>
 <script src="fx.js"></script>
 <script src="player.js"></script>
 <script>
@@ -269,7 +269,7 @@ function frame(t){
 const VBUF={};
 async function preload(){const ids=[];for(const s of S)for(const l of s[4])if(l[2]&&VD[l[2]]&&!VBUF[l[2]])ids.push(l[2]);
   const dc=new OfflineAudioContext(1,1,44100);
-  await Promise.all(ids.map(async id=>{try{const r=await fetch('voices/'+id+'.mp3');VBUF[id]=await dc.decodeAudioData(await r.arrayBuffer())}catch(e){console.warn('нет озвучки',id)}}))}
+  await Promise.all(ids.map(async id=>{try{const r=await fetch('voices/'+id+'.mp3?v=rh1',{cache:'no-store'});VBUF[id]=await dc.decodeAudioData(await r.arrayBuffer())}catch(e){console.warn('нет озвучки',id)}}))}
 function score(ac,out){
   const T=ac.currentTime+.1,MUS=ac.createGain();MUS.gain.value=1;MUS.connect(out);const M=ac.createGain();M.gain.value=.5;M.connect(MUS);
   // голоса: поверх музыки, музыка приглушается во время реплик
