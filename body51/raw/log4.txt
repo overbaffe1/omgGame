@@ -1,0 +1,25 @@
+== https://inv.nadeko.net/api/v1/captions/BSh2rLNaZ14 -> 500 0
+
+== https://invidious.nerdvpn.de/api/v1/captions/BSh2rLNaZ14 -> 403 2384
+<!DOCTYPE html> <html lang="en"> <head> 	<meta charset="UTF-8"> 	<meta name="viewport" content="width=device-width, initial-scale=1.0"> 	<meta http-equiv="X-UA-Compatible" content="IE=edge"> 	<title>Gandalf - You shall not pass!</title> 	<link rel="stylesheet" type="text/css" href="/.gandalf/static/gandalf.css?v=87fb0d71" /> </head> <body> 	<div class="page"> 		<main class="container theme-red"> 	
+== https://yewtu.be/api/v1/captions/BSh2rLNaZ14 -> 200 11354
+<!doctype html> <html lang="en">   <head>     <meta charset="utf-8" />     <meta name="viewport" content="width=device-width, initial-scale=1" />     <meta name="robots" content="noindex, nofollow" />     <title>Verifying your browser…</title>     <!-- No-JS visitors are sent to the image captcha automatically. -->     <noscript>       <meta http-equiv="refresh" content="0; url=/antibot/captcha"
+== https://invidious.f5.si/api/v1/captions/BSh2rLNaZ14 -> 200 143
+{"captions":[{"label":"Russian (auto-generated)","languageCode":"ru","url":"/api/v1/captions/BSh2rLNaZ14?label=Russian+%28auto-generated%29"}]}
+== https://iv.melmac.space/api/v1/captions/BSh2rLNaZ14 -> curl: (7) Failed to connect to iv.melmac.space port 443 after 536 ms: Couldn't connect to server
+000 0
+{"captions":[{"label":"Russian (auto-generated)","languageCode":"ru","url":"/api/v1/captions/BSh2rLNaZ14?label=Russian+%28auto-generated%29"}]}
+== https://pipedapi.kavin.rocks/streams/BSh2rLNaZ14 -> 526 0
+
+== https://api.piped.private.coffee/streams/BSh2rLNaZ14 -> 500 1357
+{"error":"org.schabi.newpipe.extractor.exceptions.SignInConfirmNotBotException: YouTube probably temporarily blocked anonymous watch access with this IP , got error LOGIN_REQUIRED: \"Sign in to confirm that you're not a bot\"\n\tat org.schabi.newpipe.extractor.services.youtube.extractors.YoutubeStreamExtractor.checkPlayabilityStatus(YoutubeStreamExtractor.java:905)\n\tat org.schabi.newpipe.extract
+== https://pipedapi.adminforge.de/streams/BSh2rLNaZ14 -> 403 239
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> <html><head> <title>403 Forbidden</title> </head><body> <h1>Forbidden</h1> <p>You don't have permission to access this resource.</p> </body></html> 
+== https://www.youtube-transcript.io/api/transcripts -> 405 0
+
+== https://kome.ai/api/transcript -> 429 33950
+<!DOCTYPE html><html lang="en" data-astro-cid-4wdtffzm><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#000"><title>Vercel Security Checkpoint</title><style>.spinner[data-astro-cid-ijmsm3te]{flex-direction:column;justify-content:center;align-items:center;display:flex}.spinner-circle[data-astro-cid-ijmsm3te]{transform
+== https://notegpt.io/api/v2/video-transcript?platform=youtube&video_id=BSh2rLNaZ14 -> 200 58
+{"code": 164003, "message": "login expired", "data": null}
+== https://r.jina.ai/https://youtubetotranscript.com/transcript?v=BSh2rLNaZ14 -> 200 512
+Title: Just a moment...  URL Source: https://youtubetotranscript.com/transcript?v=BSh2rLNaZ14  Warning: This page maybe requiring CAPTCHA, please make sure you are authorized to access this page.  Markdown Content: ![Image 1: Icon for youtubetotranscript.com](https://youtubetotranscript.com/favicon.ico)  ## youtubetotranscript.com  ## Performing security verification  This website uses a security 
