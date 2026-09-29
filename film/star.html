@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Жизнь звезды — процедурный фильм</title>
+<style>
+  html,body{margin:0;height:100%;background:#050508;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;color:#eee;overflow:hidden}
+  #wrap{position:relative;height:96vh;aspect-ratio:9/16}
+  canvas{width:100%;height:100%;display:block;border-radius:10px;box-shadow:0 0 60px #0008}
+  #ui{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#000a;border-radius:10px}
+  button{font:inherit;font-size:20px;padding:12px 28px;border-radius:30px;border:1px solid #f4d9a0;background:#0000;color:#f4d9a0;cursor:pointer}
+  button:hover{background:#f4d9a022}
+  small{opacity:.6}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="c" width="1080" height="1920"></canvas>
+  <div id="ui">
+    <div style="font-size:34px;color:#f4d9a0">Жизнь звезды</div>
+    <small>30 секунд · нарисовано и озвучено кодом</small>
+    <button id="play">▶ Смотреть</button>
+    <button id="rec">⏺ Записать в .webm</button>
+  </div>
+</div>
+<script src="fx.js"></script>
+<script src="player.js"></script>
+<script>
+// ---------- детерминированный рандом ----------
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const R=rng(7);
+const cv=document.getElementById('c'),g=cv.getContext('2d'),W=1080,H=1920,CX=W/2,CY=H*0.46;
+const DUR=30;
+const lerp=(a,b,t)=>a+(b-a)*t, clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+
+// фон: звёзды и пыль
+const stars=[...Array(420)].map(()=>({x:R()*W,y:R()*H,r:R()*2+.3,p:R()*6}));
+const dust=[...Array(900)].map(()=>{const a=R()*Math.PI*2,d=200+R()*700;return{a,d,s:.3+R()*.7,h:R()}});
+const shards=[...Array(260)].map(()=>({a:R()*Math.PI*2,v:.4+R()*.9,r:1+R()*4,h:R()}));
+const planets=[{d:240,r:14,c:'#9ad',s:1.3},{d:340,r:22,c:'#d96',s:.8},{d:470,r:30,c:'#cb8',s:.5}];
+
+// «чернильная» дрожащая окружность
+function inkCircle(x,y,r,t,wob=4){g.beginPath();for(let i=0;i<=64;i++){const a=i/64*Math.PI*2;const rr=r+Math.sin(a*5+t*3)*wob+Math.sin(a*11-t*2)*wob*.5;i?g.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr):g.moveTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr)}g.closePath()}
+function glow(x,y,r,col,a=1){const gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col.replace('A',a));gr.addColorStop(1,col.replace('A',0));g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,7);g.fill()}
+function caption(txt,sub,t,a,b){const k=Math.min(seg(t,a,a+.6),1-seg(t,b-.6,b));if(k<=0)return;g.save();g.globalAlpha=k;g.textAlign='center';g.fillStyle='#f4e6c4';g.font='italic 64px Georgia';g.fillText(txt,CX,H*.83+(1-k)*20);g.globalAlpha=k*.6;g.font='34px Georgia';g.fillText(sub,CX,H*.83+60);g.restore()}
+
+function frame(t){
+  g.setTransform(1,0,0,1,0,0);
+  // фон
+  const bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#07071a');bg.addColorStop(1,'#12060f');g.fillStyle=bg;g.fillRect(0,0,W,H);
+  // тряска на сверхновой
+  const shake=t>20&&t<22.5?(22.5-t)*14:0;g.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+  for(const s of stars){g.globalAlpha=.4+.4*Math.sin(t*2+s.p);g.fillStyle='#fff';g.fillRect(s.x,s.y,s.r,s.r)}g.globalAlpha=1;
+
+  // 1. Туманность и коллапс (0–7)
+  const collapse=ease(seg(t,1,7));
+  if(t<8.5){g.globalCompositeOperation='lighter';
+    for(const p of dust){const d=p.d*(1-collapse*.97),a=p.a+t*.15*p.s+collapse*3/p.s;
+      const x=CX+Math.cos(a)*d,y=CY+Math.sin(a)*d*.9;
+      g.fillStyle=`hsla(${280+p.h*80},80%,60%,${.35*(1-seg(t,7,8.5))})`;g.beginPath();g.arc(x,y,2+p.s*3,0,7);g.fill()}
+    g.globalCompositeOperation='source-over'}
+
+  // звезда: радиус и цвет по фазам
+  let r=0,hue=50,alive=t>5.5&&t<20.6;
+  if(t>5.5)r=lerp(0,90,ease(seg(t,5.5,8)));
+  if(t>13)r=lerp(90,300,ease(seg(t,13,19)));
+  if(t>13)hue=lerp(50,8,seg(t,13,18));
+  if(t<8)hue=lerp(200,50,seg(t,5.5,8));
+  if(alive){const pulse=t>18?Math.sin(t*25)*10*seg(t,18,20.5):Math.sin(t*3)*3;
+    g.globalCompositeOperation='lighter';glow(CX,CY,r*3.2,`hsla(${hue},100%,60%,A)`,.5);g.globalCompositeOperation='source-over';
+    inkCircle(CX,CY,r+pulse,t,t>13?10:3);g.fillStyle=`hsl(${hue},95%,${t>13?55:70}%)`;g.fill();
+    g.lineWidth=5;g.strokeStyle='#2a1208';g.stroke();
+    // штриховка-«чернила»
+    g.save();inkCircle(CX,CY,r+pulse,t,t>13?10:3);g.clip();g.strokeStyle='#0003';g.lineWidth=3;
+    for(let i=-r;i<r;i+=18){g.beginPath();g.moveTo(CX+i+r*.3,CY-r);g.lineTo(CX+i+r*.9,CY+r);g.stroke()}g.restore()}
+
+  // 2. Планеты (8–15)
+  const pk=Math.min(seg(t,8,9.5),1-seg(t,14,16));
+  if(pk>0)for(const p of planets){const a=t*p.s+p.d;const d=p.d*Math.max(1,r/90*.9);
+    g.globalAlpha=pk*.3;g.strokeStyle='#f4e6c4';g.setLineDash([6,14]);g.beginPath();g.ellipse(CX,CY,d,d*.35,0,0,7);g.stroke();g.setLineDash([]);
+    g.globalAlpha=pk;const x=CX+Math.cos(a)*d,y=CY+Math.sin(a)*d*.35;
+    if(Math.sin(a)<0&&alive&&Math.hypot(x-CX,y-CY)<r)continue;
+    inkCircle(x,y,p.r,t,1.5);g.fillStyle=p.c;g.fill();g.lineWidth=3;g.strokeStyle='#1a0a05';g.stroke()}
+  g.globalAlpha=1;
+
+  // 3. Сверхновая (20.5–26)
+  if(t>20.4){const k=seg(t,20.4,26);
+    const flash=Math.max(0,1-(t-20.4)*1.5);g.fillStyle=`rgba(255,250,235,${flash})`;g.fillRect(-50,-50,W+100,H+100);
+    g.globalCompositeOperation='lighter';
+    for(const s of shards){const d=ease(k)*900*s.v;const x=CX+Math.cos(s.a)*d,y=CY+Math.sin(s.a)*d;
+      g.fillStyle=`hsla(${s.h*60+(k*200)},90%,60%,${1-k*.7})`;g.beginPath();g.arc(x,y,s.r*(1+k*2),0,7);g.fill()}
+    // кольцо ударной волны
+    g.strokeStyle=`rgba(255,200,150,${1-k})`;g.lineWidth=8*(1-k)+1;inkCircle(CX,CY,k*1100,t,12);g.stroke();
+    g.globalCompositeOperation='source-over';
+    // нейтронная звезда + лучи пульсара
+    const n=seg(t,21.5,23);if(n>0){g.save();g.translate(CX,CY);g.rotate(t*4);
+      const beam=g.createLinearGradient(0,0,0,-900);beam.addColorStop(0,`rgba(160,210,255,${.6*n})`);beam.addColorStop(1,'rgba(160,210,255,0)');
+      g.fillStyle=beam;for(const s of[1,-1]){g.beginPath();g.moveTo(-6,0);g.lineTo(-40,-900*s);g.lineTo(40,-900*s);g.lineTo(6,0);g.fill()}
+      g.restore();glow(CX,CY,60,'hsla(210,100%,85%,A)',n);g.fillStyle='#eef6ff';g.beginPath();g.arc(CX,CY,12,0,7);g.fill()}
+  }
+  // 4. Новая туманность — цикл (26–30)
+  if(t>25){const k=seg(t,25,30);g.globalCompositeOperation='lighter';
+    for(const p of dust){const a=p.a+t*.1*p.s;const x=CX+Math.cos(a)*p.d,y=CY+Math.sin(a)*p.d*.9;
+      g.fillStyle=`hsla(${160+p.h*120},80%,60%,${.3*k})`;g.beginPath();g.arc(x,y,2+p.s*3,0,7);g.fill()}
+    g.globalCompositeOperation='source-over'}
+
+  // титры
+  caption('I. Туманность','облако пыли медленно сжимается',t,0,5.5);
+  caption('II. Рождение','в ядре загорается водород',t,5.5,9.5);
+  caption('III. Жизнь','миллиарды лет света и тепла',t,9.5,14);
+  caption('IV. Красный гигант','звезда раздувается, пожирая орбиты',t,14,20.3);
+  caption('V. Сверхновая','за секунду — ярче галактики',t,20.6,25.2);
+  caption('VI. Начало','из пепла — новые миры',t,25.5,30);
+  // зерно плёнки и виньетка
+  g.setTransform(1,0,0,1,0,0);
+  FX.post(g,t,{bloom:.6,grain:.06,vignette:.6,leak:.1,ca:.8});
+  const fade=Math.max(1-seg(t,0,1),seg(t,29,30));if(fade>0){g.fillStyle=`rgba(0,0,0,${fade})`;g.fillRect(0,0,W,H)}
+}
+
+// ---------- музыка (WebAudio) ----------
+function score(ac,out){
+  const T=ac.currentTime+.1,master=ac.createGain();master.gain.value=.5;master.connect(out);
+  // реверб из шума
+  const conv=ac.createConvolver(),len=ac.sampleRate*3,ir=ac.createBuffer(2,len,ac.sampleRate);
+  for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3)}
+  conv.buffer=ir;const wet=ac.createGain();wet.gain.value=.6;conv.connect(wet);wet.connect(master);
+  const tone=(f,t0,d,type='sine',v=.15,a=.5)=>{const o=ac.createOscillator(),e=ac.createGain();o.type=type;o.frequency.value=f;
+    e.gain.setValueAtTime(0,T+t0);e.gain.linearRampToValueAtTime(v,T+t0+a);e.gain.exponentialRampToValueAtTime(.0001,T+t0+d);
+    o.connect(e);e.connect(master);e.connect(conv);o.start(T+t0);o.stop(T+t0+d+.1);return o};
+  const m=n=>440*Math.pow(2,(n-69)/12);
+  // дрон
+  const dr=tone(m(33),0,20.4,'sawtooth',.06,4);dr.frequency.linearRampToValueAtTime(m(33),T+13);dr.frequency.linearRampToValueAtTime(m(28),T+20.3);
+  tone(m(40),0,20.4,'triangle',.07,4);
+  // аккорды: Am F C G … затем напряжение
+  const ch=[[57,60,64],[53,57,60],[48,55,64],[55,59,62],[57,60,64],[53,57,62],[52,56,59]];
+  ch.forEach((c,i)=>c.forEach(n=>tone(m(n),5.5+i*2.1,2.6,'triangle',.05,.3)));
+  // арпеджио-мерцание звезды
+  for(let i=0;i<64;i++){const t0=6+i*.22;if(t0>20)break;const c=ch[Math.min(6,Math.floor((t0-5.5)/2.1))];tone(m(c[i%3]+24),t0,.6,'sine',.04,.01)}
+  // нарастающий шум перед взрывом
+  const nb=ac.createBuffer(1,ac.sampleRate*8,ac.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+  const riser=ac.createBufferSource();riser.buffer=nb;const bp=ac.createBiquadFilter();bp.type='bandpass';bp.frequency.setValueAtTime(200,T+17);bp.frequency.exponentialRampToValueAtTime(6000,T+20.4);
+  const rg=ac.createGain();rg.gain.setValueAtTime(0,T+17);rg.gain.linearRampToValueAtTime(.4,T+20.4);rg.gain.setValueAtTime(0,T+20.45);
+  riser.connect(bp);bp.connect(rg);rg.connect(master);riser.start(T+17);riser.stop(T+20.5);
+  // взрыв
+  const boom=ac.createBufferSource();boom.buffer=nb;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(3000,T+20.4);lp.frequency.exponentialRampToValueAtTime(60,T+24);
+  const bg=ac.createGain();bg.gain.setValueAtTime(1,T+20.4);bg.gain.exponentialRampToValueAtTime(.001,T+25);boom.connect(lp);lp.connect(bg);bg.connect(master);bg.connect(conv);boom.start(T+20.4);boom.stop(T+25);
+  const sub=tone(55,20.4,3,'sine',.6,.01);sub.frequency.exponentialRampToValueAtTime(25,T+23);
+  // пульсар — тики
+  for(let i=0;i<24;i++)tone(1800,21.8+i*.16,.05,'square',.03,.002);
+  // финал: светлый мажор
+  [[60,64,67,72],[65,69,72,76]].forEach((c,i)=>c.forEach(n=>tone(m(n),25.3+i*2,3.5-i*.8,'sine',.06,1)));
+}
+
+// ---------- проигрывание / запись ----------
+Player.mount({canvas:cv,frame,score,dur:DUR,name:'zhizn-zvezdy.webm',chapters:[{t:0,title:'Туманность'},{t:5.5,title:'Рождение'},{t:9.5,title:'Жизнь'},{t:14,title:'Красный гигант'},{t:20.6,title:'Сверхновая'},{t:25.5,title:'Начало'}],start:3});
+</script>
+</body>
+</html>

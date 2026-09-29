@@ -44,7 +44,7 @@ window.Player={mount(o){
   const msg=(s)=>{$('plmsg').textContent=s;$('plmsg').style.display=s?'block':'none'};
   async function prepare(){
     if(buf)return;if(rendering)return rendering;
-    rendering=(async()=>{msg('Готовлю звук…');
+    rendering=(async()=>{if(o.preload){msg('Загружаю голоса…');await o.preload()}msg('Готовлю звук…');
       const sr=44100,oac=new OfflineAudioContext(2,Math.ceil(sr*(o.dur+1)),sr);
       o.score(oac,window.FX?FX.bus(oac,oac.destination):oac.destination);
       buf=await oac.startRendering();

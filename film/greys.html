@@ -24,6 +24,7 @@
     <button id="rec">⏺ Записать в .webm</button>
   </div>
 </div>
+<script src="voices/durations.js"></script>
 <script src="fx.js"></script>
 <script src="player.js"></script>
 <script>
@@ -86,6 +87,7 @@ function person(id,x,y,s=1,o={}){
   // лицо
   const blink=Math.sin(t*1.3+x*.01)>.97;g.fillStyle='#1a1210';
   if(o.eyesShut||blink){g.fillRect(hx-26,hy-4,16,4);g.fillRect(hx+10,hy-4,16,4)}else{g.beginPath();g.arc(hx-18,hy-4,6,0,TAU);g.arc(hx+18,hy-4,6,0,TAU);g.fill()}
+  if(o.mood!=='angry'){g.strokeStyle=p.hair==='#d8d8d8'||p.hs==='bald'?'#777':p.hair;g.lineWidth=5;g.lineCap='round';const lift=o.mood==='shock'?8:0;g.beginPath();g.moveTo(hx-30,hy-22-lift);g.lineTo(hx-8,hy-24-lift);g.moveTo(hx+8,hy-24-lift);g.lineTo(hx+30,hy-22-lift);g.stroke()}
   if(o.mood==='angry'){g.strokeStyle='#1a1210';g.lineWidth=4;g.beginPath();g.moveTo(hx-30,hy-24);g.lineTo(hx-8,hy-16);g.moveTo(hx+30,hy-24);g.lineTo(hx+8,hy-16);g.stroke()}
   if(p.must){g.fillStyle='#ccc';rr(hx-20,hy+16,40,9,4);g.fill()}
   if(p.goat){g.fillStyle='#120a06';g.beginPath();g.arc(hx,hy+44,12,0,Math.PI);g.fill()}
@@ -95,7 +97,7 @@ function person(id,x,y,s=1,o={}){
     else if(o.mood==='shock'){g.beginPath();g.ellipse(hx,hy+26,9,13,0,0,TAU);g.fill()}
     else{g.beginPath();g.ellipse(hx,hy+24,14,3+m,0,0,Math.PI+(m>1?Math.PI:0));g.fill()}}
   g.fillStyle='rgba(255,120,120,.25)';g.beginPath();g.arc(hx-30,hy+14,9,0,TAU);g.arc(hx+30,hy+14,9,0,TAU);g.fill();
-  if(p.gown&&!o.lying){g.fillStyle='#ffd84a';g.beginPath();g.moveTo(hx-24,hy-54);g.lineTo(hx-14,hy-76);g.lineTo(hx,hy-60);g.lineTo(hx+14,hy-76);g.lineTo(hx+24,hy-54);g.fill()}
+  if(id==='kat'&&!o.lying){g.fillStyle='#ffd84a';g.beginPath();g.moveTo(hx-24,hy-54);g.lineTo(hx-14,hy-76);g.lineTo(hx,hy-60);g.lineTo(hx+14,hy-76);g.lineTo(hx+24,hy-54);g.fill()}
   g.restore();
   // табличка с именем (не зеркалится)
   if(o.tag!==false&&!o.lying){g.save();g.font='bold 30px system-ui,sans-serif';const tw=g.measureText(P[id].s).width+30;g.fillStyle='rgba(10,14,20,.8)';rr(x-tw/2,y+12*s+6,tw,42,21);g.fill();
@@ -137,56 +139,69 @@ function bgElev(t,open=1){vgrad('#555c63','#2e3338');g.fillStyle='#8b949c';g.fil
 function bgNight(t){vgrad('#0e1830','#2a2440');for(let i=0;i<90;i++){g.fillStyle='rgba(255,255,255,.5)';g.fillRect((i*197)%W,(i*83)%360,3,3)}
   g.fillStyle='#1a1f2e';for(let i=0;i<16;i++)g.fillRect(i*125-20,380-(i*97%200),110,500);g.fillStyle='rgba(255,220,120,.7)';for(let i=0;i<90;i++)g.fillRect((i*131)%W,400+(i*57)%320,14,20);
   g.fillStyle='#5a4636';g.fillRect(0,FL-60,W,H);g.fillStyle='#6b5442';for(let i=0;i<3;i++)g.fillRect(0,FL-60+i*50,W,24);glow(1700,200,120,'hsla(50,80%,90%,A)',.8);g.fillStyle='#f4f0d8';g.beginPath();g.arc(1700,200,50,0,TAU);g.fill()}
+function bgLounge(t){vgrad('#d9e4e8','#b3c3c9');floor('#7f8f96','#71818a');
+  for(let i=0;i<12;i++){const x=80+i*150;g.fillStyle=i%2?'#6f8fa8':'#7c9cb4';rr(x,180,138,560,6);g.fill();g.fillStyle='rgba(0,0,0,.25)';for(let k=0;k<4;k++)g.fillRect(x+30,220+k*14,78,5);g.fillStyle='#ddd';g.fillRect(x+112,420,8,40)}
+  g.fillStyle='#5a4a3a';rr(300,FL-140,1320,40,10);g.fill();g.fillStyle='#e8e0d0';g.beginPath();g.arc(560,FL-150,22,0,TAU);g.fill();g.fillStyle='#6b3a1a';g.fillRect(550,FL-175,20,25)}
 function bgRoom(t){vgrad('#e8e2d8','#c8bfb0');floor('#a89e8e','#998f80');g.fillStyle='#bfe3f5';rr(160,130,420,420,10);g.fill();g.strokeStyle='#fff';g.lineWidth=14;g.strokeRect(160,130,420,420)}
 
 // ---------- сцены ----------
 // актёр: [id, x, y(пол), масштаб, опции]; реплика: [id | 'voice', текст, от, до, настроение]
 const LEAD=.85,SM=.66,Y=FL;
 const crowd=(ids)=>{const xs=[210,420,1500,1710,630];return ids.map((id,i)=>[id,xs[i],Y+10,SM])};
+// реплика: [кто, текст, файл озвучки | null (титр без голоса), настроение]
 const S=[
  [7,'','title',[],[]],
  [16,'Кто есть кто','cast',[],[]],
- [11,'Дом Мередит · утро','house',[['mer',760,Y,LEAD],['der',1150,Y,LEAD*1.04]],
-  [['voice','Мередит (за кадром): «Хирургия — это соревнование. Так говорила мама»',0,.28],
-   ['der','Я Дерек. Кажется, мы вчера не успели познакомиться…',.28,.54],['mer','Мередит. Слушай, мне пора — первый день на новой работе. Выход там.',.54,1]]],
- [11,'Больница «Сиэтл Грейс»','hall',[['web',CX,Y-10,LEAD*1.05],...crowd(['mer','cri','izz','geo','alx'])],
-  [['web','Посмотрите на соседа. К концу обучения многих из вас здесь уже не будет.',0,.5],['web','Семь лет вы будете жить в этих стенах. Это ваша игра — играйте или уходите.',.5,1]]],
- [12,'Первый обход','hall',[['bai',CX,Y-10,LEAD],...crowd(['mer','cri','geo','izz','alx'])],
-  [['voice','Интерны шепчутся: у Бейли прозвище — «Нацистка»',0,.2],['bai','Правило номер один: не подлизывайтесь. Я вас уже недолюбливаю.',.2,.48],
-   ['bai','Правило два: если я бегу — вы бежите. И не будите меня, пока пациент не при смерти!',.48,.78],['geo','…она ведь пошутила, да?',.78,1]]],
- [11,'Крыша · прилетает вертолёт','roof',[['kat',1000,Y,.75,{lying:true}],['mer',380,Y,LEAD],['bur',640,Y,LEAD],['geo',1760,Y,SM]],
-  [['voice','Пациентка — Кэти Брайс, 15 лет. Судороги, и никто не знает почему',0,.4],['bur','Грей — Кэти ваша. Анализы, томография. А О’Мэлли сегодня удаляет аппендицит!',.4,.78],['geo','Я?! В первый же день?..',.78,1]]],
- [12,'Лифт','elev',[['mer',780,Y,LEAD],['der',1140,Y,LEAD*1.04]],
-  [['voice','Новый врач Кэти — нейрохирург. Мередит заходит в лифт и…',0,.25],['mer','Ты?! Ты здесь работаешь?!',.25,.45],
-   ['der','Доктор Шепард, нейрохирургия. Приятно снова познакомиться, доктор Грей.',.45,.75],['mer','Это была ошибка. Одна ночь. Ты мой начальник — и точка.',.75,1]]],
- [12,'Операционная · аппендицит','or',[['geo',CX-160,Y,LEAD,{mask:1,cap:'#8be04a'}],['bur',CX+160,Y,LEAD,{mask:1,cap:'#1f3048'}],['cri',200,Y,SM],['izz',400,Y,SM],['alx',1720,Y,SM]],
-  [['voice','Интерны смотрят со стороны и делают ставки',0,.18],['geo','Так… зажим… я… я не помню, что дальше…',.18,.44],['bur','Разрыв! Отойдите, О’Мэлли. Я сам.',.44,.7],
-   ['alx','Ха! Теперь он — «Агент 007». С лицензией на убийство!',.7,1]],'geo007'],
- [13,'Палата Кэти · срочный вызов','room',[['kat',1150,Y,.8,(u)=>({lying:true,shake:u>.35&&u<.7})],['mer',640,Y,LEAD]],
-  [['kat','Мне скучно! Позвоните кому-нибудь, чтобы мне сделали причёску.',0,.3],['mer','Ты вызвала меня «911» из-за ПРИЧЁСКИ?! …Кэти? КЭТИ!',.3,.5],
-   ['mer','Приступ! Разряд! Ещё раз!',.5,.72],['voice','С четвёртой попытки сердце Кэти снова бьётся ровно',.72,1]],'defib'],
- [11,'Кто разгадает загадку?','hall',[['der',CX,Y-10,LEAD],...crowd(['mer','cri','izz','geo','alx'])],
-  [['der','Судороги без видимой причины. Кэти — бомба с часовым механизмом.',0,.45],['der','Кто первым найдёт причину — пойдёт со мной в операционную.',.45,.8],['cri','Эта операция будет моей.',.8,1]]],
- [13,'Библиотека · ночь','lib',[['mer',760,Y,LEAD],['cri',1160,Y,LEAD]],
-  [['cri','Кстати. С Шепардом у тебя что-то было, да?',0,.28],['mer','…Да. Один раз. Давай не будем об этом.',.28,.52],
-   ['mer','Стоп! Кэти занимается гимнастикой. Она упала — совсем чуть-чуть, никто и не записал!',.52,.82],['cri','Удар головой… Аневризма! Бежим к Шепарду!',.82,1]]],
- [12,'Томография','hall',[['der',1100,Y,LEAD],['mer',720,Y,LEAD],['cri',420,Y,LEAD*.95]],
-  [['der','Вы правы. Аневризма, одна на миллион. Отличная работа.',0,.4],['der','Грей — вы со мной в операционной.',.4,.65],['cri','Серьёзно?! Это же я… Ну конечно. Она с ним спала.',.65,1,'angry']],'scan'],
- [12,'Операция Кэти','or',[['der',CX-170,Y,LEAD,{mask:1,cap:'#27405e'}],['mer',CX+170,Y,LEAD,{mask:1,cap:'#4fa3ff'}],['web',1650,Y,SM*1.1]],
-  [['voice','Мередит впервые стоит у стола на настоящей операции',0,.3],['der','Нашли. Клипсу… Кровотечение остановлено.',.3,.6],['web','Грей… Вы точная копия своей матери.',.6,1]],'katie'],
- [10,'Коридор · утро','hall',[['bai',1120,Y,LEAD],['mer',760,Y,LEAD]],
-  [['bai','Грей. Ты справилась. А теперь иди домой, пока не упала.',0,.55],['mer','Спасибо, доктор Бейли.',.55,1]]],
- [13,'Дом престарелых','room',[['mer',780,Y,LEAD],['ell',1160,Y,LEAD]],
-  [['voice','Мередит приходит к маме — Эллис Грей, великому хирургу',0,.3],['ell','Вы кто? Вы врач? Я тоже была хирургом…',.3,.62],
-   ['voice','У мамы Альцгеймер. Никто в больнице не должен об этом знать',.62,1]]],
- [11,'Крыльцо Мередит · вечер','night',[['mer',560,Y,LEAD],['cri',830,Y,LEAD*.95],['geo',1100,Y,LEAD*.95],['izz',1370,Y,LEAD*.95]],
-  [['voice','Мы интерны. Мы ещё ничего не умеем.',0,.35],['voice','Но это наша игра. И мы только начинаем.',.35,.75],['voice','АНАТОМИЯ СТРАСТИ — продолжение следует',.75,1]]],
+ [0,'Дом Мередит · утро','house',[['mer',760,Y,LEAD],['der',1150,Y,LEAD*1.04]],
+  [['mer','(за кадром) Хирургия — это соревнование. Так говорила мама.','mer1'],
+   ['der','Я Дерек. Кажется, мы вчера так и не познакомились.','der1'],['mer','Мередит. Слушай, мне пора — первый день на новой работе. Выход там.','mer2']]],
+ [0,'Больница «Сиэтл Грейс»','hall',[['web',CX,Y-10,LEAD*1.05],...crowd(['mer','cri','izz','geo','alx'])],
+  [['web','Посмотрите на соседа. К концу обучения многих из вас здесь уже не будет.','web1'],['web','Семь лет вы будете жить в этих стенах. Это ваша игра — играйте или уходите.','web2']]],
+ [0,'Первый обход','hall',[['bai',CX,Y-10,LEAD],...crowd(['mer','cri','geo','izz','alx'])],
+  [['izz','Говорят, у неё прозвище — Нацистка.','izz1'],['bai','Правило номер один: не подлизывайтесь. Я вас уже недолюбливаю.','bai1'],
+   ['bai','Правило два: если я бегу — вы бежите. И не будите меня, пока пациент не при смерти!','bai2'],['geo','Она ведь пошутила, да?','geo1']]],
+ [0,'Крыша · прилетает вертолёт','roof',[['kat',1000,Y,.75,{lying:true}],['mer',380,Y,LEAD],['bur',640,Y,LEAD],['geo',1760,Y,SM]],
+  [['kat','Где я?.. Мне же на конкурс…','kat1'],['bur','Пятнадцать лет, судороги, никто не знает почему. Грей — она ваша. Анализы, томография.','bur1'],
+   ['bur','А О’Мэлли сегодня удаляет аппендицит!','bur2'],['geo','Я?! В первый же день?!','geo2']]],
+ [0,'Лифт','elev',[['mer',780,Y,LEAD],['der',1140,Y,LEAD*1.04]],
+  [['cap','Нового врача Кэти зовут доктор Шепард. Мередит заходит в лифт и…',null],['mer','Ты?! Ты здесь работаешь?!','mer3','shock'],
+   ['der','Доктор Шепард, нейрохирургия. Приятно снова познакомиться, доктор Грей.','der2'],['mer','Это была ошибка. Одна ночь. Ты мой начальник — и точка.','mer4']]],
+ [0,'Ординаторская','lounge',[['alx',760,Y,LEAD],['izz',1150,Y,LEAD]],
+  [['alx','Эй, это ведь ты с рекламы белья? Модель — в хирургии!','alx1'],['izz','Да, я была моделью. Так я заплатила за учёбу. Отстань, Карев.','izz2','angry']]],
+ [0,'Операционная · аппендицит','or',[['pat',CX,Y,.7,{lying:true}],['geo',CX-360,Y,LEAD,{mask:1,cap:'#8be04a'}],['bur',CX+360,Y,LEAD,{mask:1,cap:'#1f3048'}],['cri',150,Y,SM],['alx',1600,Y,SM],['izz',1790,Y,SM]],
+  [['pat','Доктор, вы же точно знаете, что делаете? Это ваша первая операция?','pat1'],['geo','Совсем не больно. Наверное.','geo3'],
+   ['alx','Ставлю двадцатку, что он грохнется в обморок.','alx2'],['geo','Так… зажим… я… я не помню, что дальше…','geo4','shock'],
+   ['bur','Разрыв! Отойдите, О’Мэлли. Я сам.','bur3','angry'],['alx','Ха! Теперь он — Агент ноль-ноль-семь. С лицензией на убийство!','alx3']],'geo007'],
+ [0,'Палата Кэти · срочный вызов','room',[['kat',1150,Y,.8,{lying:true}],['mer',640,Y,LEAD]],
+  [['kat','Я вообще-то на конкурс красоты еду. Моя гимнастика — лучшая!','kat3'],['kat','Мне скучно! Позвоните кому-нибудь, пусть мне сделают причёску.','kat2'],
+   ['mer','Ты вызвала меня из-за причёски?! Кэти? Кэти!','mer5','shock'],['mer','Приступ! Разряд! Ещё раз!','mer6'],['cap','С четвёртой попытки сердце Кэти снова бьётся ровно',null]],'defib'],
+ [0,'Кто разгадает загадку?','hall',[['der',CX,Y-10,LEAD],...crowd(['mer','cri','izz','geo','alx'])],
+  [['der','Судороги без видимой причины. Кэти — бомба с часовым механизмом.','der3'],['der','Кто первым найдёт причину — пойдёт со мной в операционную.','der4'],['cri','Эта операция будет моей.','cri1']]],
+ [0,'Библиотека · ночь','lib',[['mer',760,Y,LEAD],['cri',1160,Y,LEAD]],
+  [['cri','Кстати. С Шепардом у тебя что-то было, да?','cri2'],['mer','Да. Один раз. Давай не будем об этом.','mer7','sad'],
+   ['mer','Стоп! Кэти занимается гимнастикой. Она упала, совсем чуть-чуть, никто даже не записал!','mer8'],['cri','Удар головой… Аневризма! Бежим к Шепарду!','cri3']]],
+ [0,'Томография','hall',[['der',1100,Y,LEAD],['mer',720,Y,LEAD],['cri',420,Y,LEAD*.95]],
+  [['der','Вы правы. Аневризма. Одна на миллион. Отличная работа.','der5'],['der','Грей — вы со мной в операционной.','der6'],['cri','Серьёзно?! Это же я… Ну конечно. Она с ним спала.','cri4','angry']],'scan'],
+ [0,'Операция Кэти','or',[['kat',CX,Y,.7,{lying:true,eyesShut:1}],['der',CX-360,Y,LEAD,{mask:1,cap:'#27405e'}],['mer',CX+360,Y,LEAD,{mask:1,cap:'#4fa3ff'}],['web',1720,Y,SM*1.1]],
+  [['cap','Мередит впервые стоит у стола на настоящей операции',null],['der','Нашёл. Клипсу. Кровотечение остановлено.','der7'],['web','Грей… Вы точная копия своей матери.','web3']]],
+ [0,'Коридор · утро','hall',[['bai',1120,Y,LEAD],['mer',760,Y,LEAD]],
+  [['bai','Грей. Ты справилась. А теперь иди домой, пока не упала.','bai3'],['mer','Спасибо, доктор Бейли.','mer9']]],
+ [0,'Дом престарелых','room',[['mer',780,Y,LEAD],['ell',1160,Y,LEAD]],
+  [['cap','Мередит навещает маму — Эллис Грей, великого хирурга',null],['mer','Мама, это я. Мередит.','mer10'],
+   ['ell','Вы кто? Вы врач? Я тоже была хирургом. Очень хорошим.','ell1'],['ell','У меня сегодня операция… Или это было вчера?','ell2'],
+   ['cap','У мамы Альцгеймер. Никто в больнице не должен об этом знать',null]]],
+ [0,'Крыльцо Мередит · вечер','night',[['mer',560,Y,LEAD],['cri',830,Y,LEAD*.95],['geo',1100,Y,LEAD*.95],['izz',1370,Y,LEAD*.95]],
+  [['mer','(за кадром) Мы интерны. Мы ещё ничего не умеем.','mer11'],['mer','(за кадром) Но это наша игра. И мы только начинаем.','mer12'],['cap','АНАТОМИЯ СТРАСТИ — продолжение следует',null]]],
 ];
+// тайминг из длительности озвучки (voices/durations.js); если файла нет — оценка по тексту
+const VD=window.VOICE_DUR||{};
+for(const s of S){if(s[0])continue;let tt=.9;for(const l of s[4]){const d=l[2]&&VD[l[2]]?VD[l[2]]:Math.max(2.2,l[1].length*.065);l.t0=tt;l.d=d;l.t1=tt+d+.25;tt+=d+.5}s[0]=tt+.9}
+P.pat={n:'Пациент',s:'Пациент',r:'аппендицит',skin:'#e9c3a0',hair:'#6a4a2a',hs:'short',cl:'#e8eef2',col:'#aaaaaa',gown:1};
 // мама Мередит (появляется только в конце)
 P.ell={n:'Эллис Грей',s:'Эллис',r:'мама Мередит',skin:'#f0d2bc',hair:'#d8d8d8',hs:'bob',cl:'#c7b3d8',col:'#b9a0ff'};
 
 let acc=0;for(const s of S){s.t0=acc;acc+=s[0]}const DUR=acc+1;
-const BG={house:bgHouse,hall:bgHall,or:bgOR,roof:bgRoof,lib:bgLib,elev:bgElev,night:bgNight,room:bgRoom};
+const BG={lounge:bgLounge,house:bgHouse,hall:bgHall,or:bgOR,roof:bgRoof,lib:bgLib,elev:bgElev,night:bgNight,room:bgRoom};
 
 function titleCard(u,t){vgrad('#0b1a1c','#04090a');glow(CX,H*.45,800,'hsla(180,70%,60%,A)',.25*seg(u,0,.4));
   g.strokeStyle='#5fe0d0';g.lineWidth=6;g.beginPath();const L=seg(u,0,.6)*W;for(let x=0;x<L;x+=4){const ph=(x%480)/480;g.lineTo(x,230-(ph>.45&&ph<.5?110:ph>.5&&ph<.55?-50:0))}g.stroke();
@@ -203,10 +218,12 @@ function castCard(u,t){vgrad('#12262a','#0a1416');g.textAlign='center';g.fillSty
     g.fillStyle='#bcd';g.font='26px system-ui';wrapText(P[id].r,x0+172,y0+348,310,32);g.globalAlpha=1});
   g.textAlign='center';g.globalAlpha=.7;g.fillStyle='#fff';g.font='26px system-ui';g.fillText('цвет полоски = цвет таблички героя и его имени в субтитрах',CX,H-25);g.globalAlpha=1}
 
-function extra(kind,u,t){
-  if(kind==='geo007'&&u>.7){g.save();g.translate(CX,300);g.rotate(-.1);g.fillStyle='#e33';g.font='bold 200px Georgia';g.textAlign='center';g.globalAlpha=seg(u,.7,.78);g.fillText('007',0,0);g.restore()}
-  if(kind==='defib'&&u>.5&&u<.72){if(Math.sin(t*20)>.6){g.fillStyle='rgba(200,240,255,.45)';g.fillRect(0,0,W,H)}g.fillStyle='#ff3';g.font='bold 120px system-ui';g.textAlign='center';g.fillText('⚡ РАЗРЯД ⚡',CX,260)}
-  if(kind==='defib'){g.fillStyle='#0c1c1c';rr(1450,150,400,230,12);g.fill();const bad=u>.35&&u<.72;g.strokeStyle=bad?'#f44':'#3f6';g.lineWidth=5;g.beginPath();
+const LN=(s,vo,lt)=>{const l=s[4].find(x=>x[2]===vo);return l?(lt-l.t0)/(l.t1-l.t0):-1};
+function extra(kind,u,t,s,lt){
+  const a3=LN(s,'alx3',lt),m5=LN(s,'mer5',lt),m6=LN(s,'mer6',lt);
+  if(kind==='geo007'&&a3>0){g.save();g.translate(CX,300);g.rotate(-.1);g.fillStyle='#e33';g.font='bold 200px Georgia';g.textAlign='center';g.globalAlpha=seg(a3,0,.15);g.fillText('007',0,0);g.restore()}
+  if(kind==='defib'&&m6>0&&m6<1){if(Math.sin(t*20)>.6){g.fillStyle='rgba(200,240,255,.45)';g.fillRect(0,0,W,H)}g.fillStyle='#ff3';g.font='bold 120px system-ui';g.textAlign='center';g.fillText('⚡ РАЗРЯД ⚡',CX,260)}
+  if(kind==='defib'){g.fillStyle='#0c1c1c';rr(1450,150,400,230,12);g.fill();const bad=m5>.3&&m6<1||m6>0&&m6<1;g.strokeStyle=bad?'#f44':'#3f6';g.lineWidth=5;g.beginPath();
     for(let x=0;x<370;x+=4){const ph=(x/90+t*2)%1;g.lineTo(1465+x,280-(ph>.1&&ph<.15?70:0)+(bad?Math.sin(x*.5+t*30)*40:0))}g.stroke()}
   if(kind==='scan'){g.fillStyle='#111';rr(1400,130,400,400,14);g.fill();g.fillStyle='#ddd';g.beginPath();g.ellipse(1600,330,140,170,0,0,TAU);g.fill();g.fillStyle='#999';g.beginPath();g.ellipse(1600,330,118,146,0,0,TAU);g.fill();
     const k=.5+.5*Math.sin(t*5);glow(1650,270,60,'hsla(0,100%,55%,A)',.8*k+.2);g.strokeStyle='#f33';g.lineWidth=5;g.beginPath();g.arc(1650,270,42,0,TAU);g.stroke()}
@@ -214,11 +231,12 @@ function extra(kind,u,t){
   if(kind==='katie'){g.fillStyle='#fff';g.font='bold 30px system-ui';g.textAlign='center';g.fillText('Кэти Брайс · под наркозом',CX,FL-215)}
 }
 function subtitle(line,k){
-  const [id,txt]=line,col=id==='voice'?'#9fe0e0':P[id].col,name=id==='voice'?'ЗА КАДРОМ':P[id].n.toUpperCase();
-  g.save();g.globalAlpha=k;g.font='42px Georgia';const bw=1500,x0=CX-bw/2;const lines=Math.ceil(g.measureText(txt).width/(bw-120));const hh=70+lines*52,y0=H-30-hh;
+  let [id,txt]=line;const off=txt.startsWith('(за кадром) ');if(off)txt=txt.slice(12);const cap=id==='cap';
+  const col=cap?'#9fe0e0':P[id].col,name=cap?'':P[id].n.toUpperCase()+(off?' · ЗА КАДРОМ':'');
+  g.save();g.globalAlpha=k;g.font='42px Georgia';const bw=1500,x0=CX-bw/2;const lines=Math.ceil(g.measureText(txt).width/(bw-120));const hh=(line[0]==='cap'?34:70)+lines*52,y0=H-30-hh;
   g.fillStyle='rgba(8,12,16,.86)';rr(x0,y0,bw,hh,26);g.fill();g.fillStyle=col;rr(x0,y0,14,hh,7);g.fill();
   g.fillStyle=col;g.font='bold 30px system-ui';g.textAlign='left';g.fillText(name,x0+44,y0+44);
-  g.fillStyle=id==='voice'?'#dff':'#fff';g.font=(id==='voice'?'italic ':'')+'42px Georgia';wrapText(txt,x0+44,y0+96,bw-100,52);g.restore()}
+  g.fillStyle=cap||off?'#dff':'#fff';g.font=(cap||off?'italic ':'')+'42px Georgia';wrapText(txt,x0+44,y0+(cap?60:96),bw-100,52);g.restore()}
 
 function frame(t){
   g.setTransform(1,0,0,1,0,0);
@@ -227,13 +245,13 @@ function frame(t){
   else{
     g.save();const z=1+u*.04;g.translate(CX,FL);g.scale(z,z);g.translate(-CX,-FL);
     BG[s[2]](t,s[2]==='elev'?ease(seg(u,0,.25)):1);
-    if(s[5])extra(s[5],u,t);
-    const cur=s[4].find(l=>u>=l[2]&&u<l[3]);
+    const lt=t-s.t0;if(s[5])extra(s[5],u,t,s,lt);
+    const cur=s[4].find(l=>lt>=l.t0&&lt<l.t1);
     for(const a of s[3]){let o=typeof a[4]==='function'?a[4](u,t):(a[4]||{});o=Object.assign({t},o);
-      if(cur&&cur[0]===a[0]){o.talk=1;if(cur[4])o.mood=cur[4]}
-      if(s[2]==='elev'&&a[0]==='mer'&&u>.25&&u<.45)o.mood='shock';
-      let x=a[1],y=a[2];if(o.shake)x+=Math.sin(t*60)*10;
+      if(cur&&cur[0]===a[0]){o.talk=lt<cur.t0+cur.d;if(cur[3])o.mood=cur[3]}
+      let x=a[1],y=a[2];if(a[0]==='kat'&&s[5]==='defib'&&(LN(s,'mer5',lt)>.3&&LN(s,'mer6',lt)<1))x+=Math.sin(t*60)*12;
       if(o.lying){g.fillStyle='#dfe7ec';rr(x-320,y-200,640,80,20);g.fill();g.fillStyle='#8a9aa4';g.fillRect(x-300,y-120,18,120);g.fillRect(x+282,y-120,18,120)}
+      if(!o.lying){g.fillStyle='rgba(0,0,0,.22)';g.beginPath();g.ellipse(x,y+4,70*a[3],16*a[3],0,0,TAU);g.fill()}
       person(a[0],x,o.lying?y-160:y,a[3],o);
       if(o.lying){g.save();g.font='bold 30px system-ui';const nm=P[a[0]].s,tw=g.measureText(nm).width+30;g.fillStyle='rgba(10,14,20,.8)';rr(x-tw/2,y+10,tw,42,21);g.fill();g.fillStyle=P[a[0]].col;rr(x-tw/2,y+10,8,42,4);g.fill();g.fillStyle='#fff';g.textAlign='center';g.fillText(nm,x+4,y+42);g.restore()}
       if(cur&&cur[0]===a[0])speakerMark(x,o.lying?y-300:y-485*a[3],P[a[0]].col,t)}
@@ -248,8 +266,17 @@ function frame(t){
 }
 
 // ---------- музыка: мягкое пианино + звуки больницы ----------
+const VBUF={};
+async function preload(){const ids=[];for(const s of S)for(const l of s[4])if(l[2]&&VD[l[2]]&&!VBUF[l[2]])ids.push(l[2]);
+  const dc=new OfflineAudioContext(1,1,44100);
+  await Promise.all(ids.map(async id=>{try{const r=await fetch('voices/'+id+'.mp3');VBUF[id]=await dc.decodeAudioData(await r.arrayBuffer())}catch(e){console.warn('нет озвучки',id)}}))}
 function score(ac,out){
-  const T=ac.currentTime+.1,M=ac.createGain();M.gain.value=.5;M.connect(out);
+  const T=ac.currentTime+.1,MUS=ac.createGain();MUS.gain.value=1;MUS.connect(out);const M=ac.createGain();M.gain.value=.5;M.connect(MUS);
+  // голоса: поверх музыки, музыка приглушается во время реплик
+  const V=ac.createGain();V.gain.value=1.6;const comp=ac.createDynamicsCompressor();V.connect(comp);comp.connect(out);
+  for(const s of S)for(const l of s[4]){const b=l[2]&&VBUF[l[2]];if(!b)continue;const at=T+s.t0+l.t0;
+    const src=ac.createBufferSource();src.buffer=b;src.connect(V);src.start(at);
+    MUS.gain.setTargetAtTime(.35,at-.15,.08);MUS.gain.setTargetAtTime(1,at+b.duration+.1,.3)}
   const conv=ac.createConvolver(),len=ac.sampleRate*3,ir=ac.createBuffer(2,len,ac.sampleRate);
   for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3)}
   conv.buffer=ir;const wet=ac.createGain();wet.gain.value=.5;conv.connect(wet);wet.connect(M);
@@ -266,24 +293,24 @@ function score(ac,out){
   for(let b=0;b*beat<DUR-2;b++){const ch=prog[Math.floor(b/8)%4],t0=b*beat;
     if(b%8===0)tone(m(ch[0]-24),t0,4,'sine',.1,.05);
     piano(ch[[0,1,2,1,0,2,1,2][b%8]]+(b%16>11?12:0),t0,.05)}
-  const at=i=>S[i].t0;
+  const at=i=>S[i].t0,SC=k=>S.find(s=>s[2]===k),LT=vo=>{for(const s of S)for(const l of s[4])if(l[2]===vo)return {t:s.t0+l.t0,d:l.d};return {t:0,d:0}};
   // заставка: писк монитора
   for(let k=0;k<6;k++)tone(1046,at(0)+.6+k*.9,.15,'sine',.05);
   // шум вертолёта
-  for(let k=0;k<S[5][0]*6;k++)noise(at(5)+k/6,.1,300,.18);
+  {const r=SC('roof');for(let k=0;k<r[0]*6;k++)noise(r.t0+k/6,.1,300,.14)}
   // монитор в операционных
-  for(const i of[7,12])for(let k=0;k<S[i][0]*1.2;k++)tone(988,at(i)+k/1.2,.12,'sine',.03);
+  for(const r of S.filter(s=>s[2]==='or'))for(let k=0;k<r[0]*1.2;k++)tone(988,r.t0+k/1.2,.12,'sine',.025);
   // лифт «динь»
-  tone(1319,at(6)+.3,1,'sine',.06);tone(1047,at(6)+.6,1.2,'sine',.06);
+  {const r=SC('elev');tone(1319,r.t0+.3,1,'sine',.06);tone(1047,r.t0+.6,1.2,'sine',.06)}
   // приступ Кэти: тревожный писк + разряды
-  const d8=S[8][0];for(let k=0;k<d8*.22*6;k++)tone(1400,at(8)+d8*.35+k/6,.08,'square',.03);
-  for(let k=0;k<4;k++){noise(at(8)+d8*(.52+k*.05),.25,4000,.3,'highpass');tone(80,at(8)+d8*(.52+k*.05),.3,'sawtooth',.15)}
+  {const a5=LT('mer5'),a6=LT('mer6');const st=a5.t+a5.d*.4,en=a6.t+a6.d+.3;for(let k=0;k<(en-st)*6;k++)tone(1400,st+k/6,.08,'square',.025);
+   for(let k=0;k<3;k++){const z=a6.t+a6.d*(.35+k*.3);noise(z,.25,4000,.3,'highpass');tone(80,z,.3,'sawtooth',.15)}}
   // 007
-  tone(m(52),at(7)+S[7][0]*.7,.4,'sawtooth',.06);tone(m(55),at(7)+S[7][0]*.7+.4,.4,'sawtooth',.06);tone(m(59),at(7)+S[7][0]*.7+.8,1,'sawtooth',.06);
+  {const z=LT('alx3').t;tone(m(52),z,.4,'sawtooth',.05);tone(m(55),z+.4,.4,'sawtooth',.05);tone(m(59),z+.8,1,'sawtooth',.05)}
   // озарение в библиотеке
-  for(let k=0;k<5;k++)tone(m(72+[0,4,7,12,16][k]),at(10)+S[10][0]*.52+k*.08,1.2,'sine',.05);
+  {const z=LT('mer8').t;for(let k=0;k<5;k++)tone(m(72+[0,4,7,12,16][k]),z+k*.08,1.2,'sine',.05)}
 }
-Player.mount({canvas:cv,frame,score,dur:DUR,name:'anatomiya-strasti-1x01.webm',chapters:S.map((s,i)=>({t:s.t0,title:(i+1)+'. '+(s[1]||'Заставка')})),start:0});
+Player.mount({canvas:cv,frame,score,preload,dur:DUR,name:'anatomiya-strasti-1x01.webm',chapters:S.map((s,i)=>({t:s.t0,title:(i+1)+'. '+(s[1]||'Заставка')})),start:0});
 </script>
 </body>
 </html>
