@@ -151,5 +151,45 @@
 "medium",
 "fast"
 ]
+},
+"liz": {
+"name": "Лиз Фэллон",
+"voice": [
+"baya",
+"low",
+"slow"
+]
+},
+"jor": {
+"name": "Хорхе Круз",
+"voice": [
+"aidar",
+"low",
+"slow"
+]
+},
+"zon": {
+"name": "Зона Круз",
+"voice": [
+"kseniya",
+"medium",
+"slow"
+]
+},
+"hum": {
+"name": "Мистер Хамфри",
+"voice": [
+"eugene",
+"medium",
+"slow"
+]
+},
+"vic": {
+"name": "Гарри Виктор",
+"voice": [
+"eugene",
+"low",
+"medium"
+]
 }
 }
