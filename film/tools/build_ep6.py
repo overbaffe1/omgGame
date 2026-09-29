@@ -63,7 +63,7 @@ function extra(kind,u,t,s,lt){
   if(kind==='pager'){g.fillStyle='#222';rr(1300,380,160,100,14);g.fill();g.fillStyle='#394';rr(1316,396,128,50,6);g.fill();g.fillStyle='#111';g.font='bold 26px monospace';g.textAlign='center';g.fillText('- - -',1380,430);
     g.strokeStyle='#f44';g.lineWidth=4;rr(1340,454,70,18,4);g.stroke();g.fillStyle='#f44';g.fillRect(1344,458,8*Math.max(0,Math.sin(t*2)),10);g.fillText('',0,0)}
   if(kind==='jimmy'){const p=LN(s,'e6izz3',lt);if(p>.5){const q=LN(s,'e6izz4',lt);glow(1000,FL-210,120,q>.3?'hsla(120,80%,60%,A)':'hsla(0,90%,55%,A)',.5)}}
-  if(kind==='annie'){g.fillStyle='#2f6b8a';rr(CX-330,FL-300,660,120,24);g.fill();g.fillStyle='#e7f3f8';rr(CX-300,FL-290,600,24,12);g.fill();g.fillStyle='#fff';g.font='bold 30px system-ui';g.textAlign='center';g.fillText('Энни Коннорс · удаление опухоли',CX,FL-215);
+  if(kind==='annie'){g.fillStyle='#2f6b8a';rr(CX-330,FL-300,660,120,24);g.fill();g.fillStyle='#e7f3f8';rr(CX-300,FL-290,600,24,12);g.fill();g.fillStyle='#fff';g.font='bold 30px system-ui';g.textAlign='center';g.fillText('Энни Коннорс · удаление опухоли',CX,FL-188);
     if(LN(s,'e6bur3',lt)>0){g.fillStyle='#0c1c1c';rr(1560,200,300,190,10);g.fill();g.strokeStyle='#f55';g.lineWidth=5;g.beginPath();g.moveTo(1575,300);g.lineTo(1845,300);g.stroke()}}
   if(kind==='stomp'){const i6=LNx(s,'e6izz6',lt);if(i6.p>.3){const x=880,y=FL+10;g.fillStyle='#222';rr(x-50,y-20,100,34,8);g.fill();g.strokeStyle='#ddd';g.lineWidth=3;g.beginPath();g.moveTo(x-30,y-18);g.lineTo(x-5,y);g.lineTo(x+10,y-16);g.lineTo(x+35,y+10);g.stroke();
     for(let i=0;i<6;i++){g.fillStyle='#333';g.fillRect(x-60+i*24,y+14+Math.sin(i)*6,8,6)}}}
