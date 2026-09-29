@@ -15,7 +15,8 @@ CAST={'mer':('xenia','medium','medium'),'kat':('kseniya','high','fast'),'izz':('
  'ann':('baya','medium','slow'),'edw':('eugene','low','slow'),'mar':('kseniya','medium','medium'),
  'dig':('eugene','low','fast'),'tay':('eugene','x-low','medium'),'cla':('baya','high','medium'),'tin':('xenia','low','fast'),
  'dev':('kseniya','high','medium'),'duf':('aidar','medium','slow'),'wal':('aidar','low','slow'),'zoe':('xenia','medium','slow'),
- 'oli':('baya','medium','fast'),'alc':('baya','high','fast'),'add':('kseniya','low','medium')}
+ 'oli':('baya','medium','fast'),'alc':('baya','high','fast'),'add':('kseniya','low','medium'),
+ 'joe':('aidar','x-low','slow'),'jul':('xenia','high','medium')}
 imp=torch.package.PackageImporter(MODEL);model=imp.load_pickle('tts_models','model')
 L=json.load(open(sys.argv[1]));out=sys.argv[2] if len(sys.argv)>2 else HERE
 for vo,(who,txt) in L.items():

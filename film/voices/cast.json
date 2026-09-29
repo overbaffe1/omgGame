@@ -335,5 +335,21 @@
 "low",
 "medium"
 ]
+},
+"joe": {
+"name": "Джо, бармен",
+"voice": [
+"aidar",
+"x-low",
+"slow"
+]
+},
+"jul": {
+"name": "Джули Филлипс",
+"voice": [
+"xenia",
+"high",
+"medium"
+]
 }
 }
