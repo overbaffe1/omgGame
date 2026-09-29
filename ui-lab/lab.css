@@ -1,0 +1,159 @@
+/* ============================================================================
+   lab.css — dark fantasy lab chrome
+   ========================================================================== */
+:root {
+  --bg: #08070a;
+  --bg2: #0e0c10;
+  --ink: #e8ddc4;
+  --dim: #8d8168;
+  --gold: #c9a13c;
+  --gold-hi: #f0dc9a;
+  --blood: #9c1f22;
+  --line: rgba(201, 161, 60, 0.22);
+  --card: #100d13;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --serif: "IM Fell English", Georgia, serif;
+  --disp: "Cinzel", "IM Fell English", serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background:
+    radial-gradient(1100px 500px at 50% -160px, rgba(156, 31, 34, 0.16), transparent 60%),
+    radial-gradient(900px 420px at 50% 115%, rgba(201, 161, 60, 0.07), transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.55;
+  min-height: 100vh;
+}
+::selection { background: rgba(156, 31, 34, 0.6); color: #fff; }
+
+/* ── header ─────────────────────────────────────────────────────────────── */
+.top {
+  max-width: 1180px; margin: 0 auto; padding: 34px 24px 8px;
+  display: flex; gap: 22px; align-items: flex-start;
+}
+.back {
+  flex: 0 0 auto; margin-top: 6px;
+  color: var(--dim); text-decoration: none; font-family: var(--mono); font-size: 13px;
+  border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px;
+  transition: 0.15s;
+}
+.back:hover { color: var(--gold-hi); border-color: var(--gold); }
+.titles h1 {
+  margin: 0; font-family: var(--disp); font-weight: 800;
+  font-size: clamp(26px, 4.4vw, 40px); letter-spacing: 0.06em;
+  color: var(--gold-hi);
+  text-shadow: 0 2px 0 #000, 0 0 34px rgba(201, 161, 60, 0.25);
+}
+.titles h1 span { color: var(--blood); }
+.titles p { margin: 8px 0 0; color: var(--dim); max-width: 76ch; }
+.titles b { color: var(--ink); font-weight: 600; }
+.titles code, p code, li code, pre code {
+  font-family: var(--mono); font-size: 0.82em; color: var(--gold-hi);
+  background: rgba(201, 161, 60, 0.08); padding: 1px 5px; border-radius: 4px;
+}
+
+/* ── sections ───────────────────────────────────────────────────────────── */
+main { max-width: 1180px; margin: 0 auto; padding: 10px 24px 40px; }
+section { margin-top: 46px; }
+h2 {
+  font-family: var(--disp); font-weight: 600; letter-spacing: 0.12em;
+  font-size: 19px; color: var(--gold); margin: 0 0 6px;
+  border-bottom: 1px solid var(--line); padding-bottom: 10px;
+}
+h2 i { font-style: normal; color: var(--blood); margin-right: 10px; }
+.hint { color: var(--dim); margin: 6px 0 18px; max-width: 88ch; }
+.hint b { color: var(--ink); }
+
+/* ── stage ──────────────────────────────────────────────────────────────── */
+.stage-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; align-items: start; }
+.stage {
+  position: relative; border: 1px solid var(--line); border-radius: 10px;
+  background: #000; overflow: hidden;
+  box-shadow: 0 0 0 1px #000, 0 24px 70px rgba(0, 0, 0, 0.65), 0 0 44px rgba(156, 31, 34, 0.12);
+  cursor: none;
+}
+.stage canvas { display: block; width: 100%; height: auto; }
+.loading {
+  padding: 60px 0; text-align: center; color: var(--dim);
+  font-family: var(--mono); font-size: 13px; letter-spacing: 0.2em;
+}
+.stage-side h3, .anatomy-side h3 {
+  font-family: var(--disp); font-size: 13px; letter-spacing: 0.14em;
+  color: var(--gold); margin: 14px 0 6px;
+}
+.stage-side h3:first-child { margin-top: 2px; }
+.stage-side ul, .anatomy-side ul { margin: 0; padding-left: 18px; color: var(--dim); font-size: 15px; }
+.stage-side li b { color: var(--ink); font-weight: 600; }
+.stage-side li { margin: 4px 0; }
+
+/* ── anatomy ────────────────────────────────────────────────────────────── */
+.anatomy { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
+#anatomy-canvas {
+  border: 1px solid var(--line); border-radius: 10px; overflow: auto;
+  background: #0d0b08; max-height: 560px;
+}
+#anatomy-canvas canvas { display: block; }
+.anatomy-info {
+  font-family: var(--mono); font-size: 13px; color: var(--ink);
+  background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+  padding: 10px 12px; min-height: 64px;
+}
+.anatomy-info b { color: var(--gold-hi); }
+.guides {
+  display: flex; gap: 8px; align-items: center;
+  font-family: var(--mono); font-size: 12px; color: var(--dim);
+  margin: 10px 2px;
+}
+.guides input { accent-color: #5b93d6; }
+.anatomy-list { max-height: 420px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+.slice-row {
+  display: flex; align-items: center; gap: 10px; padding: 5px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04); cursor: default;
+}
+.slice-row:hover, .slice-row.on { background: rgba(201, 161, 60, 0.1); }
+.slice-row canvas { image-rendering: pixelated; flex: 0 0 auto; background: #171310; border-radius: 3px; }
+.slice-row span { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+.slice-row em { margin-left: auto; font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--dim); }
+
+/* ── sandbox ────────────────────────────────────────────────────────────── */
+.sandbox { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.sb {
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px; display: grid; gap: 10px; justify-items: center;
+}
+.sb h3 {
+  margin: 0; font-family: var(--mono); font-size: 12px; font-weight: 700;
+  letter-spacing: 0.12em; color: var(--dim); justify-self: start;
+}
+.sb .stage-mini { image-rendering: pixelated; }
+.sb-controls { width: 100%; display: grid; gap: 6px; }
+.sb-controls label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 11px; color: var(--dim);
+}
+.sb-controls input[type="range"] { flex: 1; accent-color: var(--gold); }
+.sb-controls .dims { color: var(--gold-hi); min-width: 52px; text-align: right; }
+
+/* ── pipeline ───────────────────────────────────────────────────────────── */
+.pipeline pre {
+  background: var(--bg2); border: 1px solid var(--line); border-radius: 10px;
+  padding: 18px 22px; overflow: auto;
+  font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--ink);
+}
+
+/* ── footer ─────────────────────────────────────────────────────────────── */
+footer {
+  max-width: 1180px; margin: 30px auto 0; padding: 18px 24px 34px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 11.5px; color: #57503f; letter-spacing: 0.08em;
+}
+
+/* ── responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .stage-wrap, .anatomy { grid-template-columns: 1fr; }
+  .sandbox { grid-template-columns: 1fr; }
+}

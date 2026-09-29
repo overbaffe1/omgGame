@@ -45,3 +45,28 @@ python3 -m http.server 8080
 | `js/scenes.js` | сами кадры |
 | `js/audio.js` | партитура: music box, пэд, удар, шорох бумаги |
 | `js/main.js` | часы, звук, игра «зажги свою» |
+
+## UI Lab — Dark Fantasy Atlas (Aseprite + MCP)
+
+![atlas](ui-lab/assets/atlas.png)
+
+Спрайт-атлас для UI в стиле Diablo II и html-лаборатория с ним в деле.
+Атлас целиком собран **Aseprite** (headless-сборка 1.3.18.6 прямо в песочнице,
+без UI и Skia) через **MCP-сервер** `@letsagents/aseprite-mcp`: 36 вызовов
+инструментов — `create_canvas`, `set_palette`, `add_layer` ×6, `edit_sprite`
+×26 (батчи примитивов и пикселей), `script_execute` (slice-метаданные),
+`spritesheet_export`. Результат: `atlas.png` 512×384 + `atlas.json`
+с 26 регионами и 9-slice центрами + исходник `atlas.aseprite`
+(слои: misc · stone · buttons · orbs · slots · icons, палитра 35 цветов).
+
+Открыть: `http://localhost:8080/ui-lab/` (любой статический сервер из корня).
+
+| | |
+|---|---|
+| сцена | макет игрового экрана: панели и кнопки 9-slice, орбы жизни/маны с процедурной жидкостью, ремень, тултипы, курсор-спрайт |
+| анатомия | атлас с slice-рамками и 9-slice центрами, инспектор регионов |
+| песочница | слайдеры: растяни 9-slice и убедись, что рамки не плывут |
+| конвейер | как MCP-вызовы превращаются в атлас |
+
+Перегенерация: `node tools/gen-atlas.mjs` (`ASEPRITE_PATH=…` — путь к бинарю;
+headless-сборка из исходников — `tools/ensure-aseprite-headless.sh`).

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OMG★GAME — UI LAB · Dark Fantasy Atlas (Aseprite + MCP)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lab.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="back" href="../">← omgGame</a>
+  <div class="titles">
+    <h1>UI LAB <span>·</span> Dark Fantasy Atlas</h1>
+    <p>Sprite-атлас в духе Diablo II, сгенерированный <b>Aseprite</b> (headless, собран из исходников)
+       через <b>MCP-сервер</b> <code>aseprite-mcp</code> — 36 реальных вызова инструментов, ноль ручного рисования.
+       Ниже — атлас в деле: 9-slice, состояния, тултипы, живые орбы.</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══════════════════ 1. STAGE ══════════════════ -->
+  <section>
+    <h2><i>Ι.</i> СЦЕНА — «весь UI из одного PNG»</h2>
+    <p class="hint">Всё внутри рамки нарисовано из <code>atlas.png</code>: панели и кнопки — 9-slice,
+       орбы — спрайт + процедурная жидкость, шрифт — 4×5, курсор — спрайт из атласа.
+       Кликай кнопки и слоты ремня (1–6). SLAY даёт золото и опыт, BLEED пугает орб жизни.</p>
+    <div class="stage-wrap">
+      <div id="stage" class="stage"><div id="loading" class="loading">summoning atlas…</div></div>
+      <aside class="stage-side">
+        <h3>что здесь происходит</h3>
+        <ul>
+          <li><b>9-slice</b> — панели тянутся без потери пиксельных рамок (центр из slice-метаданных Aseprite)</li>
+          <li><b>состояния</b> — btn_normal / btn_hover / btn_pressed — три региона одного атласа</li>
+          <li><b>орбы</b> — круг-клип поверх спрайта, волна — синус, уровень — lerp к цели</li>
+          <li><b>тултипы</b> — tooltip9 + пиксельный шрифт, позиция от слота</li>
+          <li><b>курсор</b> — системный скрыт, рисуется спрайт <code>cursor</code></li>
+        </ul>
+        <h3>попробуй</h3>
+        <ul>
+          <li>наведи на слоты ремня</li>
+          <li>SLAY ×N до LEVEL UP</li>
+          <li>BLEED — виньетка и отлив орба</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ══════════════════ 2. ANATOMY ══════════════════ -->
+  <section>
+    <h2><i>ΙΙ.</i> АНАТОМИЯ АТЛАСА — 26 slice-регионов</h2>
+    <p class="hint">Тот самый <code>atlas.png</code> 512×384. Золотые рамки — slice-границы,
+       синий пунктир — 9-slice центр (метаданные из <code>atlas.aseprite</code>).</p>
+    <div class="anatomy">
+      <div id="anatomy-canvas"></div>
+      <div class="anatomy-side">
+        <div id="anatomy-info" class="anatomy-info">hover a region…</div>
+        <label class="guides"><input type="checkbox" id="guides-toggle" checked> показывать 9-slice центры</label>
+        <div id="anatomy-list" class="anatomy-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ 3. SANDBOX ══════════════════ -->
+  <section>
+    <h2><i>ΙΙΙ.</i> ПЕСОЧНИЦА — растяни 9-slice</h2>
+    <p class="hint">Рамки, заклёпки и блики остаются 1:1, тянется только каменный центр. Так одна панель
+       обслуживает диалог любого размера.</p>
+    <div class="sandbox">
+      <div class="sb" id="sb-panel">
+        <h3>panel9</h3>
+        <div class="sb-controls">
+          <label>W <input class="w" type="range" min="120" max="420" value="240"> <span class="dims"></span></label>
+          <label>H <input class="h" type="range" min="64" max="240" value="150"> <span class="dims"></span></label>
+        </div>
+      </div>
+      <div class="sb" id="sb-tooltip">
+        <h3>tooltip9</h3>
+        <div class="sb-controls">
+          <label>W <input class="w" type="range" min="80" max="420" value="200"> <span class="dims"></span></label>
+          <label>H <input class="h" type="range" min="24" max="160" value="84"> <span class="dims"></span></label>
+        </div>
+      </div>
+      <div class="sb" id="sb-button">
+        <h3>btn_normal</h3>
+        <div class="sb-controls">
+          <label>W <input class="w" type="range" min="60" max="420" value="170"> <span class="dims"></span></label>
+          <label>H <input class="h" type="range" min="28" max="120" value="44"> <span class="dims"></span></label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ PIPELINE ══════════════════ -->
+  <section>
+    <h2><i>ΙV.</i> КОНВЕЙЕР — как это собрано</h2>
+    <div class="pipeline">
+      <pre>headless Aseprite 1.3.18.6 (собран из исходников, без UI/Skia)
+        │
+        ▼
+@letsagents/aseprite-mcp  ·  76 инструментов, stdio JSON-RPC
+        │   create_canvas · set_palette · add_layer ×6 · edit_sprite ×26
+        │   script_execute (slices) · spritesheet_export
+        ▼
+ui-lab/assets/atlas.aseprite  →  atlas.png (512×384) + atlas.json (26 slices)</pre>
+      <p class="hint">Перегенерировать: <code>node tools/gen-atlas.mjs</code> (нужен бинарь Aseprite:
+       <code>ASEPRITE_PATH=…</code>; сборка headless-версии — <code>tools/ensure-aseprite-headless.sh</code>).</p>
+      <p class="hint">Слои исходника: <code>misc · stone · buttons · orbs · slots · icons</code> —
+       каждый регион рисуется батчами примитивов (edit_sprite) поверх палитры из 35 цветов.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>omgGame · ui-lab · atlas generated via aseprite + mcp · 2026</footer>
+
+<script type="module" src="js/lab.js"></script>
+</body>
+</html>

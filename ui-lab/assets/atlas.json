@@ -1,0 +1,58 @@
+{ "frames": {
+   "atlas.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 512, "h": 384 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 512, "h": 384 },
+    "sourceSize": { "w": 512, "h": 384 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.3.18.6-dirty-dev",
+  "image": "atlas.png",
+  "format": "RGBA8888",
+  "size": { "w": 512, "h": 384 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" },
+   { "name": "misc", "opacity": 255, "blendMode": "normal" },
+   { "name": "stone", "opacity": 255, "blendMode": "normal" },
+   { "name": "buttons", "opacity": 255, "blendMode": "normal" },
+   { "name": "orbs", "opacity": 255, "blendMode": "normal" },
+   { "name": "slots", "opacity": 255, "blendMode": "normal" },
+   { "name": "icons", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+   { "name": "panel9", "keys": [{ "frame": 0, "bounds": {"x": 0, "y": 0, "w": 96, "h": 64 }, "center": {"x": 16, "y": 16, "w": 64, "h": 32 } }] },
+   { "name": "tooltip9", "keys": [{ "frame": 0, "bounds": {"x": 104, "y": 0, "w": 40, "h": 24 }, "center": {"x": 8, "y": 8, "w": 24, "h": 8 } }] },
+   { "name": "btn_normal", "keys": [{ "frame": 0, "bounds": {"x": 0, "y": 72, "w": 120, "h": 28 }, "center": {"x": 6, "y": 6, "w": 108, "h": 16 } }] },
+   { "name": "btn_hover", "keys": [{ "frame": 0, "bounds": {"x": 0, "y": 104, "w": 120, "h": 28 }, "center": {"x": 6, "y": 6, "w": 108, "h": 16 } }] },
+   { "name": "btn_pressed", "keys": [{ "frame": 0, "bounds": {"x": 0, "y": 136, "w": 120, "h": 28 }, "center": {"x": 6, "y": 6, "w": 108, "h": 16 } }] },
+   { "name": "divider", "keys": [{ "frame": 0, "bounds": {"x": 152, "y": 0, "w": 96, "h": 12 } }] },
+   { "name": "corner", "keys": [{ "frame": 0, "bounds": {"x": 256, "y": 0, "w": 24, "h": 24 } }] },
+   { "name": "cursor", "keys": [{ "frame": 0, "bounds": {"x": 288, "y": 0, "w": 24, "h": 24 } }] },
+   { "name": "orb_hp", "keys": [{ "frame": 0, "bounds": {"x": 0, "y": 176, "w": 72, "h": 72 } }] },
+   { "name": "orb_mp", "keys": [{ "frame": 0, "bounds": {"x": 80, "y": 176, "w": 72, "h": 72 } }] },
+   { "name": "slot", "keys": [{ "frame": 0, "bounds": {"x": 168, "y": 176, "w": 36, "h": 36 } }] },
+   { "name": "slot_hover", "keys": [{ "frame": 0, "bounds": {"x": 208, "y": 176, "w": 36, "h": 36 } }] },
+   { "name": "slot_selected", "keys": [{ "frame": 0, "bounds": {"x": 248, "y": 176, "w": 36, "h": 36 } }] },
+   { "name": "icon_hp", "keys": [{ "frame": 0, "bounds": {"x": 168, "y": 256, "w": 18, "h": 18 } }] },
+   { "name": "icon_mp", "keys": [{ "frame": 0, "bounds": {"x": 192, "y": 256, "w": 18, "h": 18 } }] },
+   { "name": "icon_sword", "keys": [{ "frame": 0, "bounds": {"x": 216, "y": 256, "w": 18, "h": 18 } }] },
+   { "name": "icon_shield", "keys": [{ "frame": 0, "bounds": {"x": 240, "y": 256, "w": 18, "h": 18 } }] },
+   { "name": "icon_skull", "keys": [{ "frame": 0, "bounds": {"x": 264, "y": 256, "w": 18, "h": 18 } }] },
+   { "name": "icon_scroll", "keys": [{ "frame": 0, "bounds": {"x": 288, "y": 256, "w": 18, "h": 18 } }] },
+   { "name": "bar_cap_l", "keys": [{ "frame": 0, "bounds": {"x": 168, "y": 288, "w": 6, "h": 8 } }] },
+   { "name": "bar_mid", "keys": [{ "frame": 0, "bounds": {"x": 178, "y": 288, "w": 8, "h": 8 } }] },
+   { "name": "bar_cap_r", "keys": [{ "frame": 0, "bounds": {"x": 190, "y": 288, "w": 6, "h": 8 } }] },
+   { "name": "bar_fill", "keys": [{ "frame": 0, "bounds": {"x": 200, "y": 288, "w": 8, "h": 8 } }] },
+   { "name": "exp_fill", "keys": [{ "frame": 0, "bounds": {"x": 212, "y": 288, "w": 8, "h": 8 } }] },
+   { "name": "sb_track", "keys": [{ "frame": 0, "bounds": {"x": 224, "y": 288, "w": 24, "h": 8 } }] },
+   { "name": "sb_handle", "keys": [{ "frame": 0, "bounds": {"x": 252, "y": 288, "w": 12, "h": 8 } }] }
+  ]
+ }
+}
