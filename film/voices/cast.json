@@ -247,5 +247,37 @@
 "medium",
 "medium"
 ]
+},
+"dig": {
+"name": "Дигби Оуэнс",
+"voice": [
+"eugene",
+"low",
+"fast"
+]
+},
+"tay": {
+"name": "Доктор Тейлор",
+"voice": [
+"eugene",
+"x-low",
+"medium"
+]
+},
+"cla": {
+"name": "Клэр Райс",
+"voice": [
+"baya",
+"high",
+"medium"
+]
+},
+"tin": {
+"name": "Тина Райс",
+"voice": [
+"xenia",
+"low",
+"fast"
+]
 }
 }
