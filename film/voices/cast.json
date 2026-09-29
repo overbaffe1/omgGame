@@ -311,5 +311,29 @@
 "medium",
 "slow"
 ]
+},
+"oli": {
+"name": "Оливия",
+"voice": [
+"baya",
+"medium",
+"fast"
+]
+},
+"alc": {
+"name": "Элис Франклин",
+"voice": [
+"baya",
+"high",
+"fast"
+]
+},
+"add": {
+"name": "Эддисон Шепард",
+"voice": [
+"kseniya",
+"low",
+"medium"
+]
 }
 }
