@@ -51,11 +51,7 @@
 const V=Date.now(); // сброс кэша — всегда свежая версия
 const FILMS=[
   {id:'universe',file:'universe.html',title:'История Вселенной',emoji:'🌌',bg:'linear-gradient(#1a1040,#401a30)',desc:'От Большого взрыва до искусственного интеллекта. 44 главы: пульсары, Пангея, Рим, Галилей, Гагарин, Марс и многое другое. 3D-сцены.',tags:['~7 мин','3D','44 главы']},
-  {id:'star',file:'star.html',title:'Жизнь звезды',emoji:'⭐',bg:'linear-gradient(#10102a,#3a1a10)',desc:'Туманность, рождение, красный гигант, сверхновая — и новое начало.',tags:['30 сек','чернила']},
-  {id:'citro',file:'video.html?src=../exports/citro-dopdop-ep01.mp4&poster=../exports/citro-thumbnail.jpg',title:'Цитро доп-доп',emoji:'🦜',bg:'url(../exports/citro-thumbnail.jpg) center/cover',desc:'Шортс 1: жёлтый попугай в кедах, чайник сказал «нет», лимоны победили.',tags:['25 сек','MP4','Shorts']},
-  {id:'syrok',file:'video.html?src=../exports/syrok-vzhuh-ep01.mp4&poster=../exports/syrok-thumbnail.jpg',title:'Сырко вжух-вжух',emoji:'🧀',bg:'url(../exports/syrok-thumbnail.jpg) center/cover',desc:'Шортс 2: сырок против холодильника.',tags:['MP4','Shorts']},
-  {id:'tapok',file:'video.html?src=../exports/tapok-shlep-ep01.mp4&poster=../exports/tapok-thumbnail.jpg',title:'Тапок шлёп-шлёп',emoji:'🩴',bg:'url(../exports/tapok-thumbnail.jpg) center/cover',desc:'Шортс 3: тапок, веник и таракан.',tags:['MP4','Shorts']},
-  {id:'brainrot',file:'brainrot.html',title:'LIMONINI DINAMITINI',emoji:'🍋',bg:'linear-gradient(#ffe600,#ff4fd8)',desc:'Брейнрот-шортс: лимон с динамитом, тостер-балерина, кактус-боксёр.',tags:['30 сек','140 BPM','Shorts']},
+  {id:'greys',file:'greys.html',title:'Анатомия страсти · 1×01',emoji:'🩺',bg:'linear-gradient(#0b3a3e,#1a1030)',desc:'Мультпересказ первой серии «Тяжёлый день»: первый день интернов в «Сиэтл Грейс». У каждого героя своё имя и цвет, в начале — «Кто есть кто».',tags:['~3 мин','серия 1','субтитры с именами']},
 ];
 const list=document.getElementById('list'),frame=document.getElementById('frame');
 FILMS.forEach(f=>{const a=document.createElement('a');a.className='card';a.href='#'+f.id;a.id='c-'+f.id;
