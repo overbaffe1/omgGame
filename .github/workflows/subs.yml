@@ -14,4 +14,4 @@ jobs:
       - run: |
           git config user.name bot; git config user.email bot@x
           git add body51/txt; git commit -m "raw subs [skip ci]" || true
-          git push
+          git pull --rebase -X theirs origin ${GITHUB_REF_NAME} || true; git push
