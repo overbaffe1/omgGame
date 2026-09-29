@@ -191,5 +191,37 @@
 "low",
 "medium"
 ]
+},
+"pmh": {
+"name": "Мистер Паттерсон",
+"voice": [
+"eugene",
+"medium",
+"medium"
+]
+},
+"drk": {
+"name": "Стефани Дрейк",
+"voice": [
+"baya",
+"low",
+"medium"
+]
+},
+"fro": {
+"name": "Джерри Фрост",
+"voice": [
+"aidar",
+"medium",
+"fast"
+]
+},
+"hnk": {
+"name": "Хэнк",
+"voice": [
+"aidar",
+"low",
+"medium"
+]
 }
 }

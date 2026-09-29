@@ -10,7 +10,8 @@ CAST={'mer':('xenia','medium','medium'),'kat':('kseniya','high','fast'),'izz':('
  'geo':('aidar','high','fast'),'alx':('aidar','low','fast'),'pat':('eugene','high','medium'),
  'ali':('baya','high','slow'),'lu':('kseniya','low','slow'),'rap':('eugene','x-low','medium'),
  'vip':('aidar','x-high','fast'),'mac':('eugene','x-low','slow'),'she':('xenia','low','slow'),'vf1':('aidar','medium','fast'),
- 'liz':('baya','low','slow'),'jor':('aidar','low','slow'),'zon':('kseniya','medium','slow'),'hum':('eugene','medium','slow'),'vic':('eugene','low','medium')}
+ 'liz':('baya','low','slow'),'jor':('aidar','low','slow'),'zon':('kseniya','medium','slow'),'hum':('eugene','medium','slow'),'vic':('eugene','low','medium'),
+ 'pmh':('eugene','medium','medium'),'drk':('baya','low','medium'),'fro':('aidar','medium','fast'),'hnk':('aidar','low','medium')}
 imp=torch.package.PackageImporter(MODEL);model=imp.load_pickle('tts_models','model')
 L=json.load(open(sys.argv[1]));out=sys.argv[2] if len(sys.argv)>2 else HERE
 for vo,(who,txt) in L.items():
