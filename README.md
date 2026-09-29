@@ -46,7 +46,7 @@ python3 -m http.server 8080
 | `js/audio.js` | партитура: music box, пэд, удар, шорох бумаги |
 | `js/main.js` | часы, звук, игра «зажги свою» |
 
-## UI Lab — Dark Fantasy Atlas (Aseprite + MCP)
+## UI Lab — Dark Fantasy Atlas (итерация 2: Aseprite + aseprite-mcp)
 
 ![atlas](ui-lab/assets/atlas.png)
 
@@ -70,3 +70,15 @@ python3 -m http.server 8080
 
 Перегенерация: `node tools/gen-atlas.mjs` (`ASEPRITE_PATH=…` — путь к бинарю;
 headless-сборка из исходников — `tools/ensure-aseprite-headless.sh`).
+
+## Dark UI (итерация 1: Python-MCP, border-image)
+
+Спрайт-атлас интерфейса в стиле Dark Fantasy (Diablo II) и лаборатория, которая показывает его в деле: стенд 640×480 с инвентарём, глобусами и факелами, CSS-виджеты на `border-image` и инспектор листа. Атлас нарисован кодом и собран через MCP-сервер (`darkui/mcp/server.py`), на выходе — `darkui/atlas/darkui.png`, `darkui.json` и редактируемый `darkui.aseprite`.
+
+```bash
+python3 -m http.server 8000   # → http://localhost:8000/darkui/
+python3 darkui/mcp/client.py  # пересобрать атлас
+```
+
+Подробности: [`darkui/README.md`](darkui/README.md).
+

@@ -1,1 +1,53 @@
-<!doctype html><meta charset="utf-8"><title>Процедурное кино</title><meta http-equiv="refresh" content="0; url=film/"><a href="film/">Открыть галерею</a>
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>omgGame — процедурное кино и лаборатории</title>
+<style>
+  *{box-sizing:border-box} html,body{margin:0;min-height:100%;background:#070508;color:#e8dcc0;font-family:system-ui,sans-serif}
+  body{display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(900px 500px at 50% -10%, #1e1812, transparent 60%), linear-gradient(180deg,#0a0705,#060508)}
+  .wrap{max-width:1000px;width:100%}
+  h1{font-family:Georgia,serif;color:#f4d9a0;margin:0 0 6px;font-size:32px} .sub{opacity:.6;margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  .card{display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg,#1a1410,#0f0c08);border:1px solid #c9a84c22;padding:18px;transition:.15s;position:relative;overflow:hidden}
+  .card:hover{border-color:#c9a84c66;transform:translateY(-2px);box-shadow:0 12px 30px #0008}
+  .card b{display:block;font:18px Georgia,serif;color:#e8d48a;margin-bottom:6px}
+  .card p{margin:0;opacity:.7;font-size:14px;line-height:1.45}
+  .tag{display:inline-block;font-size:11px;padding:2px 7px;background:#ffffff14;border-radius:10px;margin-top:8px;margin-right:4px}
+  .hero{margin-bottom:16px;padding:18px;background:linear-gradient(90deg,#1a0a0a,#0a1a3a);border:1px solid #c9a84c33}
+  .hero b{color:#e8d48a}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div style="font:11px system-ui;letter-spacing:.2em;color:#c9a84c">OMGGAME · ПРОЦЕДУРНОЕ ТВОРЧЕСТВО</div>
+    <div style="font:22px Georgia,serif;color:#fff;margin-top:6px">Всё нарисовано кодом — без картинок, без видео, без семплов</div>
+    <div style="opacity:.7;font-size:13px;margin-top:6px">Выбери куда пойти — смотреть кино или ковырять UI-атлас.</div>
+  </div>
+  <h1>omgGame</h1>
+  <div class="sub">Два входа в один мир — кино и лаборатории.</div>
+  <div class="grid">
+    <a class="card" href="film/">
+      <b>🎬 Процедурное кино</b>
+      <p>Галерея из 12 фильмов: вселенная за 7 минут, 9 серий «Анатомии страсти» и спичка. Всё на Canvas и WebAudio.</p>
+      <span class="tag">12 фильмов</span><span class="tag">Canvas</span><span class="tag">16:9 / 9:16</span>
+    </a>
+    <a class="card" href="darkui/">
+      <b>☩ DARKUI — атлас и лаба (новый конвейер)</b>
+      <p>1024×320, 141 кадр: панели, кнопки, глобусы, факелы, иконки предметов. Настоящий MCP-сервер, бинарный .aseprite, стенд 640×480 с drag&amp;drop и CSS-виджеты на nine-slice.</p>
+      <span class="tag">MCP-сервер</span><span class="tag">.aseprite</span><span class="tag">141 кадр</span><span class="tag">анимации</span>
+    </a>
+    <a class="card" href="lab/diablo-ui/">
+      <b>◈ Diablo II — UI Atlas v1</b>
+      <p>Первый подход: атлас 1024×1024, 54 спрайта и черновик лабы. Исторический, заменён конвейером darkui/.</p>
+      <span class="tag">v1</span><span class="tag">1024×1024</span><span class="tag">54 спрайта</span>
+    </a>
+  </div>
+  <div class="grid" style="margin-top:14px">
+    <a class="card" href="lab/" style="grid-column:1/-1; padding:14px; display:flex; align-items:center; justify-content:space-between">
+      <span><b style="margin:0">Лаборатории →</b><span style="opacity:.6;font-size:13px">Все эксперименты в одном месте</span></span>
+      <span style="font-size:22px">→</span>
+    </a>
+  </div>
+  <p style="text-align:center;opacity:.4;font-size:12px;margin-top:14px">Ещё шортсы: <a href="shorts.html" style="color:#c9a84c">shorts.html</a> · <a href="https://github.com/overbaffe1/omgGame" style="color:#c9a84c">GitHub</a></p>
+</div>
+</body></html>

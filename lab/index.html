@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Лаборатории — omgGame</title>
+<style>
+  body{margin:0;min-height:100vh;background:#0a0705;color:#e8dcc0;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:20px}
+  .wrap{max-width:900px;width:100%}
+  h1{font-family:Georgia,serif;color:#e8d48a}
+  a{color:#c9a84c}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:16px}
+  .card{border:1px solid #c9a84c33;background:#1a1410;padding:16px;text-decoration:none;color:inherit;transition:.15s}
+  .card:hover{border-color:#c9a84c99;transform:translateY(-2px);box-shadow:0 8px 20px #0008}
+  .card b{display:block;font-size:18px;margin-bottom:6px;color:#e8d48a}
+  .card p{margin:0;font-size:13px;opacity:.7;line-height:1.4}
+  .tag{display:inline-block;font-size:11px;padding:2px 7px;background:#ffffff14;border-radius:10px;margin-top:8px}
+</style></head>
+<body>
+<div class="wrap">
+  <p><a href="../film/">← Галерея фильмов</a></p>
+  <h1>Лаборатории omgGame</h1>
+  <p>Экспериментальные штуки — от процедурного кино до генеративного UI.</p>
+  <div class="grid">
+    <a class="card" href="../darkui/">
+      <b>☩ DARKUI — атлас + лаба (MCP-конвейер)</b>
+      <p>141 кадр в листе 1024×320, редактируемый .aseprite, стенд 640×480, CSS-виджеты и инспектор nine-slice.</p>
+      <span class="tag">MCP</span><span class="tag">.aseprite</span><span class="tag">141 кадр</span><span class="tag">640×480</span>
+    </a>
+    <a class="card" href="diablo-ui/">
+      <b>◈ Diablo II — Dark Fantasy UI Atlas</b>
+      <p>1024×1024 атлас, 54 спрайта: камень, золото, кровь и пергамент. Собран Aseprite + MCP (эмуляция Pillow).</p>
+      <span class="tag">Aseprite MCP</span><span class="tag">1024×1024</span><span class="tag">54 спрайта</span><span class="tag">9-Slice</span>
+    </a>
+    <a class="card" href="../film/">
+      <b>🎬 Процедурное кино</b>
+      <p>Все фильмы нарисованы кодом — без видео и картинок. От спички до вселенной.</p>
+      <span class="tag">Canvas</span><span class="tag">WebAudio</span>
+    </a>
+  </div>
+  <p style="margin-top:20px;opacity:.5;font-size:12px">Добавь свою лабу в <code>lab/</code> и она появится здесь.</p>
+</div>
+</body></html>
