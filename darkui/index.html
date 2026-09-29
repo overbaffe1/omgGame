@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DARKUI — лаборатория атласа в стиле Diablo II</title>
+<link rel="stylesheet" href="lab.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="rune">☩</span>
+    <div>
+      <h1>DARKUI ATLAS</h1>
+      <p>спрайт-атлас интерфейса в духе Diablo II · собран конвейером Aseprite-MCP</p>
+    </div>
+  </div>
+  <div class="chips" id="chips">загрузка…</div>
+</header>
+
+<main class="wrap">
+  <section class="stage-col">
+    <div class="stage-head">
+      <h2>Стенд: интерфейс из атласа</h2>
+      <div class="tools">
+        <label>масштаб
+          <select id="zoom">
+            <option value="1">1×</option>
+            <option value="2" selected>2×</option>
+            <option value="3">3×</option>
+          </select>
+        </label>
+        <label class="chk"><input type="checkbox" id="grid"> хитбоксы</label>
+        <label class="chk"><input type="checkbox" id="anim" checked> анимации</label>
+        <label class="chk"><input type="checkbox" id="fx" checked> частицы</label>
+      </div>
+    </div>
+    <div class="stage-frame">
+      <canvas id="stage" width="640" height="480"></canvas>
+      <div class="hint">Тяни предметы между ячейками · наводи на кнопки и зелья · крути журнал справа · жми «АТАКА»</div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <nav class="tabs" id="sideTabs">
+      <button data-tab="css" class="on">CSS-виджеты</button>
+      <button data-tab="inspect">Инспектор</button>
+      <button data-tab="pipe">Конвейер MCP</button>
+    </nav>
+
+    <div class="pane on" id="pane-css">
+      <p class="note">Те же кадры атласа, но без канваса: рамки тянутся через <code>border-image</code>
+        (nine-slice из JSON), заливки — тайлами <code>background-repeat</code>.</p>
+      <div class="df-panel" id="cssPanel">
+        <div class="df-panel-head" id="cssPanelHead">СУНДУК ГЕРОЯ</div>
+        <div class="df-panel-body">
+          <div class="df-row">
+            <button class="df-btn df-btn-stone" id="cssBtn1">НАЧАТЬ</button>
+            <button class="df-btn df-btn-gold" id="cssBtn2">КУПИТЬ</button>
+            <button class="df-btn df-btn-stone" disabled>НЕЛЬЗЯ</button>
+          </div>
+          <div class="df-row">
+            <button class="df-round" id="cssRound" title="круглая кнопка"></button>
+            <span class="df-chip" data-rar="unique" id="chip1">Клинок погибели</span>
+            <span class="df-chip" data-rar="magic" id="chip2">Щит туманов</span>
+            <span class="df-chip" data-rar="set" id="chip3">Перстни двойни</span>
+          </div>
+          <div class="df-bars">
+            <div class="df-bar"><i id="cssHp" class="fill-blood"></i></div>
+            <div class="df-bar"><i id="cssMp" class="fill-mana"></i></div>
+            <div class="df-bar"><i id="cssXp" class="fill-xp"></i></div>
+          </div>
+          <div class="df-scroll" id="cssScroll"><div class="df-scroll-body" id="cssScrollBody"></div></div>
+        </div>
+      </div>
+      <div class="df-tooltip-demo" id="cssTip">
+        <b class="rar-unique">КЛИНОК ПОГИБЕЛИ</b>
+        <span class="line">Урон: 12–48</span>
+        <span class="line">Прочность: 40 из 60</span>
+        <span class="line rar-magic">+35% к урону по нежити</span>
+        <span class="line rar-set">Требует силы: 41</span>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-inspect">
+      <p class="note">Клик по листу — карточка кадра и песочница nine-slice: тяни ширину/высоту и сравнивай с обычным стретчем.</p>
+      <canvas id="sheetView" width="512" height="160"></canvas>
+      <div class="insp-card" id="inspCard">кадр не выбран</div>
+      <div class="play">
+        <label>ширина <input type="range" id="pw" min="48" max="360" value="180"></label>
+        <label>высота <input type="range" id="ph" min="32" max="220" value="96"></label>
+        <label class="chk"><input type="checkbox" id="noNine"> растянуть без nine-slice</label>
+      </div>
+      <canvas id="playView" width="380" height="240"></canvas>
+      <pre class="json" id="inspJson"></pre>
+    </div>
+
+    <div class="pane" id="pane-pipe">
+      <p class="note">Атлас собран MCP-сервером <code>darkui/mcp/server.py</code> (stdio, JSON-RPC).
+        Сессия клиента записана в <code>atlas/mcp-session.jsonl</code>.</p>
+      <ol class="steps" id="steps"></ol>
+      <div class="sess" id="sess"></div>
+      <pre class="json">python3 darkui/mcp/client.py          # собрать атлас
+ASEPRITE_BIN=/path/to/aseprite \
+  python3 darkui/mcp/client.py          # лист пересоберёт настоящий Aseprite</pre>
+    </div>
+  </aside>
+</main>
+
+<footer class="foot">
+  <span>darkui/atlas/darkui.png · darkui.json · darkui.aseprite (141 кадр, 12 слоёв, 6 тегов, 35 срезов)</span>
+  <span class="dim">omgGame · procedural · без единого нарисованного вручную пикселя</span>
+</footer>
+
+<script src="lab.js"></script>
+</body>
+</html>

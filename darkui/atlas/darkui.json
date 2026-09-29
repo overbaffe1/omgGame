@@ -1,0 +1,6268 @@
+{
+ "frames": [
+  {
+   "filename": "fill_bloodstone",
+   "name": "fill_bloodstone",
+   "group": "fills",
+   "frame": {
+    "x": 36,
+    "y": 114,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Тайл кровавого камня"
+  },
+  {
+   "filename": "fill_dark",
+   "name": "fill_dark",
+   "group": "fills",
+   "frame": {
+    "x": 70,
+    "y": 114,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Тайл тёмного фона"
+  },
+  {
+   "filename": "fill_parchment",
+   "name": "fill_parchment",
+   "group": "fills",
+   "frame": {
+    "x": 522,
+    "y": 116,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Тайл пергамента"
+  },
+  {
+   "filename": "fill_stone",
+   "name": "fill_stone",
+   "group": "fills",
+   "frame": {
+    "x": 556,
+    "y": 116,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Тайл камня 32×32"
+  },
+  {
+   "filename": "fill_wood",
+   "name": "fill_wood",
+   "group": "fills",
+   "frame": {
+    "x": 590,
+    "y": 116,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Тайл дерева"
+  },
+  {
+   "filename": "banner_title",
+   "name": "banner_title",
+   "group": "panels",
+   "frame": {
+    "x": 230,
+    "y": 78,
+    "w": 176,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 176,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 176,
+    "h": 40
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 26,
+    "t": 10,
+    "r": 26,
+    "b": 10
+   },
+   "desc": "Табличка заголовка"
+  },
+  {
+   "filename": "panel_frame_heavy",
+   "name": "panel_frame_heavy",
+   "group": "panels",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 112
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 112
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 112
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 24,
+    "t": 24,
+    "r": 24,
+    "b": 24
+   },
+   "desc": "Тяжёлая рама, 9-slice"
+  },
+  {
+   "filename": "panel_frame_ornate",
+   "name": "panel_frame_ornate",
+   "group": "panels",
+   "frame": {
+    "x": 114,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 96
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 16,
+    "r": 16,
+    "b": 16
+   },
+   "desc": "Рама окна, 9-slice"
+  },
+  {
+   "filename": "tooltip_frame",
+   "name": "tooltip_frame",
+   "group": "panels",
+   "frame": {
+    "x": 464,
+    "y": 0,
+    "w": 88,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 88,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 88,
+    "h": 64
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 10,
+    "t": 10,
+    "r": 10,
+    "b": 12
+   },
+   "desc": "Подсказка, 9-slice"
+  },
+  {
+   "filename": "corner_bl",
+   "name": "corner_bl",
+   "group": "decor",
+   "frame": {
+    "x": 914,
+    "y": 104,
+    "w": 34,
+    "h": 34
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 34,
+    "h": 34
+   },
+   "sourceSize": {
+    "w": 34,
+    "h": 34
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Угловой орнамент bl"
+  },
+  {
+   "filename": "corner_br",
+   "name": "corner_br",
+   "group": "decor",
+   "frame": {
+    "x": 450,
+    "y": 108,
+    "w": 34,
+    "h": 34
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 34,
+    "h": 34
+   },
+   "sourceSize": {
+    "w": 34,
+    "h": 34
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Угловой орнамент br"
+  },
+  {
+   "filename": "corner_tl",
+   "name": "corner_tl",
+   "group": "decor",
+   "frame": {
+    "x": 486,
+    "y": 108,
+    "w": 34,
+    "h": 34
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 34,
+    "h": 34
+   },
+   "sourceSize": {
+    "w": 34,
+    "h": 34
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Угловой орнамент tl"
+  },
+  {
+   "filename": "corner_tr",
+   "name": "corner_tr",
+   "group": "decor",
+   "frame": {
+    "x": 0,
+    "y": 114,
+    "w": 34,
+    "h": 34
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 34,
+    "h": 34
+   },
+   "sourceSize": {
+    "w": 34,
+    "h": 34
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Угловой орнамент tr"
+  },
+  {
+   "filename": "divider_ornate",
+   "name": "divider_ornate",
+   "group": "decor",
+   "frame": {
+    "x": 294,
+    "y": 276,
+    "w": 96,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 12
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 28,
+    "t": 0,
+    "r": 28,
+    "b": 0
+   },
+   "desc": "Золотой разделитель"
+  },
+  {
+   "filename": "divider_simple",
+   "name": "divider_simple",
+   "group": "decor",
+   "frame": {
+    "x": 494,
+    "y": 276,
+    "w": 32,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 4
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Тонкий разделитель (тайл)"
+  },
+  {
+   "filename": "rivet",
+   "name": "rivet",
+   "group": "decor",
+   "frame": {
+    "x": 918,
+    "y": 268,
+    "w": 10,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 10
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Заклёпка"
+  },
+  {
+   "filename": "skull_ornament",
+   "name": "skull_ornament",
+   "group": "decor",
+   "frame": {
+    "x": 974,
+    "y": 58,
+    "w": 48,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 40
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Череп с костями"
+  },
+  {
+   "filename": "torch",
+   "name": "torch",
+   "group": "decor",
+   "frame": {
+    "x": 728,
+    "y": 58,
+    "w": 24,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 52
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Факел (пламя — fx_flame)"
+  },
+  {
+   "filename": "btn_blood_disabled",
+   "name": "btn_blood_disabled",
+   "group": "buttons",
+   "frame": {
+    "x": 636,
+    "y": 210,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка blood / disabled"
+  },
+  {
+   "filename": "btn_blood_hover",
+   "name": "btn_blood_hover",
+   "group": "buttons",
+   "frame": {
+    "x": 734,
+    "y": 210,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка blood / hover"
+  },
+  {
+   "filename": "btn_blood_normal",
+   "name": "btn_blood_normal",
+   "group": "buttons",
+   "frame": {
+    "x": 0,
+    "y": 214,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка blood / normal"
+  },
+  {
+   "filename": "btn_blood_pressed",
+   "name": "btn_blood_pressed",
+   "group": "buttons",
+   "frame": {
+    "x": 402,
+    "y": 216,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка blood / pressed"
+  },
+  {
+   "filename": "btn_gold_disabled",
+   "name": "btn_gold_disabled",
+   "group": "buttons",
+   "frame": {
+    "x": 500,
+    "y": 216,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка gold / disabled"
+  },
+  {
+   "filename": "btn_gold_hover",
+   "name": "btn_gold_hover",
+   "group": "buttons",
+   "frame": {
+    "x": 186,
+    "y": 218,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка gold / hover"
+  },
+  {
+   "filename": "btn_gold_normal",
+   "name": "btn_gold_normal",
+   "group": "buttons",
+   "frame": {
+    "x": 284,
+    "y": 218,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка gold / normal"
+  },
+  {
+   "filename": "btn_gold_pressed",
+   "name": "btn_gold_pressed",
+   "group": "buttons",
+   "frame": {
+    "x": 832,
+    "y": 238,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка gold / pressed"
+  },
+  {
+   "filename": "btn_iron_disabled",
+   "name": "btn_iron_disabled",
+   "group": "buttons",
+   "frame": {
+    "x": 598,
+    "y": 240,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка iron / disabled"
+  },
+  {
+   "filename": "btn_iron_hover",
+   "name": "btn_iron_hover",
+   "group": "buttons",
+   "frame": {
+    "x": 696,
+    "y": 240,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка iron / hover"
+  },
+  {
+   "filename": "btn_iron_normal",
+   "name": "btn_iron_normal",
+   "group": "buttons",
+   "frame": {
+    "x": 0,
+    "y": 244,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка iron / normal"
+  },
+  {
+   "filename": "btn_iron_pressed",
+   "name": "btn_iron_pressed",
+   "group": "buttons",
+   "frame": {
+    "x": 382,
+    "y": 246,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка iron / pressed"
+  },
+  {
+   "filename": "btn_round_disabled",
+   "name": "btn_round_disabled",
+   "group": "buttons",
+   "frame": {
+    "x": 464,
+    "y": 66,
+    "w": 40,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 40
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Круглая кнопка / disabled"
+  },
+  {
+   "filename": "btn_round_hover",
+   "name": "btn_round_hover",
+   "group": "buttons",
+   "frame": {
+    "x": 506,
+    "y": 66,
+    "w": 40,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 40
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Круглая кнопка / hover"
+  },
+  {
+   "filename": "btn_round_normal",
+   "name": "btn_round_normal",
+   "group": "buttons",
+   "frame": {
+    "x": 408,
+    "y": 78,
+    "w": 40,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 40
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Круглая кнопка / normal"
+  },
+  {
+   "filename": "btn_round_pressed",
+   "name": "btn_round_pressed",
+   "group": "buttons",
+   "frame": {
+    "x": 114,
+    "y": 98,
+    "w": 40,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 40
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Круглая кнопка / pressed"
+  },
+  {
+   "filename": "btn_stone_disabled",
+   "name": "btn_stone_disabled",
+   "group": "buttons",
+   "frame": {
+    "x": 480,
+    "y": 246,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка stone / disabled"
+  },
+  {
+   "filename": "btn_stone_hover",
+   "name": "btn_stone_hover",
+   "group": "buttons",
+   "frame": {
+    "x": 98,
+    "y": 248,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка stone / hover"
+  },
+  {
+   "filename": "btn_stone_normal",
+   "name": "btn_stone_normal",
+   "group": "buttons",
+   "frame": {
+    "x": 196,
+    "y": 248,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка stone / normal"
+  },
+  {
+   "filename": "btn_stone_pressed",
+   "name": "btn_stone_pressed",
+   "group": "buttons",
+   "frame": {
+    "x": 794,
+    "y": 268,
+    "w": 96,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 28
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 16,
+    "t": 9,
+    "r": 16,
+    "b": 9
+   },
+   "desc": "Кнопка stone / pressed"
+  },
+  {
+   "filename": "checkbox_hover",
+   "name": "checkbox_hover",
+   "group": "buttons",
+   "frame": {
+    "x": 1004,
+    "y": 238,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Флажок / hover"
+  },
+  {
+   "filename": "checkbox_off",
+   "name": "checkbox_off",
+   "group": "buttons",
+   "frame": {
+    "x": 1004,
+    "y": 256,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Флажок / off"
+  },
+  {
+   "filename": "checkbox_on",
+   "name": "checkbox_on",
+   "group": "buttons",
+   "frame": {
+    "x": 956,
+    "y": 266,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Флажок / on"
+  },
+  {
+   "filename": "tab_active",
+   "name": "tab_active",
+   "group": "buttons",
+   "frame": {
+    "x": 112,
+    "y": 204,
+    "w": 72,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 72,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 72,
+    "h": 30
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 12,
+    "t": 10,
+    "r": 12,
+    "b": 8
+   },
+   "desc": "Вкладка / active"
+  },
+  {
+   "filename": "tab_hover",
+   "name": "tab_hover",
+   "group": "buttons",
+   "frame": {
+    "x": 862,
+    "y": 206,
+    "w": 72,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 72,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 72,
+    "h": 30
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 12,
+    "t": 10,
+    "r": 12,
+    "b": 8
+   },
+   "desc": "Вкладка / hover"
+  },
+  {
+   "filename": "tab_normal",
+   "name": "tab_normal",
+   "group": "buttons",
+   "frame": {
+    "x": 936,
+    "y": 206,
+    "w": 72,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 72,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 72,
+    "h": 30
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 12,
+    "t": 10,
+    "r": 12,
+    "b": 8
+   },
+   "desc": "Вкладка / normal"
+  },
+  {
+   "filename": "slot_drop",
+   "name": "slot_drop",
+   "group": "slots",
+   "frame": {
+    "x": 754,
+    "y": 58,
+    "w": 44,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 44
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Ячейка инвентаря / drop"
+  },
+  {
+   "filename": "slot_empty",
+   "name": "slot_empty",
+   "group": "slots",
+   "frame": {
+    "x": 800,
+    "y": 58,
+    "w": 44,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 44
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Ячейка инвентаря / empty"
+  },
+  {
+   "filename": "slot_hover",
+   "name": "slot_hover",
+   "group": "slots",
+   "frame": {
+    "x": 846,
+    "y": 58,
+    "w": 44,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 44
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Ячейка инвентаря / hover"
+  },
+  {
+   "filename": "slot_selected",
+   "name": "slot_selected",
+   "group": "slots",
+   "frame": {
+    "x": 892,
+    "y": 58,
+    "w": 44,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 44
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Ячейка инвентаря / selected"
+  },
+  {
+   "filename": "socket_amethyst",
+   "name": "socket_amethyst",
+   "group": "slots",
+   "frame": {
+    "x": 978,
+    "y": 238,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Гнездо: amethyst"
+  },
+  {
+   "filename": "socket_diamond",
+   "name": "socket_diamond",
+   "group": "slots",
+   "frame": {
+    "x": 294,
+    "y": 248,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Гнездо: diamond"
+  },
+  {
+   "filename": "socket_emerald",
+   "name": "socket_emerald",
+   "group": "slots",
+   "frame": {
+    "x": 320,
+    "y": 248,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Гнездо: emerald"
+  },
+  {
+   "filename": "socket_empty",
+   "name": "socket_empty",
+   "group": "slots",
+   "frame": {
+    "x": 346,
+    "y": 248,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Гнездо под камень"
+  },
+  {
+   "filename": "socket_ruby",
+   "name": "socket_ruby",
+   "group": "slots",
+   "frame": {
+    "x": 978,
+    "y": 264,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Гнездо: ruby"
+  },
+  {
+   "filename": "socket_sapphire",
+   "name": "socket_sapphire",
+   "group": "slots",
+   "frame": {
+    "x": 930,
+    "y": 266,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Гнездо: sapphire"
+  },
+  {
+   "filename": "socket_topaz",
+   "name": "socket_topaz",
+   "group": "slots",
+   "frame": {
+    "x": 892,
+    "y": 268,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Гнездо: topaz"
+  },
+  {
+   "filename": "bar_fill_blood",
+   "name": "bar_fill_blood",
+   "group": "bars",
+   "frame": {
+    "x": 16,
+    "y": 274,
+    "w": 32,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 10
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Заполнение: blood"
+  },
+  {
+   "filename": "bar_fill_mana",
+   "name": "bar_fill_mana",
+   "group": "bars",
+   "frame": {
+    "x": 50,
+    "y": 274,
+    "w": 32,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 10
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Заполнение: mana"
+  },
+  {
+   "filename": "bar_fill_poison",
+   "name": "bar_fill_poison",
+   "group": "bars",
+   "frame": {
+    "x": 392,
+    "y": 276,
+    "w": 32,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 10
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Заполнение: poison"
+  },
+  {
+   "filename": "bar_fill_stamina",
+   "name": "bar_fill_stamina",
+   "group": "bars",
+   "frame": {
+    "x": 426,
+    "y": 276,
+    "w": 32,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 10
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Заполнение: stamina"
+  },
+  {
+   "filename": "bar_fill_xp",
+   "name": "bar_fill_xp",
+   "group": "bars",
+   "frame": {
+    "x": 460,
+    "y": 276,
+    "w": 32,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 10
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Заполнение: xp"
+  },
+  {
+   "filename": "bar_frame",
+   "name": "bar_frame",
+   "group": "bars",
+   "frame": {
+    "x": 578,
+    "y": 270,
+    "w": 96,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 16
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 8,
+    "t": 5,
+    "r": 8,
+    "b": 5
+   },
+   "desc": "Оправа полосы"
+  },
+  {
+   "filename": "globe_base",
+   "name": "globe_base",
+   "group": "globes",
+   "frame": {
+    "x": 230,
+    "y": 0,
+    "w": 76,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 76
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Пустая сфера"
+  },
+  {
+   "filename": "globe_frame",
+   "name": "globe_frame",
+   "group": "globes",
+   "frame": {
+    "x": 308,
+    "y": 0,
+    "w": 76,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 76
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Обод глобуса"
+  },
+  {
+   "filename": "globe_glass",
+   "name": "globe_glass",
+   "group": "globes",
+   "frame": {
+    "x": 386,
+    "y": 0,
+    "w": 76,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 76
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Блики стекла"
+  },
+  {
+   "filename": "globe_liquid_blood_0",
+   "name": "globe_liquid_blood_0",
+   "group": "globes",
+   "frame": {
+    "x": 246,
+    "y": 154,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна крови, кадр 0"
+  },
+  {
+   "filename": "globe_liquid_blood_1",
+   "name": "globe_liquid_blood_1",
+   "group": "globes",
+   "frame": {
+    "x": 324,
+    "y": 154,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна крови, кадр 1"
+  },
+  {
+   "filename": "globe_liquid_blood_2",
+   "name": "globe_liquid_blood_2",
+   "group": "globes",
+   "frame": {
+    "x": 138,
+    "y": 172,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна крови, кадр 2"
+  },
+  {
+   "filename": "globe_liquid_blood_3",
+   "name": "globe_liquid_blood_3",
+   "group": "globes",
+   "frame": {
+    "x": 896,
+    "y": 174,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна крови, кадр 3"
+  },
+  {
+   "filename": "globe_liquid_blood_4",
+   "name": "globe_liquid_blood_4",
+   "group": "globes",
+   "frame": {
+    "x": 402,
+    "y": 178,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна крови, кадр 4"
+  },
+  {
+   "filename": "globe_liquid_blood_5",
+   "name": "globe_liquid_blood_5",
+   "group": "globes",
+   "frame": {
+    "x": 706,
+    "y": 178,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна крови, кадр 5"
+  },
+  {
+   "filename": "globe_liquid_mana_0",
+   "name": "globe_liquid_mana_0",
+   "group": "globes",
+   "frame": {
+    "x": 784,
+    "y": 178,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна маны, кадр 0"
+  },
+  {
+   "filename": "globe_liquid_mana_1",
+   "name": "globe_liquid_mana_1",
+   "group": "globes",
+   "frame": {
+    "x": 34,
+    "y": 182,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна маны, кадр 1"
+  },
+  {
+   "filename": "globe_liquid_mana_2",
+   "name": "globe_liquid_mana_2",
+   "group": "globes",
+   "frame": {
+    "x": 480,
+    "y": 184,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна маны, кадр 2"
+  },
+  {
+   "filename": "globe_liquid_mana_3",
+   "name": "globe_liquid_mana_3",
+   "group": "globes",
+   "frame": {
+    "x": 558,
+    "y": 184,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна маны, кадр 3"
+  },
+  {
+   "filename": "globe_liquid_mana_4",
+   "name": "globe_liquid_mana_4",
+   "group": "globes",
+   "frame": {
+    "x": 246,
+    "y": 186,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна маны, кадр 4"
+  },
+  {
+   "filename": "globe_liquid_mana_5",
+   "name": "globe_liquid_mana_5",
+   "group": "globes",
+   "frame": {
+    "x": 324,
+    "y": 186,
+    "w": 76,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 30
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Волна маны, кадр 5"
+  },
+  {
+   "filename": "scroll_arrow_down",
+   "name": "scroll_arrow_down",
+   "group": "scroll",
+   "frame": {
+    "x": 676,
+    "y": 270,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Стрелка down"
+  },
+  {
+   "filename": "scroll_arrow_up",
+   "name": "scroll_arrow_up",
+   "group": "scroll",
+   "frame": {
+    "x": 694,
+    "y": 270,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Стрелка up"
+  },
+  {
+   "filename": "scroll_thumb_hover",
+   "name": "scroll_thumb_hover",
+   "group": "scroll",
+   "frame": {
+    "x": 938,
+    "y": 58,
+    "w": 16,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 44
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 5,
+    "t": 8,
+    "r": 5,
+    "b": 8
+   },
+   "desc": "Ползунок / hover"
+  },
+  {
+   "filename": "scroll_thumb_normal",
+   "name": "scroll_thumb_normal",
+   "group": "scroll",
+   "frame": {
+    "x": 956,
+    "y": 58,
+    "w": 16,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 44
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 5,
+    "t": 8,
+    "r": 5,
+    "b": 8
+   },
+   "desc": "Ползунок / normal"
+  },
+  {
+   "filename": "scroll_track",
+   "name": "scroll_track",
+   "group": "scroll",
+   "frame": {
+    "x": 212,
+    "y": 0,
+    "w": 16,
+    "h": 80
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 80
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 80
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 5,
+    "t": 10,
+    "r": 5,
+    "b": 10
+   },
+   "desc": "Жёлоб скроллбара"
+  },
+  {
+   "filename": "rarity_crafted",
+   "name": "rarity_crafted",
+   "group": "rarity",
+   "frame": {
+    "x": 786,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 9,
+    "t": 9,
+    "r": 9,
+    "b": 9
+   },
+   "desc": "Рамка редкости: crafted"
+  },
+  {
+   "filename": "rarity_magic",
+   "name": "rarity_magic",
+   "group": "rarity",
+   "frame": {
+    "x": 844,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 9,
+    "t": 9,
+    "r": 9,
+    "b": 9
+   },
+   "desc": "Рамка редкости: magic"
+  },
+  {
+   "filename": "rarity_normal",
+   "name": "rarity_normal",
+   "group": "rarity",
+   "frame": {
+    "x": 902,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 9,
+    "t": 9,
+    "r": 9,
+    "b": 9
+   },
+   "desc": "Рамка редкости: normal"
+  },
+  {
+   "filename": "rarity_rare",
+   "name": "rarity_rare",
+   "group": "rarity",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 9,
+    "t": 9,
+    "r": 9,
+    "b": 9
+   },
+   "desc": "Рамка редкости: rare"
+  },
+  {
+   "filename": "rarity_runeword",
+   "name": "rarity_runeword",
+   "group": "rarity",
+   "frame": {
+    "x": 554,
+    "y": 58,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 9,
+    "t": 9,
+    "r": 9,
+    "b": 9
+   },
+   "desc": "Рамка редкости: runeword"
+  },
+  {
+   "filename": "rarity_set",
+   "name": "rarity_set",
+   "group": "rarity",
+   "frame": {
+    "x": 612,
+    "y": 58,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 9,
+    "t": 9,
+    "r": 9,
+    "b": 9
+   },
+   "desc": "Рамка редкости: set"
+  },
+  {
+   "filename": "rarity_unique",
+   "name": "rarity_unique",
+   "group": "rarity",
+   "frame": {
+    "x": 670,
+    "y": 58,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": {
+    "l": 9,
+    "t": 9,
+    "r": 9,
+    "b": 9
+   },
+   "desc": "Рамка редкости: unique"
+  },
+  {
+   "filename": "icon_amulet",
+   "name": "icon_amulet",
+   "group": "icons",
+   "frame": {
+    "x": 322,
+    "y": 120,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Амулет"
+  },
+  {
+   "filename": "icon_axe",
+   "name": "icon_axe",
+   "group": "icons",
+   "frame": {
+    "x": 356,
+    "y": 120,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Топор"
+  },
+  {
+   "filename": "icon_belt",
+   "name": "icon_belt",
+   "group": "icons",
+   "frame": {
+    "x": 390,
+    "y": 120,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Пояс"
+  },
+  {
+   "filename": "icon_book",
+   "name": "icon_book",
+   "group": "icons",
+   "frame": {
+    "x": 156,
+    "y": 138,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Книга"
+  },
+  {
+   "filename": "icon_boots",
+   "name": "icon_boots",
+   "group": "icons",
+   "frame": {
+    "x": 104,
+    "y": 140,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Сапоги"
+  },
+  {
+   "filename": "icon_bow",
+   "name": "icon_bow",
+   "group": "icons",
+   "frame": {
+    "x": 914,
+    "y": 140,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Лук"
+  },
+  {
+   "filename": "icon_coin",
+   "name": "icon_coin",
+   "group": "icons",
+   "frame": {
+    "x": 948,
+    "y": 140,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Золото"
+  },
+  {
+   "filename": "icon_dagger",
+   "name": "icon_dagger",
+   "group": "icons",
+   "frame": {
+    "x": 982,
+    "y": 140,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Кинжал"
+  },
+  {
+   "filename": "icon_gem",
+   "name": "icon_gem",
+   "group": "icons",
+   "frame": {
+    "x": 424,
+    "y": 144,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Самоцвет"
+  },
+  {
+   "filename": "icon_helm",
+   "name": "icon_helm",
+   "group": "icons",
+   "frame": {
+    "x": 458,
+    "y": 144,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Шлем"
+  },
+  {
+   "filename": "icon_key",
+   "name": "icon_key",
+   "group": "icons",
+   "frame": {
+    "x": 726,
+    "y": 144,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Ключ"
+  },
+  {
+   "filename": "icon_potion_health",
+   "name": "icon_potion_health",
+   "group": "icons",
+   "frame": {
+    "x": 760,
+    "y": 144,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Зелье лечения"
+  },
+  {
+   "filename": "icon_potion_mana",
+   "name": "icon_potion_mana",
+   "group": "icons",
+   "frame": {
+    "x": 794,
+    "y": 144,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Зелье маны"
+  },
+  {
+   "filename": "icon_ring",
+   "name": "icon_ring",
+   "group": "icons",
+   "frame": {
+    "x": 828,
+    "y": 144,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Кольцо"
+  },
+  {
+   "filename": "icon_rune",
+   "name": "icon_rune",
+   "group": "icons",
+   "frame": {
+    "x": 862,
+    "y": 144,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Руна"
+  },
+  {
+   "filename": "icon_scroll",
+   "name": "icon_scroll",
+   "group": "icons",
+   "frame": {
+    "x": 36,
+    "y": 148,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Свиток"
+  },
+  {
+   "filename": "icon_shield",
+   "name": "icon_shield",
+   "group": "icons",
+   "frame": {
+    "x": 70,
+    "y": 148,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Щит"
+  },
+  {
+   "filename": "icon_skull",
+   "name": "icon_skull",
+   "group": "icons",
+   "frame": {
+    "x": 0,
+    "y": 150,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Череп"
+  },
+  {
+   "filename": "icon_staff",
+   "name": "icon_staff",
+   "group": "icons",
+   "frame": {
+    "x": 492,
+    "y": 150,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Посох"
+  },
+  {
+   "filename": "icon_sword",
+   "name": "icon_sword",
+   "group": "icons",
+   "frame": {
+    "x": 526,
+    "y": 150,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Меч"
+  },
+  {
+   "filename": "icon_torch",
+   "name": "icon_torch",
+   "group": "icons",
+   "frame": {
+    "x": 560,
+    "y": 150,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Факел"
+  },
+  {
+   "filename": "fx_ember_0",
+   "name": "fx_ember_0",
+   "group": "fx",
+   "frame": {
+    "x": 712,
+    "y": 270,
+    "w": 14,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 14
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Уголёк, кадр 0"
+  },
+  {
+   "filename": "fx_ember_1",
+   "name": "fx_ember_1",
+   "group": "fx",
+   "frame": {
+    "x": 728,
+    "y": 270,
+    "w": 14,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 14
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Уголёк, кадр 1"
+  },
+  {
+   "filename": "fx_ember_2",
+   "name": "fx_ember_2",
+   "group": "fx",
+   "frame": {
+    "x": 744,
+    "y": 270,
+    "w": 14,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 14
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Уголёк, кадр 2"
+  },
+  {
+   "filename": "fx_ember_3",
+   "name": "fx_ember_3",
+   "group": "fx",
+   "frame": {
+    "x": 760,
+    "y": 270,
+    "w": 14,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 14
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Уголёк, кадр 3"
+  },
+  {
+   "filename": "fx_ember_4",
+   "name": "fx_ember_4",
+   "group": "fx",
+   "frame": {
+    "x": 776,
+    "y": 270,
+    "w": 14,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 14
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Уголёк, кадр 4"
+  },
+  {
+   "filename": "fx_ember_5",
+   "name": "fx_ember_5",
+   "group": "fx",
+   "frame": {
+    "x": 0,
+    "y": 274,
+    "w": 14,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 14
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Уголёк, кадр 5"
+  },
+  {
+   "filename": "fx_flame_0",
+   "name": "fx_flame_0",
+   "group": "fx",
+   "frame": {
+    "x": 156,
+    "y": 98,
+    "w": 30,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 38
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пламя, кадр 0"
+  },
+  {
+   "filename": "fx_flame_1",
+   "name": "fx_flame_1",
+   "group": "fx",
+   "frame": {
+    "x": 188,
+    "y": 98,
+    "w": 30,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 38
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пламя, кадр 1"
+  },
+  {
+   "filename": "fx_flame_2",
+   "name": "fx_flame_2",
+   "group": "fx",
+   "frame": {
+    "x": 974,
+    "y": 100,
+    "w": 30,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 38
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пламя, кадр 2"
+  },
+  {
+   "filename": "fx_flame_3",
+   "name": "fx_flame_3",
+   "group": "fx",
+   "frame": {
+    "x": 754,
+    "y": 104,
+    "w": 30,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 38
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пламя, кадр 3"
+  },
+  {
+   "filename": "fx_flame_4",
+   "name": "fx_flame_4",
+   "group": "fx",
+   "frame": {
+    "x": 786,
+    "y": 104,
+    "w": 30,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 38
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пламя, кадр 4"
+  },
+  {
+   "filename": "fx_flame_5",
+   "name": "fx_flame_5",
+   "group": "fx",
+   "frame": {
+    "x": 818,
+    "y": 104,
+    "w": 30,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 38
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пламя, кадр 5"
+  },
+  {
+   "filename": "fx_flame_6",
+   "name": "fx_flame_6",
+   "group": "fx",
+   "frame": {
+    "x": 850,
+    "y": 104,
+    "w": 30,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 38
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пламя, кадр 6"
+  },
+  {
+   "filename": "fx_flame_7",
+   "name": "fx_flame_7",
+   "group": "fx",
+   "frame": {
+    "x": 882,
+    "y": 104,
+    "w": 30,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 38
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пламя, кадр 7"
+  },
+  {
+   "filename": "fx_rune_0",
+   "name": "fx_rune_0",
+   "group": "fx",
+   "frame": {
+    "x": 624,
+    "y": 116,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пульс руны, кадр 0"
+  },
+  {
+   "filename": "fx_rune_1",
+   "name": "fx_rune_1",
+   "group": "fx",
+   "frame": {
+    "x": 658,
+    "y": 116,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пульс руны, кадр 1"
+  },
+  {
+   "filename": "fx_rune_2",
+   "name": "fx_rune_2",
+   "group": "fx",
+   "frame": {
+    "x": 692,
+    "y": 116,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пульс руны, кадр 2"
+  },
+  {
+   "filename": "fx_rune_3",
+   "name": "fx_rune_3",
+   "group": "fx",
+   "frame": {
+    "x": 220,
+    "y": 120,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пульс руны, кадр 3"
+  },
+  {
+   "filename": "fx_rune_4",
+   "name": "fx_rune_4",
+   "group": "fx",
+   "frame": {
+    "x": 254,
+    "y": 120,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пульс руны, кадр 4"
+  },
+  {
+   "filename": "fx_rune_5",
+   "name": "fx_rune_5",
+   "group": "fx",
+   "frame": {
+    "x": 288,
+    "y": 120,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Пульс руны, кадр 5"
+  },
+  {
+   "filename": "fx_smoke_0",
+   "name": "fx_smoke_0",
+   "group": "fx",
+   "frame": {
+    "x": 190,
+    "y": 138,
+    "w": 26,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Дым, кадр 0"
+  },
+  {
+   "filename": "fx_smoke_1",
+   "name": "fx_smoke_1",
+   "group": "fx",
+   "frame": {
+    "x": 594,
+    "y": 150,
+    "w": 26,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Дым, кадр 1"
+  },
+  {
+   "filename": "fx_smoke_2",
+   "name": "fx_smoke_2",
+   "group": "fx",
+   "frame": {
+    "x": 622,
+    "y": 150,
+    "w": 26,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Дым, кадр 2"
+  },
+  {
+   "filename": "fx_smoke_3",
+   "name": "fx_smoke_3",
+   "group": "fx",
+   "frame": {
+    "x": 650,
+    "y": 150,
+    "w": 26,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Дым, кадр 3"
+  },
+  {
+   "filename": "fx_smoke_4",
+   "name": "fx_smoke_4",
+   "group": "fx",
+   "frame": {
+    "x": 678,
+    "y": 150,
+    "w": 26,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Дым, кадр 4"
+  },
+  {
+   "filename": "fx_smoke_5",
+   "name": "fx_smoke_5",
+   "group": "fx",
+   "frame": {
+    "x": 218,
+    "y": 154,
+    "w": 26,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 32
+   },
+   "duration": 83,
+   "nineSlice": null,
+   "desc": "Дым, кадр 5"
+  },
+  {
+   "filename": "glow_blue",
+   "name": "glow_blue",
+   "group": "fx",
+   "frame": {
+    "x": 554,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Свечение маны"
+  },
+  {
+   "filename": "glow_gold",
+   "name": "glow_gold",
+   "group": "fx",
+   "frame": {
+    "x": 612,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Мягкое золотое свечение"
+  },
+  {
+   "filename": "glow_green",
+   "name": "glow_green",
+   "group": "fx",
+   "frame": {
+    "x": 670,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Ядовитое свечение"
+  },
+  {
+   "filename": "glow_red",
+   "name": "glow_red",
+   "group": "fx",
+   "frame": {
+    "x": 728,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 56
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Кровавое свечение"
+  },
+  {
+   "filename": "cursor_fist",
+   "name": "cursor_fist",
+   "group": "cursor",
+   "frame": {
+    "x": 930,
+    "y": 238,
+    "w": 22,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 26
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Курсор: fist"
+  },
+  {
+   "filename": "cursor_hand",
+   "name": "cursor_hand",
+   "group": "cursor",
+   "frame": {
+    "x": 954,
+    "y": 238,
+    "w": 22,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 26
+   },
+   "duration": 100,
+   "nineSlice": null,
+   "desc": "Курсор: hand"
+  }
+ ],
+ "meta": {
+  "app": "omgGame darkui-mcp/1.0",
+  "version": "1.0",
+  "image": "darkui.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1024,
+   "h": 320
+  },
+  "scale": "1",
+  "padding": 2,
+  "fillRatio": 0.753,
+  "frameTags": [
+   {
+    "name": "wave_blood",
+    "from": 64,
+    "to": 69,
+    "direction": "forward",
+    "fps": 12
+   },
+   {
+    "name": "wave_mana",
+    "from": 70,
+    "to": 75,
+    "direction": "forward",
+    "fps": 12
+   },
+   {
+    "name": "ember",
+    "from": 109,
+    "to": 114,
+    "direction": "forward",
+    "fps": 12
+   },
+   {
+    "name": "flame",
+    "from": 115,
+    "to": 122,
+    "direction": "forward",
+    "fps": 12
+   },
+   {
+    "name": "rune_pulse",
+    "from": 123,
+    "to": 128,
+    "direction": "forward",
+    "fps": 12
+   },
+   {
+    "name": "smoke",
+    "from": 129,
+    "to": 134,
+    "direction": "forward",
+    "fps": 12
+   }
+  ],
+  "layers": [
+   {
+    "name": "fills",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "panels",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "decor",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "buttons",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "slots",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "bars",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "globes",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "scroll",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "rarity",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "icons",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "fx",
+    "opacity": 255,
+    "blendMode": "normal"
+   },
+   {
+    "name": "cursor",
+    "opacity": 255,
+    "blendMode": "normal"
+   }
+  ],
+  "slices": [
+   {
+    "name": "banner_title",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 5,
+      "bounds": {
+       "x": 230,
+       "y": 78,
+       "w": 176,
+       "h": 40
+      },
+      "center": {
+       "x": 26,
+       "y": 10,
+       "w": 124,
+       "h": 20
+      }
+     }
+    ]
+   },
+   {
+    "name": "panel_frame_heavy",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 6,
+      "bounds": {
+       "x": 0,
+       "y": 0,
+       "w": 112,
+       "h": 112
+      },
+      "center": {
+       "x": 24,
+       "y": 24,
+       "w": 64,
+       "h": 64
+      }
+     }
+    ]
+   },
+   {
+    "name": "panel_frame_ornate",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 7,
+      "bounds": {
+       "x": 114,
+       "y": 0,
+       "w": 96,
+       "h": 96
+      },
+      "center": {
+       "x": 16,
+       "y": 16,
+       "w": 64,
+       "h": 64
+      }
+     }
+    ]
+   },
+   {
+    "name": "tooltip_frame",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 8,
+      "bounds": {
+       "x": 464,
+       "y": 0,
+       "w": 88,
+       "h": 64
+      },
+      "center": {
+       "x": 10,
+       "y": 10,
+       "w": 68,
+       "h": 42
+      }
+     }
+    ]
+   },
+   {
+    "name": "divider_ornate",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 13,
+      "bounds": {
+       "x": 294,
+       "y": 276,
+       "w": 96,
+       "h": 12
+      },
+      "center": {
+       "x": 28,
+       "y": 0,
+       "w": 40,
+       "h": 12
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_blood_disabled",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 18,
+      "bounds": {
+       "x": 636,
+       "y": 210,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_blood_hover",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 19,
+      "bounds": {
+       "x": 734,
+       "y": 210,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_blood_normal",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 20,
+      "bounds": {
+       "x": 0,
+       "y": 214,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_blood_pressed",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 21,
+      "bounds": {
+       "x": 402,
+       "y": 216,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_gold_disabled",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 22,
+      "bounds": {
+       "x": 500,
+       "y": 216,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_gold_hover",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 23,
+      "bounds": {
+       "x": 186,
+       "y": 218,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_gold_normal",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 24,
+      "bounds": {
+       "x": 284,
+       "y": 218,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_gold_pressed",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 25,
+      "bounds": {
+       "x": 832,
+       "y": 238,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_iron_disabled",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 26,
+      "bounds": {
+       "x": 598,
+       "y": 240,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_iron_hover",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 27,
+      "bounds": {
+       "x": 696,
+       "y": 240,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_iron_normal",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 28,
+      "bounds": {
+       "x": 0,
+       "y": 244,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_iron_pressed",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 29,
+      "bounds": {
+       "x": 382,
+       "y": 246,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_stone_disabled",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 34,
+      "bounds": {
+       "x": 480,
+       "y": 246,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_stone_hover",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 35,
+      "bounds": {
+       "x": 98,
+       "y": 248,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_stone_normal",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 36,
+      "bounds": {
+       "x": 196,
+       "y": 248,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "btn_stone_pressed",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 37,
+      "bounds": {
+       "x": 794,
+       "y": 268,
+       "w": 96,
+       "h": 28
+      },
+      "center": {
+       "x": 16,
+       "y": 9,
+       "w": 64,
+       "h": 10
+      }
+     }
+    ]
+   },
+   {
+    "name": "tab_active",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 41,
+      "bounds": {
+       "x": 112,
+       "y": 204,
+       "w": 72,
+       "h": 30
+      },
+      "center": {
+       "x": 12,
+       "y": 10,
+       "w": 48,
+       "h": 12
+      }
+     }
+    ]
+   },
+   {
+    "name": "tab_hover",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 42,
+      "bounds": {
+       "x": 862,
+       "y": 206,
+       "w": 72,
+       "h": 30
+      },
+      "center": {
+       "x": 12,
+       "y": 10,
+       "w": 48,
+       "h": 12
+      }
+     }
+    ]
+   },
+   {
+    "name": "tab_normal",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 43,
+      "bounds": {
+       "x": 936,
+       "y": 206,
+       "w": 72,
+       "h": 30
+      },
+      "center": {
+       "x": 12,
+       "y": 10,
+       "w": 48,
+       "h": 12
+      }
+     }
+    ]
+   },
+   {
+    "name": "bar_frame",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 60,
+      "bounds": {
+       "x": 578,
+       "y": 270,
+       "w": 96,
+       "h": 16
+      },
+      "center": {
+       "x": 8,
+       "y": 5,
+       "w": 80,
+       "h": 6
+      }
+     }
+    ]
+   },
+   {
+    "name": "scroll_thumb_hover",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 78,
+      "bounds": {
+       "x": 938,
+       "y": 58,
+       "w": 16,
+       "h": 44
+      },
+      "center": {
+       "x": 5,
+       "y": 8,
+       "w": 6,
+       "h": 28
+      }
+     }
+    ]
+   },
+   {
+    "name": "scroll_thumb_normal",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 79,
+      "bounds": {
+       "x": 956,
+       "y": 58,
+       "w": 16,
+       "h": 44
+      },
+      "center": {
+       "x": 5,
+       "y": 8,
+       "w": 6,
+       "h": 28
+      }
+     }
+    ]
+   },
+   {
+    "name": "scroll_track",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 80,
+      "bounds": {
+       "x": 212,
+       "y": 0,
+       "w": 16,
+       "h": 80
+      },
+      "center": {
+       "x": 5,
+       "y": 10,
+       "w": 6,
+       "h": 60
+      }
+     }
+    ]
+   },
+   {
+    "name": "rarity_crafted",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 81,
+      "bounds": {
+       "x": 786,
+       "y": 0,
+       "w": 56,
+       "h": 56
+      },
+      "center": {
+       "x": 9,
+       "y": 9,
+       "w": 38,
+       "h": 38
+      }
+     }
+    ]
+   },
+   {
+    "name": "rarity_magic",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 82,
+      "bounds": {
+       "x": 844,
+       "y": 0,
+       "w": 56,
+       "h": 56
+      },
+      "center": {
+       "x": 9,
+       "y": 9,
+       "w": 38,
+       "h": 38
+      }
+     }
+    ]
+   },
+   {
+    "name": "rarity_normal",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 83,
+      "bounds": {
+       "x": 902,
+       "y": 0,
+       "w": 56,
+       "h": 56
+      },
+      "center": {
+       "x": 9,
+       "y": 9,
+       "w": 38,
+       "h": 38
+      }
+     }
+    ]
+   },
+   {
+    "name": "rarity_rare",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 84,
+      "bounds": {
+       "x": 960,
+       "y": 0,
+       "w": 56,
+       "h": 56
+      },
+      "center": {
+       "x": 9,
+       "y": 9,
+       "w": 38,
+       "h": 38
+      }
+     }
+    ]
+   },
+   {
+    "name": "rarity_runeword",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 85,
+      "bounds": {
+       "x": 554,
+       "y": 58,
+       "w": 56,
+       "h": 56
+      },
+      "center": {
+       "x": 9,
+       "y": 9,
+       "w": 38,
+       "h": 38
+      }
+     }
+    ]
+   },
+   {
+    "name": "rarity_set",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 86,
+      "bounds": {
+       "x": 612,
+       "y": 58,
+       "w": 56,
+       "h": 56
+      },
+      "center": {
+       "x": 9,
+       "y": 9,
+       "w": 38,
+       "h": 38
+      }
+     }
+    ]
+   },
+   {
+    "name": "rarity_unique",
+    "color": "#ff00ff7f",
+    "keys": [
+     {
+      "frame": 87,
+      "bounds": {
+       "x": 670,
+       "y": 58,
+       "w": 56,
+       "h": 56
+      },
+      "center": {
+       "x": 9,
+       "y": 9,
+       "w": 38,
+       "h": 38
+      }
+     }
+    ]
+   }
+  ],
+  "components": {
+   "fill_bloodstone": {
+    "group": "fills",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Тайл кровавого камня",
+    "layer": 0
+   },
+   "fill_dark": {
+    "group": "fills",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Тайл тёмного фона",
+    "layer": 0
+   },
+   "fill_parchment": {
+    "group": "fills",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Тайл пергамента",
+    "layer": 0
+   },
+   "fill_stone": {
+    "group": "fills",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Тайл камня 32×32",
+    "layer": 0
+   },
+   "fill_wood": {
+    "group": "fills",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Тайл дерева",
+    "layer": 0
+   },
+   "banner_title": {
+    "group": "panels",
+    "w": 176,
+    "h": 40,
+    "nine": [
+     26,
+     10,
+     26,
+     10
+    ],
+    "tag": null,
+    "desc": "Табличка заголовка",
+    "layer": 1
+   },
+   "panel_frame_heavy": {
+    "group": "panels",
+    "w": 112,
+    "h": 112,
+    "nine": [
+     24,
+     24,
+     24,
+     24
+    ],
+    "tag": null,
+    "desc": "Тяжёлая рама, 9-slice",
+    "layer": 1
+   },
+   "panel_frame_ornate": {
+    "group": "panels",
+    "w": 96,
+    "h": 96,
+    "nine": [
+     16,
+     16,
+     16,
+     16
+    ],
+    "tag": null,
+    "desc": "Рама окна, 9-slice",
+    "layer": 1
+   },
+   "tooltip_frame": {
+    "group": "panels",
+    "w": 88,
+    "h": 64,
+    "nine": [
+     10,
+     10,
+     10,
+     12
+    ],
+    "tag": null,
+    "desc": "Подсказка, 9-slice",
+    "layer": 1
+   },
+   "corner_bl": {
+    "group": "decor",
+    "w": 34,
+    "h": 34,
+    "nine": null,
+    "tag": null,
+    "desc": "Угловой орнамент bl",
+    "layer": 2
+   },
+   "corner_br": {
+    "group": "decor",
+    "w": 34,
+    "h": 34,
+    "nine": null,
+    "tag": null,
+    "desc": "Угловой орнамент br",
+    "layer": 2
+   },
+   "corner_tl": {
+    "group": "decor",
+    "w": 34,
+    "h": 34,
+    "nine": null,
+    "tag": null,
+    "desc": "Угловой орнамент tl",
+    "layer": 2
+   },
+   "corner_tr": {
+    "group": "decor",
+    "w": 34,
+    "h": 34,
+    "nine": null,
+    "tag": null,
+    "desc": "Угловой орнамент tr",
+    "layer": 2
+   },
+   "divider_ornate": {
+    "group": "decor",
+    "w": 96,
+    "h": 12,
+    "nine": [
+     28,
+     0,
+     28,
+     0
+    ],
+    "tag": null,
+    "desc": "Золотой разделитель",
+    "layer": 2
+   },
+   "divider_simple": {
+    "group": "decor",
+    "w": 32,
+    "h": 4,
+    "nine": null,
+    "tag": null,
+    "desc": "Тонкий разделитель (тайл)",
+    "layer": 2
+   },
+   "rivet": {
+    "group": "decor",
+    "w": 10,
+    "h": 10,
+    "nine": null,
+    "tag": null,
+    "desc": "Заклёпка",
+    "layer": 2
+   },
+   "skull_ornament": {
+    "group": "decor",
+    "w": 48,
+    "h": 40,
+    "nine": null,
+    "tag": null,
+    "desc": "Череп с костями",
+    "layer": 2
+   },
+   "torch": {
+    "group": "decor",
+    "w": 24,
+    "h": 52,
+    "nine": null,
+    "tag": null,
+    "desc": "Факел (пламя — fx_flame)",
+    "layer": 2
+   },
+   "btn_blood_disabled": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка blood / disabled",
+    "layer": 3
+   },
+   "btn_blood_hover": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка blood / hover",
+    "layer": 3
+   },
+   "btn_blood_normal": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка blood / normal",
+    "layer": 3
+   },
+   "btn_blood_pressed": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка blood / pressed",
+    "layer": 3
+   },
+   "btn_gold_disabled": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка gold / disabled",
+    "layer": 3
+   },
+   "btn_gold_hover": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка gold / hover",
+    "layer": 3
+   },
+   "btn_gold_normal": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка gold / normal",
+    "layer": 3
+   },
+   "btn_gold_pressed": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка gold / pressed",
+    "layer": 3
+   },
+   "btn_iron_disabled": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка iron / disabled",
+    "layer": 3
+   },
+   "btn_iron_hover": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка iron / hover",
+    "layer": 3
+   },
+   "btn_iron_normal": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка iron / normal",
+    "layer": 3
+   },
+   "btn_iron_pressed": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка iron / pressed",
+    "layer": 3
+   },
+   "btn_round_disabled": {
+    "group": "buttons",
+    "w": 40,
+    "h": 40,
+    "nine": null,
+    "tag": null,
+    "desc": "Круглая кнопка / disabled",
+    "layer": 3
+   },
+   "btn_round_hover": {
+    "group": "buttons",
+    "w": 40,
+    "h": 40,
+    "nine": null,
+    "tag": null,
+    "desc": "Круглая кнопка / hover",
+    "layer": 3
+   },
+   "btn_round_normal": {
+    "group": "buttons",
+    "w": 40,
+    "h": 40,
+    "nine": null,
+    "tag": null,
+    "desc": "Круглая кнопка / normal",
+    "layer": 3
+   },
+   "btn_round_pressed": {
+    "group": "buttons",
+    "w": 40,
+    "h": 40,
+    "nine": null,
+    "tag": null,
+    "desc": "Круглая кнопка / pressed",
+    "layer": 3
+   },
+   "btn_stone_disabled": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка stone / disabled",
+    "layer": 3
+   },
+   "btn_stone_hover": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка stone / hover",
+    "layer": 3
+   },
+   "btn_stone_normal": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка stone / normal",
+    "layer": 3
+   },
+   "btn_stone_pressed": {
+    "group": "buttons",
+    "w": 96,
+    "h": 28,
+    "nine": [
+     16,
+     9,
+     16,
+     9
+    ],
+    "tag": null,
+    "desc": "Кнопка stone / pressed",
+    "layer": 3
+   },
+   "checkbox_hover": {
+    "group": "buttons",
+    "w": 16,
+    "h": 16,
+    "nine": null,
+    "tag": null,
+    "desc": "Флажок / hover",
+    "layer": 3
+   },
+   "checkbox_off": {
+    "group": "buttons",
+    "w": 16,
+    "h": 16,
+    "nine": null,
+    "tag": null,
+    "desc": "Флажок / off",
+    "layer": 3
+   },
+   "checkbox_on": {
+    "group": "buttons",
+    "w": 16,
+    "h": 16,
+    "nine": null,
+    "tag": null,
+    "desc": "Флажок / on",
+    "layer": 3
+   },
+   "tab_active": {
+    "group": "buttons",
+    "w": 72,
+    "h": 30,
+    "nine": [
+     12,
+     10,
+     12,
+     8
+    ],
+    "tag": null,
+    "desc": "Вкладка / active",
+    "layer": 3
+   },
+   "tab_hover": {
+    "group": "buttons",
+    "w": 72,
+    "h": 30,
+    "nine": [
+     12,
+     10,
+     12,
+     8
+    ],
+    "tag": null,
+    "desc": "Вкладка / hover",
+    "layer": 3
+   },
+   "tab_normal": {
+    "group": "buttons",
+    "w": 72,
+    "h": 30,
+    "nine": [
+     12,
+     10,
+     12,
+     8
+    ],
+    "tag": null,
+    "desc": "Вкладка / normal",
+    "layer": 3
+   },
+   "slot_drop": {
+    "group": "slots",
+    "w": 44,
+    "h": 44,
+    "nine": null,
+    "tag": null,
+    "desc": "Ячейка инвентаря / drop",
+    "layer": 4
+   },
+   "slot_empty": {
+    "group": "slots",
+    "w": 44,
+    "h": 44,
+    "nine": null,
+    "tag": null,
+    "desc": "Ячейка инвентаря / empty",
+    "layer": 4
+   },
+   "slot_hover": {
+    "group": "slots",
+    "w": 44,
+    "h": 44,
+    "nine": null,
+    "tag": null,
+    "desc": "Ячейка инвентаря / hover",
+    "layer": 4
+   },
+   "slot_selected": {
+    "group": "slots",
+    "w": 44,
+    "h": 44,
+    "nine": null,
+    "tag": null,
+    "desc": "Ячейка инвентаря / selected",
+    "layer": 4
+   },
+   "socket_amethyst": {
+    "group": "slots",
+    "w": 24,
+    "h": 24,
+    "nine": null,
+    "tag": null,
+    "desc": "Гнездо: amethyst",
+    "layer": 4
+   },
+   "socket_diamond": {
+    "group": "slots",
+    "w": 24,
+    "h": 24,
+    "nine": null,
+    "tag": null,
+    "desc": "Гнездо: diamond",
+    "layer": 4
+   },
+   "socket_emerald": {
+    "group": "slots",
+    "w": 24,
+    "h": 24,
+    "nine": null,
+    "tag": null,
+    "desc": "Гнездо: emerald",
+    "layer": 4
+   },
+   "socket_empty": {
+    "group": "slots",
+    "w": 24,
+    "h": 24,
+    "nine": null,
+    "tag": null,
+    "desc": "Гнездо под камень",
+    "layer": 4
+   },
+   "socket_ruby": {
+    "group": "slots",
+    "w": 24,
+    "h": 24,
+    "nine": null,
+    "tag": null,
+    "desc": "Гнездо: ruby",
+    "layer": 4
+   },
+   "socket_sapphire": {
+    "group": "slots",
+    "w": 24,
+    "h": 24,
+    "nine": null,
+    "tag": null,
+    "desc": "Гнездо: sapphire",
+    "layer": 4
+   },
+   "socket_topaz": {
+    "group": "slots",
+    "w": 24,
+    "h": 24,
+    "nine": null,
+    "tag": null,
+    "desc": "Гнездо: topaz",
+    "layer": 4
+   },
+   "bar_fill_blood": {
+    "group": "bars",
+    "w": 32,
+    "h": 10,
+    "nine": null,
+    "tag": null,
+    "desc": "Заполнение: blood",
+    "layer": 5
+   },
+   "bar_fill_mana": {
+    "group": "bars",
+    "w": 32,
+    "h": 10,
+    "nine": null,
+    "tag": null,
+    "desc": "Заполнение: mana",
+    "layer": 5
+   },
+   "bar_fill_poison": {
+    "group": "bars",
+    "w": 32,
+    "h": 10,
+    "nine": null,
+    "tag": null,
+    "desc": "Заполнение: poison",
+    "layer": 5
+   },
+   "bar_fill_stamina": {
+    "group": "bars",
+    "w": 32,
+    "h": 10,
+    "nine": null,
+    "tag": null,
+    "desc": "Заполнение: stamina",
+    "layer": 5
+   },
+   "bar_fill_xp": {
+    "group": "bars",
+    "w": 32,
+    "h": 10,
+    "nine": null,
+    "tag": null,
+    "desc": "Заполнение: xp",
+    "layer": 5
+   },
+   "bar_frame": {
+    "group": "bars",
+    "w": 96,
+    "h": 16,
+    "nine": [
+     8,
+     5,
+     8,
+     5
+    ],
+    "tag": null,
+    "desc": "Оправа полосы",
+    "layer": 5
+   },
+   "globe_base": {
+    "group": "globes",
+    "w": 76,
+    "h": 76,
+    "nine": null,
+    "tag": null,
+    "desc": "Пустая сфера",
+    "layer": 6
+   },
+   "globe_frame": {
+    "group": "globes",
+    "w": 76,
+    "h": 76,
+    "nine": null,
+    "tag": null,
+    "desc": "Обод глобуса",
+    "layer": 6
+   },
+   "globe_glass": {
+    "group": "globes",
+    "w": 76,
+    "h": 76,
+    "nine": null,
+    "tag": null,
+    "desc": "Блики стекла",
+    "layer": 6
+   },
+   "globe_liquid_blood_0": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_blood",
+    "desc": "Волна крови, кадр 0",
+    "layer": 6
+   },
+   "globe_liquid_blood_1": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_blood",
+    "desc": "Волна крови, кадр 1",
+    "layer": 6
+   },
+   "globe_liquid_blood_2": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_blood",
+    "desc": "Волна крови, кадр 2",
+    "layer": 6
+   },
+   "globe_liquid_blood_3": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_blood",
+    "desc": "Волна крови, кадр 3",
+    "layer": 6
+   },
+   "globe_liquid_blood_4": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_blood",
+    "desc": "Волна крови, кадр 4",
+    "layer": 6
+   },
+   "globe_liquid_blood_5": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_blood",
+    "desc": "Волна крови, кадр 5",
+    "layer": 6
+   },
+   "globe_liquid_mana_0": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_mana",
+    "desc": "Волна маны, кадр 0",
+    "layer": 6
+   },
+   "globe_liquid_mana_1": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_mana",
+    "desc": "Волна маны, кадр 1",
+    "layer": 6
+   },
+   "globe_liquid_mana_2": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_mana",
+    "desc": "Волна маны, кадр 2",
+    "layer": 6
+   },
+   "globe_liquid_mana_3": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_mana",
+    "desc": "Волна маны, кадр 3",
+    "layer": 6
+   },
+   "globe_liquid_mana_4": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_mana",
+    "desc": "Волна маны, кадр 4",
+    "layer": 6
+   },
+   "globe_liquid_mana_5": {
+    "group": "globes",
+    "w": 76,
+    "h": 30,
+    "nine": null,
+    "tag": "wave_mana",
+    "desc": "Волна маны, кадр 5",
+    "layer": 6
+   },
+   "scroll_arrow_down": {
+    "group": "scroll",
+    "w": 16,
+    "h": 16,
+    "nine": null,
+    "tag": null,
+    "desc": "Стрелка down",
+    "layer": 7
+   },
+   "scroll_arrow_up": {
+    "group": "scroll",
+    "w": 16,
+    "h": 16,
+    "nine": null,
+    "tag": null,
+    "desc": "Стрелка up",
+    "layer": 7
+   },
+   "scroll_thumb_hover": {
+    "group": "scroll",
+    "w": 16,
+    "h": 44,
+    "nine": [
+     5,
+     8,
+     5,
+     8
+    ],
+    "tag": null,
+    "desc": "Ползунок / hover",
+    "layer": 7
+   },
+   "scroll_thumb_normal": {
+    "group": "scroll",
+    "w": 16,
+    "h": 44,
+    "nine": [
+     5,
+     8,
+     5,
+     8
+    ],
+    "tag": null,
+    "desc": "Ползунок / normal",
+    "layer": 7
+   },
+   "scroll_track": {
+    "group": "scroll",
+    "w": 16,
+    "h": 80,
+    "nine": [
+     5,
+     10,
+     5,
+     10
+    ],
+    "tag": null,
+    "desc": "Жёлоб скроллбара",
+    "layer": 7
+   },
+   "rarity_crafted": {
+    "group": "rarity",
+    "w": 56,
+    "h": 56,
+    "nine": [
+     9,
+     9,
+     9,
+     9
+    ],
+    "tag": null,
+    "desc": "Рамка редкости: crafted",
+    "layer": 8
+   },
+   "rarity_magic": {
+    "group": "rarity",
+    "w": 56,
+    "h": 56,
+    "nine": [
+     9,
+     9,
+     9,
+     9
+    ],
+    "tag": null,
+    "desc": "Рамка редкости: magic",
+    "layer": 8
+   },
+   "rarity_normal": {
+    "group": "rarity",
+    "w": 56,
+    "h": 56,
+    "nine": [
+     9,
+     9,
+     9,
+     9
+    ],
+    "tag": null,
+    "desc": "Рамка редкости: normal",
+    "layer": 8
+   },
+   "rarity_rare": {
+    "group": "rarity",
+    "w": 56,
+    "h": 56,
+    "nine": [
+     9,
+     9,
+     9,
+     9
+    ],
+    "tag": null,
+    "desc": "Рамка редкости: rare",
+    "layer": 8
+   },
+   "rarity_runeword": {
+    "group": "rarity",
+    "w": 56,
+    "h": 56,
+    "nine": [
+     9,
+     9,
+     9,
+     9
+    ],
+    "tag": null,
+    "desc": "Рамка редкости: runeword",
+    "layer": 8
+   },
+   "rarity_set": {
+    "group": "rarity",
+    "w": 56,
+    "h": 56,
+    "nine": [
+     9,
+     9,
+     9,
+     9
+    ],
+    "tag": null,
+    "desc": "Рамка редкости: set",
+    "layer": 8
+   },
+   "rarity_unique": {
+    "group": "rarity",
+    "w": 56,
+    "h": 56,
+    "nine": [
+     9,
+     9,
+     9,
+     9
+    ],
+    "tag": null,
+    "desc": "Рамка редкости: unique",
+    "layer": 8
+   },
+   "icon_amulet": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Амулет",
+    "layer": 9
+   },
+   "icon_axe": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Топор",
+    "layer": 9
+   },
+   "icon_belt": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Пояс",
+    "layer": 9
+   },
+   "icon_book": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Книга",
+    "layer": 9
+   },
+   "icon_boots": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Сапоги",
+    "layer": 9
+   },
+   "icon_bow": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Лук",
+    "layer": 9
+   },
+   "icon_coin": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Золото",
+    "layer": 9
+   },
+   "icon_dagger": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Кинжал",
+    "layer": 9
+   },
+   "icon_gem": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Самоцвет",
+    "layer": 9
+   },
+   "icon_helm": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Шлем",
+    "layer": 9
+   },
+   "icon_key": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Ключ",
+    "layer": 9
+   },
+   "icon_potion_health": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Зелье лечения",
+    "layer": 9
+   },
+   "icon_potion_mana": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Зелье маны",
+    "layer": 9
+   },
+   "icon_ring": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Кольцо",
+    "layer": 9
+   },
+   "icon_rune": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Руна",
+    "layer": 9
+   },
+   "icon_scroll": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Свиток",
+    "layer": 9
+   },
+   "icon_shield": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Щит",
+    "layer": 9
+   },
+   "icon_skull": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Череп",
+    "layer": 9
+   },
+   "icon_staff": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Посох",
+    "layer": 9
+   },
+   "icon_sword": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Меч",
+    "layer": 9
+   },
+   "icon_torch": {
+    "group": "icons",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": null,
+    "desc": "Факел",
+    "layer": 9
+   },
+   "fx_ember_0": {
+    "group": "fx",
+    "w": 14,
+    "h": 14,
+    "nine": null,
+    "tag": "ember",
+    "desc": "Уголёк, кадр 0",
+    "layer": 10
+   },
+   "fx_ember_1": {
+    "group": "fx",
+    "w": 14,
+    "h": 14,
+    "nine": null,
+    "tag": "ember",
+    "desc": "Уголёк, кадр 1",
+    "layer": 10
+   },
+   "fx_ember_2": {
+    "group": "fx",
+    "w": 14,
+    "h": 14,
+    "nine": null,
+    "tag": "ember",
+    "desc": "Уголёк, кадр 2",
+    "layer": 10
+   },
+   "fx_ember_3": {
+    "group": "fx",
+    "w": 14,
+    "h": 14,
+    "nine": null,
+    "tag": "ember",
+    "desc": "Уголёк, кадр 3",
+    "layer": 10
+   },
+   "fx_ember_4": {
+    "group": "fx",
+    "w": 14,
+    "h": 14,
+    "nine": null,
+    "tag": "ember",
+    "desc": "Уголёк, кадр 4",
+    "layer": 10
+   },
+   "fx_ember_5": {
+    "group": "fx",
+    "w": 14,
+    "h": 14,
+    "nine": null,
+    "tag": "ember",
+    "desc": "Уголёк, кадр 5",
+    "layer": 10
+   },
+   "fx_flame_0": {
+    "group": "fx",
+    "w": 30,
+    "h": 38,
+    "nine": null,
+    "tag": "flame",
+    "desc": "Пламя, кадр 0",
+    "layer": 10
+   },
+   "fx_flame_1": {
+    "group": "fx",
+    "w": 30,
+    "h": 38,
+    "nine": null,
+    "tag": "flame",
+    "desc": "Пламя, кадр 1",
+    "layer": 10
+   },
+   "fx_flame_2": {
+    "group": "fx",
+    "w": 30,
+    "h": 38,
+    "nine": null,
+    "tag": "flame",
+    "desc": "Пламя, кадр 2",
+    "layer": 10
+   },
+   "fx_flame_3": {
+    "group": "fx",
+    "w": 30,
+    "h": 38,
+    "nine": null,
+    "tag": "flame",
+    "desc": "Пламя, кадр 3",
+    "layer": 10
+   },
+   "fx_flame_4": {
+    "group": "fx",
+    "w": 30,
+    "h": 38,
+    "nine": null,
+    "tag": "flame",
+    "desc": "Пламя, кадр 4",
+    "layer": 10
+   },
+   "fx_flame_5": {
+    "group": "fx",
+    "w": 30,
+    "h": 38,
+    "nine": null,
+    "tag": "flame",
+    "desc": "Пламя, кадр 5",
+    "layer": 10
+   },
+   "fx_flame_6": {
+    "group": "fx",
+    "w": 30,
+    "h": 38,
+    "nine": null,
+    "tag": "flame",
+    "desc": "Пламя, кадр 6",
+    "layer": 10
+   },
+   "fx_flame_7": {
+    "group": "fx",
+    "w": 30,
+    "h": 38,
+    "nine": null,
+    "tag": "flame",
+    "desc": "Пламя, кадр 7",
+    "layer": 10
+   },
+   "fx_rune_0": {
+    "group": "fx",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": "rune_pulse",
+    "desc": "Пульс руны, кадр 0",
+    "layer": 10
+   },
+   "fx_rune_1": {
+    "group": "fx",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": "rune_pulse",
+    "desc": "Пульс руны, кадр 1",
+    "layer": 10
+   },
+   "fx_rune_2": {
+    "group": "fx",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": "rune_pulse",
+    "desc": "Пульс руны, кадр 2",
+    "layer": 10
+   },
+   "fx_rune_3": {
+    "group": "fx",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": "rune_pulse",
+    "desc": "Пульс руны, кадр 3",
+    "layer": 10
+   },
+   "fx_rune_4": {
+    "group": "fx",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": "rune_pulse",
+    "desc": "Пульс руны, кадр 4",
+    "layer": 10
+   },
+   "fx_rune_5": {
+    "group": "fx",
+    "w": 32,
+    "h": 32,
+    "nine": null,
+    "tag": "rune_pulse",
+    "desc": "Пульс руны, кадр 5",
+    "layer": 10
+   },
+   "fx_smoke_0": {
+    "group": "fx",
+    "w": 26,
+    "h": 32,
+    "nine": null,
+    "tag": "smoke",
+    "desc": "Дым, кадр 0",
+    "layer": 10
+   },
+   "fx_smoke_1": {
+    "group": "fx",
+    "w": 26,
+    "h": 32,
+    "nine": null,
+    "tag": "smoke",
+    "desc": "Дым, кадр 1",
+    "layer": 10
+   },
+   "fx_smoke_2": {
+    "group": "fx",
+    "w": 26,
+    "h": 32,
+    "nine": null,
+    "tag": "smoke",
+    "desc": "Дым, кадр 2",
+    "layer": 10
+   },
+   "fx_smoke_3": {
+    "group": "fx",
+    "w": 26,
+    "h": 32,
+    "nine": null,
+    "tag": "smoke",
+    "desc": "Дым, кадр 3",
+    "layer": 10
+   },
+   "fx_smoke_4": {
+    "group": "fx",
+    "w": 26,
+    "h": 32,
+    "nine": null,
+    "tag": "smoke",
+    "desc": "Дым, кадр 4",
+    "layer": 10
+   },
+   "fx_smoke_5": {
+    "group": "fx",
+    "w": 26,
+    "h": 32,
+    "nine": null,
+    "tag": "smoke",
+    "desc": "Дым, кадр 5",
+    "layer": 10
+   },
+   "glow_blue": {
+    "group": "fx",
+    "w": 56,
+    "h": 56,
+    "nine": null,
+    "tag": null,
+    "desc": "Свечение маны",
+    "layer": 10
+   },
+   "glow_gold": {
+    "group": "fx",
+    "w": 56,
+    "h": 56,
+    "nine": null,
+    "tag": null,
+    "desc": "Мягкое золотое свечение",
+    "layer": 10
+   },
+   "glow_green": {
+    "group": "fx",
+    "w": 56,
+    "h": 56,
+    "nine": null,
+    "tag": null,
+    "desc": "Ядовитое свечение",
+    "layer": 10
+   },
+   "glow_red": {
+    "group": "fx",
+    "w": 56,
+    "h": 56,
+    "nine": null,
+    "tag": null,
+    "desc": "Кровавое свечение",
+    "layer": 10
+   },
+   "cursor_fist": {
+    "group": "cursor",
+    "w": 22,
+    "h": 26,
+    "nine": null,
+    "tag": null,
+    "desc": "Курсор: fist",
+    "layer": 11
+   },
+   "cursor_hand": {
+    "group": "cursor",
+    "w": 22,
+    "h": 26,
+    "nine": null,
+    "tag": null,
+    "desc": "Курсор: hand",
+    "layer": 11
+   }
+  },
+  "groups": [
+   {
+    "name": "fills",
+    "count": 5
+   },
+   {
+    "name": "panels",
+    "count": 4
+   },
+   {
+    "name": "decor",
+    "count": 9
+   },
+   {
+    "name": "buttons",
+    "count": 26
+   },
+   {
+    "name": "slots",
+    "count": 11
+   },
+   {
+    "name": "bars",
+    "count": 6
+   },
+   {
+    "name": "globes",
+    "count": 15
+   },
+   {
+    "name": "scroll",
+    "count": 5
+   },
+   {
+    "name": "rarity",
+    "count": 7
+   },
+   {
+    "name": "icons",
+    "count": 21
+   },
+   {
+    "name": "fx",
+    "count": 30
+   },
+   {
+    "name": "cursor",
+    "count": 2
+   }
+  ],
+  "animations": {
+   "wave_blood": {
+    "frames": [
+     "globe_liquid_blood_0",
+     "globe_liquid_blood_1",
+     "globe_liquid_blood_2",
+     "globe_liquid_blood_3",
+     "globe_liquid_blood_4",
+     "globe_liquid_blood_5"
+    ],
+    "fps": 12
+   },
+   "wave_mana": {
+    "frames": [
+     "globe_liquid_mana_0",
+     "globe_liquid_mana_1",
+     "globe_liquid_mana_2",
+     "globe_liquid_mana_3",
+     "globe_liquid_mana_4",
+     "globe_liquid_mana_5"
+    ],
+    "fps": 12
+   },
+   "ember": {
+    "frames": [
+     "fx_ember_0",
+     "fx_ember_1",
+     "fx_ember_2",
+     "fx_ember_3",
+     "fx_ember_4",
+     "fx_ember_5"
+    ],
+    "fps": 12
+   },
+   "flame": {
+    "frames": [
+     "fx_flame_0",
+     "fx_flame_1",
+     "fx_flame_2",
+     "fx_flame_3",
+     "fx_flame_4",
+     "fx_flame_5",
+     "fx_flame_6",
+     "fx_flame_7"
+    ],
+    "fps": 12
+   },
+   "rune_pulse": {
+    "frames": [
+     "fx_rune_0",
+     "fx_rune_1",
+     "fx_rune_2",
+     "fx_rune_3",
+     "fx_rune_4",
+     "fx_rune_5"
+    ],
+    "fps": 12
+   },
+   "smoke": {
+    "frames": [
+     "fx_smoke_0",
+     "fx_smoke_1",
+     "fx_smoke_2",
+     "fx_smoke_3",
+     "fx_smoke_4",
+     "fx_smoke_5"
+    ],
+    "fps": 12
+   }
+  },
+  "generated": "2026-09-29T22:14:49Z"
+ }
+}

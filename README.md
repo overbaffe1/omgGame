@@ -45,3 +45,14 @@ python3 -m http.server 8080
 | `js/scenes.js` | сами кадры |
 | `js/audio.js` | партитура: music box, пэд, удар, шорох бумаги |
 | `js/main.js` | часы, звук, игра «зажги свою» |
+
+## Dark UI
+
+Спрайт-атлас интерфейса в стиле Dark Fantasy (Diablo II) и лаборатория, которая показывает его в деле: стенд 640×480 с инвентарём, глобусами и факелами, CSS-виджеты на `border-image` и инспектор листа. Атлас нарисован кодом и собран через MCP-сервер (`darkui/mcp/server.py`), на выходе — `darkui/atlas/darkui.png`, `darkui.json` и редактируемый `darkui.aseprite`.
+
+```bash
+python3 -m http.server 8000   # → http://localhost:8000/darkui/
+python3 darkui/mcp/client.py  # пересобрать атлас
+```
+
+Подробности: [`darkui/README.md`](darkui/README.md).
