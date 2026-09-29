@@ -426,7 +426,7 @@ function extra(kind,u,t,s,lt){
     if(e<1){for(let i=0;i<8;i++){g.fillStyle=`rgba(160,150,130,${.4*(1-e)})`;g.beginPath();g.arc(tx+340+i*30,FL-40-(i%3)*20,26+i*4,0,TAU);g.fill()}}}
   if(kind==='stitch'){g.fillStyle='#8a9aa4';g.fillRect(1500,FL-420,8,420);g.fillRect(1380,FL-420,128,8);g.fillStyle='#e8eef2';g.beginPath();g.ellipse(1380,FL-406,50,20,0,0,TAU);g.fill();glow(1300,FL-330,220,'hsla(50,100%,90%,A)',.4);
     g.fillStyle='#b8c4cc';rr(900,FL-260,180,16,4);g.fill();g.fillRect(985,FL-244,8,244);g.fillStyle='#fff';for(let i=0;i<5;i++)g.fillRect(912+i*32,FL-272,4,14)}
-  if(kind==='code'&&LN(s,'e2geo5',lt)>0){g.fillStyle='#07100c';rr(1630,310,180,100,6);g.fill();g.strokeStyle='#f55';g.lineWidth=3;g.beginPath();g.moveTo(1640,380);g.lineTo(1800,380);g.stroke();g.fillStyle='#f55';g.font='bold 22px monospace';g.textAlign='left';g.fillText('0',1634,432)}
+  if(kind==='code'&&LN(s,'e2geo5',lt)>0){g.fillStyle='#07100c';rr(1630,310,180,100,6);g.fill();g.strokeStyle='#f55';g.lineWidth=3;g.beginPath();g.moveTo(1640,380);g.lineTo(1800,380);g.stroke();g.fillStyle='#1b2226';g.fillRect(1624,412,176,26);g.fillStyle='#f55';g.font='bold 22px monospace';g.textAlign='left';g.fillText('♥ 0',1634,432)}
   if(kind==='code'){const g4=LNx(s,'e2geo4',lt);if(g4.p>0&&g4.p<1){g.fillStyle='#ff3';g.font='bold 110px system-ui';g.textAlign='center';g.fillText('⚡ РАЗРЯД ⚡',CX,250)}}
   if(kind==='hug'){const m=LN(s,'e2mer14',lt);if(m>.5){for(let i=0;i<30;i++){const st=((t*.5+i*.13)%1);g.fillStyle=`hsla(${i*37},90%,65%,${1-st})`;g.save();g.translate(300+(i*211)%1400,80+st*700);g.rotate(t*3+i);g.fillRect(-8,-4,16,8);g.restore()}}}
 }
