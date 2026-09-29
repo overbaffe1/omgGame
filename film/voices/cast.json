@@ -279,5 +279,37 @@
 "low",
 "fast"
 ]
+},
+"dev": {
+"name": "Дево (Эстер) Фридман",
+"voice": [
+"kseniya",
+"high",
+"medium"
+]
+},
+"duf": {
+"name": "Мистер Дафф",
+"voice": [
+"aidar",
+"medium",
+"slow"
+]
+},
+"wal": {
+"name": "Томми Уокер",
+"voice": [
+"aidar",
+"low",
+"slow"
+]
+},
+"zoe": {
+"name": "Зои Гласс",
+"voice": [
+"xenia",
+"medium",
+"slow"
+]
 }
 }

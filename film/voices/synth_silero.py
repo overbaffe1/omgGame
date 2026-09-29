@@ -13,7 +13,8 @@ CAST={'mer':('xenia','medium','medium'),'kat':('kseniya','high','fast'),'izz':('
  'liz':('baya','low','slow'),'jor':('aidar','low','slow'),'zon':('kseniya','medium','slow'),'hum':('eugene','medium','slow'),'vic':('eugene','low','medium'),
  'pmh':('eugene','medium','medium'),'drk':('baya','low','medium'),'fro':('aidar','medium','fast'),'hnk':('aidar','low','medium'),
  'ann':('baya','medium','slow'),'edw':('eugene','low','slow'),'mar':('kseniya','medium','medium'),
- 'dig':('eugene','low','fast'),'tay':('eugene','x-low','medium'),'cla':('baya','high','medium'),'tin':('xenia','low','fast')}
+ 'dig':('eugene','low','fast'),'tay':('eugene','x-low','medium'),'cla':('baya','high','medium'),'tin':('xenia','low','fast'),
+ 'dev':('kseniya','high','medium'),'duf':('aidar','medium','slow'),'wal':('aidar','low','slow'),'zoe':('xenia','medium','slow')}
 imp=torch.package.PackageImporter(MODEL);model=imp.load_pickle('tts_models','model')
 L=json.load(open(sys.argv[1]));out=sys.argv[2] if len(sys.argv)>2 else HERE
 for vo,(who,txt) in L.items():
