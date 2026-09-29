@@ -119,5 +119,37 @@
 "x-low",
 "medium"
 ]
+},
+"vip": {
+"name": "Вайпер",
+"voice": [
+"aidar",
+"x-high",
+"fast"
+]
+},
+"mac": {
+"name": "Ллойд Макки",
+"voice": [
+"eugene",
+"x-low",
+"slow"
+]
+},
+"she": {
+"name": "Шелли Дэвидсон",
+"voice": [
+"xenia",
+"low",
+"slow"
+]
+},
+"vf1": {
+"name": "друг Вайпера",
+"voice": [
+"aidar",
+"medium",
+"fast"
+]
 }
 }
