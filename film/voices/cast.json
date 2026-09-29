@@ -1,7 +1,7 @@
-{"_note":"Голоса героев «Анатомии страсти» — одинаковые во всех сериях (voice_id из Arena).",
- "mer":{"name":"Мередит Грей","voice":"voice-12"},"der":{"name":"Дерек Шепард","voice":"voice-01"},
- "cri":{"name":"Кристина Янг","voice":"voice-02"},"izz":{"name":"Иззи Стивенс","voice":"voice-03"},
- "geo":{"name":"Джордж О’Мэлли","voice":"voice-04"},"alx":{"name":"Алекс Карев","voice":"voice-05"},
- "bai":{"name":"Миранда Бейли","voice":"voice-06"},"web":{"name":"Ричард Уэббер","voice":"voice-07"},
- "bur":{"name":"Престон Бёрк","voice":"voice-08"},"kat":{"name":"Кэти Брайс","voice":"voice-09"},
- "ell":{"name":"Эллис Грей","voice":"voice-10"},"pat":{"name":"пациент (аппендицит)","voice":"voice-11"}}
+{"_note":"Голоса «Анатомии страсти» — одинаковые во всех сериях. Движок: RHVoice (локально, film/voices/synth.py). Профиль: [голос, сдвиг высоты в полутонах, темп].",
+ "mer":{"name":"Мередит Грей","prof":["elena",0,1.0]},"cri":{"name":"Кристина Янг","prof":["irina",1,1.1]},
+ "izz":{"name":"Иззи Стивенс","prof":["anna",1.5,1.0]},"bai":{"name":"Миранда Бейли","prof":["irina",-2,0.97]},
+ "kat":{"name":"Кэти Брайс","prof":["anna",3.5,1.1]},"ell":{"name":"Эллис Грей","prof":["elena",-2.5,0.88]},
+ "der":{"name":"Дерек Шепард","prof":["aleksandr",-1,0.98]},"web":{"name":"Ричард Уэббер","prof":["aleksandr",-4,0.9]},
+ "bur":{"name":"Престон Бёрк","prof":["aleksandr",-2.5,1.05]},"geo":{"name":"Джордж О’Мэлли","prof":["aleksandr",2,1.08]},
+ "alx":{"name":"Алекс Карев","prof":["aleksandr",0.5,1.12]},"pat":{"name":"пациент","prof":["aleksandr",3,0.95]}}
