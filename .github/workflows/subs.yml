@@ -10,9 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          mkdir -p body51/raw; L=body51/raw/log3.txt
-          curl -sSL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/128 Safari/537.36" "https://youtubetotranscript.com/transcript?v=BSh2rLNaZ14" -o body51/raw/t.html -w "%{http_code} %{size_download}\n" >> $L 2>&1
-          head -c 300 body51/raw/t.html >> $L
+          mkdir -p body51/raw; L=body51/raw/log4.txt; rm -f body51/raw/t.html
+          V=BSh2rLNaZ14; UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/128 Safari/537.36"
+          for u in "https://inv.nadeko.net/api/v1/captions/$V" "https://invidious.nerdvpn.de/api/v1/captions/$V" "https://yewtu.be/api/v1/captions/$V" "https://invidious.f5.si/api/v1/captions/$V" "https://iv.melmac.space/api/v1/captions/$V" "https://pipedapi.kavin.rocks/streams/$V" "https://api.piped.private.coffee/streams/$V" "https://pipedapi.adminforge.de/streams/$V" "https://www.youtube-transcript.io/api/transcripts" "https://kome.ai/api/transcript" "https://notegpt.io/api/v2/video-transcript?platform=youtube&video_id=$V" "https://r.jina.ai/https://youtubetotranscript.com/transcript?v=$V"; do
+            code=$(curl -sSL -m 40 -A "$UA" "$u" -o /tmp/o -w "%{http_code} %{size_download}" 2>&1); echo "== $u -> $code" >> $L; head -c 400 /tmp/o | tr '\n' ' ' >> $L; echo >> $L
+          done
       - run: |
           git config user.name bot; git config user.email bot@x
           git add body51/raw; git commit -m "raw subs [skip ci]" || true
