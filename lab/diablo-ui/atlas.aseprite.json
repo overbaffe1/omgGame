@@ -1,0 +1,13 @@
+{
+  "width": 1024,
+  "height": 1024,
+  "frames": 54,
+  "layers": [
+    "Background",
+    "Stone",
+    "Gold",
+    "Icons",
+    "FX"
+  ],
+  "palette": "diablo.gpl"
+}
