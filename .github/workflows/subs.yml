@@ -9,12 +9,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install -q yt-dlp
+      - uses: denoland/setup-deno@v2
+      - run: pip install -q -U yt-dlp youtube-transcript-api
       - run: |
-          mkdir -p body51/raw
-          yt-dlp --flat-playlist --print "%(id)s	%(duration_string)s	%(title)s" "https://www.youtube.com/playlist?list=UULVF-I2CGL_0yeqCujjnuwYqg" > body51/raw/all_streams.tsv 2> body51/raw/log.txt || true
-          yt-dlp --skip-download --write-auto-subs --sub-langs ru --sub-format vtt -o "body51/raw/%(id)s.%(ext)s" "https://youtu.be/BSh2rLNaZ14" >> body51/raw/log.txt 2>&1 || true
-          wc -l body51/raw/all_streams.tsv >> body51/raw/log.txt
+          mkdir -p body51/raw; L=body51/raw/log2.txt
+          python -c "
+          from youtube_transcript_api import YouTubeTranscriptApi as A
+          t=A().fetch('BSh2rLNaZ14',languages=['ru'])
+          open('body51/raw/BSh2rLNaZ14.api.txt','w').write(' '.join(s.text for s in t))
+          print('API OK')" >> $L 2>&1 || echo API FAIL >> $L
+          for c in tv web_safari mweb android_vr ios; do
+            yt-dlp --skip-download --write-auto-subs --sub-langs ru --sub-format vtt --extractor-args "youtube:player_client=$c" -o "body51/raw/%(id)s.$c.%(ext)s" "https://youtu.be/BSh2rLNaZ14" >> $L 2>&1 && echo "OK $c" >> $L || echo "FAIL $c" >> $L
+          done
+          ls -la body51/raw >> $L
       - run: |
           git config user.name bot; git config user.email bot@x
           git add body51/raw; git commit -m "raw subs [skip ci]" || true
