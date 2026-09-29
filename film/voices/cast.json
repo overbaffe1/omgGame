@@ -223,5 +223,29 @@
 "low",
 "medium"
 ]
+},
+"ann": {
+"name": "Энни Коннорс",
+"voice": [
+"baya",
+"medium",
+"slow"
+]
+},
+"edw": {
+"name": "Эдвард Левенджи",
+"voice": [
+"eugene",
+"low",
+"slow"
+]
+},
+"mar": {
+"name": "Мэри Левенджи",
+"voice": [
+"kseniya",
+"medium",
+"medium"
+]
 }
 }
