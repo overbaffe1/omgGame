@@ -11,12 +11,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        r: ["1 160", "161 320", "321 479"]
+        r: ["1 479"]
     steps:
       - uses: actions/checkout@v4
       - run: pip install -q playwright && python -m playwright install --with-deps chromium >/dev/null
-      - run: python body51/tools/downsub.py ${{ matrix.r }} || true
-      - run: python body51/tools/downsub.py ${{ matrix.r }} || true
+      - run: for i in 1 2 3; do PAR=2 python body51/tools/downsub.py ${{ matrix.r }} || true; done
       - run: |
           git config user.name bot; git config user.email bot@x
           git add body51/txt; git commit -qm "downsub ${{ matrix.r }} [skip ci]" || true
