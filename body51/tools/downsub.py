@@ -18,8 +18,8 @@ async def one(ctx,n,r):
         await page.goto(f"https://downsub.com/?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D{vid}",timeout=90000)
         await page.wait_for_selector("text=Russian (auto-generated)",timeout=90000)
         if DBG: open("body51/raw/downsub_dbg.json","w").write(json.dumps(info.get("j"),ensure_ascii=False)[:20000]+"\n"+info.get("u",""))
-        row=page.locator("div,li,tr").filter(has_text=re.compile(r"^\s*SRT\s*VTT\s*TXT\s*RAW.*Russian \(auto-generated\)\s*$",re.S)).last
-        btn=row.get_by_text("TXT",exact=True).first
+        btn=page.locator('button[data-title="[TXT] Russian (auto-generated)"]').first
+        if not await btn.count(): btn=page.locator('button[data-title^="[TXT] Russian"]').first
         async with page.expect_download(timeout=90000) as d:
             await btn.click()
         dl=await d.value; tmp=await dl.path(); txt=open(tmp,encoding="utf-8",errors="replace").read()
@@ -34,7 +34,7 @@ async def one(ctx,n,r):
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(); ctx=await b.new_context(accept_downloads=True,user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36")
-        sem=asyncio.Semaphore(4); log=open(f"{OUT}/_downsub_log.txt","a")
+        sem=asyncio.Semaphore(3); log=open(f"{OUT}/_downsub_log_{A}.txt","a")
         async def job(n,r):
             async with sem:
                 res=await one(ctx,n,r); log.write(f"{n} {r[0]} {res}\n"); log.flush(); print(n,res,flush=True)
