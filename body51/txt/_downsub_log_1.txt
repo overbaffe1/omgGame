@@ -1,0 +1,283 @@
+3 KcZbSadgB1g skip
+2 BSh2rLNaZ14 OK 112046
+5 0wwvK0PPTQA skip
+4 WD_plyBSH-4 OK 53563
+1 k77G1GZdXtg FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+6 gkYg7fIl4ZU FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+7 -Ks2e1XNglM FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+9 X6bn5EIdJhE OK 69818
+10 njvBE0T6yIA OK 42159
+11 HrgFHiy--IE OK 43279
+8 o1Fp6JVxEzA OK 104648
+12 XG52JbNfuPc FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+13 N5IGAV4nYks FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+14 G3zjhr7TD7g FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+15 aPTY1z-uDC0 OK 99926
+16 _h4xM7HItL0 OK 137346
+17 p-ueBMlxMoo OK 100039
+18 OsaGF5DVi44 FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+19 vdPQ2oblF-w FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+21 0lZw7tQZ5XI OK 82700
+22 GOs8921_Zvs OK 54867
+23 xnUvdticP3Y OK 62250
+20 amdBIKkZvIw FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+24 qsaY4CDP4so FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+25 XmYxh76TT6k FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+27 4jJPA0riYmA OK 20134
+28 S8SuKBDogZw OK 76418
+29 FMAN5SdXYa4 OK 66322
+26 nGilF4-uN40 FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+30 _PK1tke3BSI OK 85656
+31 KoypLC5jPi4 OK 64173
+32 chFDarOUxaY OK 107304
+33 VCtWc-YNUHg OK 113348
+34 rPyw2F5bYhY FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+35 T_lD3HQxJ78 FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+36 pFYOVl2w9tM FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+37 pXBe79y7eoI OK 64569
+38 5E6qdDrSq0E OK 40991
+39 Yiqw14RwqpE OK 74640
+40 lNA2mdHxTPc OK 52090
+41 whbWt338G2M OK 127454
+42 K4yV01UBCUw OK 133116
+44 z-LurtPlW4Q FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+43 tEcRweIJeKY FAIL Timeout 90000ms exceeded while waiting for event "download"
+=========================== logs ===========================
+waiting for event "download"
+
+45 MzPrGfZxa2Q FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+46 ZfY7gpdtr5c OK 122154
+48 5fkEpsRvTcs OK 81242
+47 nqvJOe9cYGk OK 93454
+50 afiFO4hctW0 OK 27650
+49 db3Th_0GzW8 OK 154126
+51 ijv_bvzL_v4 OK 106703
+52 jjDyBzns8Zk FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+53 OOC4ioW9DYE FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+54 0MiJ_zZXCZQ FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+55 XYEchd7ZHIs OK 90022
+57 xNTIVDuE4aI OK 44021
+56 0uOoVk52MWI OK 117237
+58 o7ITCRK6H10 OK 97689
+60 w44dS-utA-Y OK 19073
+59 Z0MbmA8rXKI OK 144811
+61 iaO_WS83PQk FAIL Timeout 90000ms exceeded while waiting for event "download"
+=========================== logs ===========================
+waiting for event "download"
+
+62 At483rnHvlw FAIL Timeout 90000ms exceeded while waiting for event "download"
+=========================== logs ===========================
+waiting for event "download"
+
+63 58BX2GwWTwU FAIL Timeout 90000ms exceeded while waiting for event "download"
+=========================== logs ===========================
+waiting for event "download"
+
+64 gVrgN9bUTNI OK 22097
+65 pmqTmr1Ozuo OK 132446
+67 mV2T1Da5mn0 OK 44937
+68 _qEswkhrPMA OK 80382
+69 no5RgaGKDRA OK 75870
+70 p6KvwyZkDiw OK 56973
+66 7nfuEg14beY FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+73 nXrzs84Su4E OK 48017
+74 uIQAldoHfLk OK 84002
+71 ywqYL6GoTDw FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+72 qTbHKmoLJvM FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+75 yEOquFnH2uU OK 37980
+76 0uU3PL0P6CE OK 85874
+77 44fEVV5cTow OK 114709
+78 AdyfxlIfkqI OK 84613
+79 eoqbjumBjEE OK 96350
+80 oKDZswxYu4s FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+2 BSh2rLNaZ14 skip
+3 KcZbSadgB1g skip
+4 WD_plyBSH-4 skip
+5 0wwvK0PPTQA skip
+6 gkYg7fIl4ZU OK 79440
+8 o1Fp6JVxEzA skip
+9 X6bn5EIdJhE skip
+10 njvBE0T6yIA skip
+11 HrgFHiy--IE skip
+12 XG52JbNfuPc OK 173646
+13 N5IGAV4nYks OK 34093
+14 G3zjhr7TD7g OK 108148
+15 aPTY1z-uDC0 skip
+16 _h4xM7HItL0 skip
+17 p-ueBMlxMoo skip
+7 -Ks2e1XNglM FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+1 k77G1GZdXtg FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+20 amdBIKkZvIw OK 37745
+21 0lZw7tQZ5XI skip
+22 GOs8921_Zvs skip
+23 xnUvdticP3Y skip
+19 vdPQ2oblF-w OK 90664
+24 qsaY4CDP4so OK 62100
+18 OsaGF5DVi44 FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+27 4jJPA0riYmA skip
+28 S8SuKBDogZw skip
+29 FMAN5SdXYa4 skip
+30 _PK1tke3BSI skip
+31 KoypLC5jPi4 skip
+32 chFDarOUxaY skip
+33 VCtWc-YNUHg skip
+25 XmYxh76TT6k FAIL Timeout 90000ms exceeded while waiting for event "download"
+=========================== logs ===========================
+waiting for event "download"
+
+26 nGilF4-uN40 FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+34 rPyw2F5bYhY FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+37 pXBe79y7eoI skip
+38 5E6qdDrSq0E skip
+39 Yiqw14RwqpE skip
+40 lNA2mdHxTPc skip
+41 whbWt338G2M skip
+42 K4yV01UBCUw skip
+36 pFYOVl2w9tM OK 172190
+44 z-LurtPlW4Q OK 75864
+35 T_lD3HQxJ78 OK 87172
+46 ZfY7gpdtr5c skip
+47 nqvJOe9cYGk skip
+48 5fkEpsRvTcs skip
+49 db3Th_0GzW8 skip
+50 afiFO4hctW0 skip
+51 ijv_bvzL_v4 skip
+43 tEcRweIJeKY OK 123449
+45 MzPrGfZxa2Q FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+54 0MiJ_zZXCZQ OK 78384
+55 XYEchd7ZHIs skip
+56 0uOoVk52MWI skip
+57 xNTIVDuE4aI skip
+58 o7ITCRK6H10 skip
+59 Z0MbmA8rXKI skip
+60 w44dS-utA-Y skip
+52 jjDyBzns8Zk FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+53 OOC4ioW9DYE FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+62 At483rnHvlw OK 92824
+64 gVrgN9bUTNI skip
+65 pmqTmr1Ozuo skip
+61 iaO_WS83PQk OK 200552
+67 mV2T1Da5mn0 skip
+68 _qEswkhrPMA skip
+69 no5RgaGKDRA skip
+70 p6KvwyZkDiw skip
+63 58BX2GwWTwU FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+66 7nfuEg14beY FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+73 nXrzs84Su4E skip
+74 uIQAldoHfLk skip
+75 yEOquFnH2uU skip
+76 0uU3PL0P6CE skip
+77 44fEVV5cTow skip
+78 AdyfxlIfkqI skip
+79 eoqbjumBjEE skip
+71 ywqYL6GoTDw FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
+72 qTbHKmoLJvM OK 70540
+80 oKDZswxYu4s FAIL Page.wait_for_selector: Timeout 90000ms exceeded.
+Call log:
+  - waiting for locator("text=Russian (auto-generated)") to be visible
+
