@@ -16,11 +16,12 @@ async def one(ctx,n,r):
     page.on("response",onresp)
     try:
         await page.goto(f"https://downsub.com/?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D{vid}",timeout=90000)
-        await page.wait_for_selector("text=Russian (auto-generated)",timeout=90000)
+        await page.wait_for_selector('button[data-title^="[TXT]"]',timeout=120000)
         if DBG: open("body51/raw/downsub_dbg.json","w").write(json.dumps(info.get("j"),ensure_ascii=False)[:20000]+"\n"+info.get("u",""))
         btn=page.locator('button[data-title="[TXT] Russian (auto-generated)"]').first
         if not await btn.count(): btn=page.locator('button[data-title^="[TXT] Russian"]').first
-        async with page.expect_download(timeout=90000) as d:
+        if not await btn.count(): btn=page.locator('button[data-title^="[TXT]"]').first
+        async with page.expect_download(timeout=180000) as d:
             await btn.click()
         dl=await d.value; tmp=await dl.path(); txt=open(tmp,encoding="utf-8",errors="replace").read()
         txt=re.sub(r"<[^>]+>","",txt)  # убрать теги <b>,<i>,<font>
