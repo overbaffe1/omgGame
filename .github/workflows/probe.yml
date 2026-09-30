@@ -1,0 +1,23 @@
+name: probe
+on:
+  push:
+    paths: ['.github/workflows/probe.yml']
+permissions:
+  contents: write
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          V=BSh2rLNaZ14; L=body51/raw/probe.txt; mkdir -p body51/raw
+          (curl -sS -m 60 -X POST https://tactiq-apps-prod.tactiq.io/transcript -H 'content-type: application/json' -d "{\"videoUrl\":\"https://www.youtube.com/watch?v=$V\",\"langCode\":\"ru\"}" | head -c 600; echo) > $L 2>&1 || true
+          (echo ==yt; curl -sS -m 60 "https://youtubetranscript.com/?server_vid2=$V" | head -c 400; echo) >> $L 2>&1 || true
+          pip install -q curl_cffi
+          python - >> $L 2>&1 <<'PY' || true
+          from curl_cffi import requests
+          r=requests.get("https://youtubetotranscript.com/transcript?v=BSh2rLNaZ14",impersonate="chrome")
+          print("==cffi",r.status_code,len(r.text),r.text[:200])
+          PY
+          git config user.name bot; git config user.email bot@x
+          git add $L; git commit -qm "probe [skip ci]"; git pull -q --rebase -X theirs origin $GITHUB_REF_NAME; git push -q
