@@ -281,3 +281,401 @@ Call log:
 Call log:
   - waiting for locator("text=Russian (auto-generated)") to be visible
 
+2 BSh2rLNaZ14 skip
+3 KcZbSadgB1g skip
+4 WD_plyBSH-4 skip
+5 0wwvK0PPTQA skip
+6 gkYg7fIl4ZU skip
+8 o1Fp6JVxEzA skip
+9 X6bn5EIdJhE skip
+10 njvBE0T6yIA skip
+11 HrgFHiy--IE skip
+12 XG52JbNfuPc skip
+13 N5IGAV4nYks skip
+14 G3zjhr7TD7g skip
+15 aPTY1z-uDC0 skip
+16 _h4xM7HItL0 skip
+17 p-ueBMlxMoo skip
+18 OsaGF5DVi44 OK 45426
+19 vdPQ2oblF-w skip
+20 amdBIKkZvIw skip
+21 0lZw7tQZ5XI skip
+22 GOs8921_Zvs skip
+23 xnUvdticP3Y skip
+24 qsaY4CDP4so skip
+1 k77G1GZdXtg FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+7 -Ks2e1XNglM FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+27 4jJPA0riYmA skip
+28 S8SuKBDogZw skip
+29 FMAN5SdXYa4 skip
+30 _PK1tke3BSI skip
+31 KoypLC5jPi4 skip
+32 chFDarOUxaY skip
+33 VCtWc-YNUHg skip
+25 XmYxh76TT6k FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+35 T_lD3HQxJ78 skip
+36 pFYOVl2w9tM skip
+37 pXBe79y7eoI skip
+38 5E6qdDrSq0E skip
+39 Yiqw14RwqpE skip
+40 lNA2mdHxTPc skip
+41 whbWt338G2M skip
+42 K4yV01UBCUw skip
+43 tEcRweIJeKY skip
+44 z-LurtPlW4Q skip
+26 nGilF4-uN40 OK 38839
+46 ZfY7gpdtr5c skip
+47 nqvJOe9cYGk skip
+48 5fkEpsRvTcs skip
+49 db3Th_0GzW8 skip
+50 afiFO4hctW0 skip
+51 ijv_bvzL_v4 skip
+34 rPyw2F5bYhY OK 48264
+45 MzPrGfZxa2Q OK 38891
+54 0MiJ_zZXCZQ skip
+55 XYEchd7ZHIs skip
+56 0uOoVk52MWI skip
+57 xNTIVDuE4aI skip
+58 o7ITCRK6H10 skip
+59 Z0MbmA8rXKI skip
+60 w44dS-utA-Y skip
+61 iaO_WS83PQk skip
+62 At483rnHvlw skip
+52 jjDyBzns8Zk FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+64 gVrgN9bUTNI skip
+65 pmqTmr1Ozuo skip
+53 OOC4ioW9DYE FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+67 mV2T1Da5mn0 skip
+68 _qEswkhrPMA skip
+69 no5RgaGKDRA skip
+70 p6KvwyZkDiw skip
+63 58BX2GwWTwU FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+72 qTbHKmoLJvM skip
+73 nXrzs84Su4E skip
+74 uIQAldoHfLk skip
+75 yEOquFnH2uU skip
+76 0uU3PL0P6CE skip
+77 44fEVV5cTow skip
+78 AdyfxlIfkqI skip
+79 eoqbjumBjEE skip
+71 ywqYL6GoTDw OK 64496
+81 zf0cDWRdmoc skip
+82 nMhVfUm8hVg skip
+66 7nfuEg14beY FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+84 S3UQRFvX9NE skip
+85 GfzPEYTG4xw skip
+86 N4KbluLa5ug skip
+87 1YcSaADGp1U skip
+88 bRgat3AIsS4 skip
+89 ki8aRnrjevs skip
+90 WGsKMG9ZUbo skip
+91 9IFJeIlstlg skip
+92 pQT96o3K65E skip
+93 b5W0IJLHcsI skip
+80 oKDZswxYu4s FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+95 wnzNqAqH1T0 skip
+96 1Cv49AGiwwc skip
+97 a9ajILzJeQQ skip
+94 5OFSE82RvSE OK 73783
+99 iQ0ArcOqMUA skip
+100 rF2W-V31dEw skip
+101 Ef28_4NyG4o skip
+102 _1Y628IJvWM skip
+103 6eEENbHWlVw skip
+104 jfk0ZHoTJjs skip
+105 hrUPsc1IWj0 skip
+106 TIIufAb4R9U skip
+107 KqR6XhmKAAA skip
+108 fd7ru2G0EYM skip
+109 KSACT-W4ZoI skip
+110 2moiw87JuMs skip
+111 U7O44lcVnvs skip
+83 ZsaYCzR0XvQ FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+98 lX6vqF1uRrM OK 45248
+113 iaeCnK6CQVk OK 39363
+115 bmN-2-boWEg skip
+116 kEooqb_Kp1Q skip
+117 426C8FSQiDM skip
+118 QOkXzEeWRjo skip
+119 hsFpHoPTY5c skip
+120 YFZFUUz3vFY skip
+121 VH2weAruz_k skip
+122 E9W9Id0oRHI skip
+123 KZImHDi5S5Q skip
+112 bxqFQoVKrSk OK 7950
+114 SAjzmr7HBU0 FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+124 mV_V9bIPKMQ FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+127 S69QghldM8k skip
+128 D3KzD1aLi8E skip
+129 1NhZlxmCu8U skip
+130 5nsWJ-GXDuE skip
+131 VxzB6g2aLwY skip
+132 5urHEPhKZwM skip
+133 okcEigjdc20 skip
+125 hGKlp3BjiRo FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+126 FZN5UUthuB8 OK 35946
+134 jnOUow0dpfs FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+137 bQ1CZu2K0oU skip
+138 D_TdL-lqn6M skip
+139 YITe0DPBgWo skip
+140 cq38Cp707gI skip
+141 t2Xu6-9Ne7E skip
+142 mqFWhlhp3C8 skip
+143 D0fABNrarCM skip
+144 AN3M4kKAPFE skip
+145 gfhIFEmq1q8 skip
+146 FlmdYZmGc5o skip
+135 _ZcYnRazyCs FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+136 8FJLlG8b0I8 FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+149 c-FJNzjJNOc skip
+150 piB-K3_C_aM skip
+151 Rr34IZce_v4 skip
+147 hAulXjltDQs OK 95550
+153 KhFQojGN74U skip
+154 92dzxeE-jXQ skip
+155 9dkZ-R6MCyY skip
+156 PkwbKum2yhA skip
+157 nmqAgxLsB2E skip
+158 VV4P8rDTA-U skip
+148 0mjaer4WyqA OK 32918
+152 jryjy-D6Dhc OK 18330
+159 cOpy9BP0V0g FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+160 r0Qh8BWgwn8 FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+2 BSh2rLNaZ14 skip
+3 KcZbSadgB1g skip
+4 WD_plyBSH-4 skip
+5 0wwvK0PPTQA skip
+6 gkYg7fIl4ZU skip
+8 o1Fp6JVxEzA skip
+9 X6bn5EIdJhE skip
+10 njvBE0T6yIA skip
+11 HrgFHiy--IE skip
+12 XG52JbNfuPc skip
+13 N5IGAV4nYks skip
+14 G3zjhr7TD7g skip
+15 aPTY1z-uDC0 skip
+16 _h4xM7HItL0 skip
+17 p-ueBMlxMoo skip
+18 OsaGF5DVi44 skip
+19 vdPQ2oblF-w skip
+20 amdBIKkZvIw skip
+21 0lZw7tQZ5XI skip
+22 GOs8921_Zvs skip
+23 xnUvdticP3Y skip
+24 qsaY4CDP4so skip
+25 XmYxh76TT6k OK 21045
+26 nGilF4-uN40 skip
+27 4jJPA0riYmA skip
+28 S8SuKBDogZw skip
+29 FMAN5SdXYa4 skip
+30 _PK1tke3BSI skip
+31 KoypLC5jPi4 skip
+32 chFDarOUxaY skip
+33 VCtWc-YNUHg skip
+34 rPyw2F5bYhY skip
+35 T_lD3HQxJ78 skip
+36 pFYOVl2w9tM skip
+37 pXBe79y7eoI skip
+38 5E6qdDrSq0E skip
+39 Yiqw14RwqpE skip
+40 lNA2mdHxTPc skip
+41 whbWt338G2M skip
+42 K4yV01UBCUw skip
+43 tEcRweIJeKY skip
+44 z-LurtPlW4Q skip
+45 MzPrGfZxa2Q skip
+46 ZfY7gpdtr5c skip
+47 nqvJOe9cYGk skip
+48 5fkEpsRvTcs skip
+49 db3Th_0GzW8 skip
+50 afiFO4hctW0 skip
+51 ijv_bvzL_v4 skip
+7 -Ks2e1XNglM FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+1 k77G1GZdXtg FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+54 0MiJ_zZXCZQ skip
+55 XYEchd7ZHIs skip
+56 0uOoVk52MWI skip
+57 xNTIVDuE4aI skip
+58 o7ITCRK6H10 skip
+59 Z0MbmA8rXKI skip
+60 w44dS-utA-Y skip
+61 iaO_WS83PQk skip
+62 At483rnHvlw skip
+52 jjDyBzns8Zk FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+64 gVrgN9bUTNI skip
+65 pmqTmr1Ozuo skip
+63 58BX2GwWTwU OK 35905
+67 mV2T1Da5mn0 skip
+68 _qEswkhrPMA skip
+69 no5RgaGKDRA skip
+70 p6KvwyZkDiw skip
+71 ywqYL6GoTDw skip
+72 qTbHKmoLJvM skip
+73 nXrzs84Su4E skip
+74 uIQAldoHfLk skip
+75 yEOquFnH2uU skip
+76 0uU3PL0P6CE skip
+77 44fEVV5cTow skip
+78 AdyfxlIfkqI skip
+79 eoqbjumBjEE skip
+53 OOC4ioW9DYE OK 66727
+81 zf0cDWRdmoc skip
+82 nMhVfUm8hVg skip
+66 7nfuEg14beY FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+84 S3UQRFvX9NE skip
+85 GfzPEYTG4xw skip
+86 N4KbluLa5ug skip
+87 1YcSaADGp1U skip
+88 bRgat3AIsS4 skip
+89 ki8aRnrjevs skip
+90 WGsKMG9ZUbo skip
+91 9IFJeIlstlg skip
+92 pQT96o3K65E skip
+93 b5W0IJLHcsI skip
+94 5OFSE82RvSE skip
+95 wnzNqAqH1T0 skip
+96 1Cv49AGiwwc skip
+97 a9ajILzJeQQ skip
+98 lX6vqF1uRrM skip
+99 iQ0ArcOqMUA skip
+100 rF2W-V31dEw skip
+101 Ef28_4NyG4o skip
+102 _1Y628IJvWM skip
+103 6eEENbHWlVw skip
+104 jfk0ZHoTJjs skip
+105 hrUPsc1IWj0 skip
+106 TIIufAb4R9U skip
+107 KqR6XhmKAAA skip
+108 fd7ru2G0EYM skip
+109 KSACT-W4ZoI skip
+110 2moiw87JuMs skip
+111 U7O44lcVnvs skip
+112 bxqFQoVKrSk skip
+113 iaeCnK6CQVk skip
+80 oKDZswxYu4s FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+115 bmN-2-boWEg skip
+116 kEooqb_Kp1Q skip
+117 426C8FSQiDM skip
+118 QOkXzEeWRjo skip
+119 hsFpHoPTY5c skip
+120 YFZFUUz3vFY skip
+121 VH2weAruz_k skip
+122 E9W9Id0oRHI skip
+123 KZImHDi5S5Q skip
+83 ZsaYCzR0XvQ FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+114 SAjzmr7HBU0 OK 41795
+126 FZN5UUthuB8 skip
+127 S69QghldM8k skip
+128 D3KzD1aLi8E skip
+129 1NhZlxmCu8U skip
+130 5nsWJ-GXDuE skip
+131 VxzB6g2aLwY skip
+132 5urHEPhKZwM skip
+133 okcEigjdc20 skip
+125 hGKlp3BjiRo OK 33292
+124 mV_V9bIPKMQ FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+135 _ZcYnRazyCs FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+137 bQ1CZu2K0oU skip
+138 D_TdL-lqn6M skip
+139 YITe0DPBgWo skip
+140 cq38Cp707gI skip
+141 t2Xu6-9Ne7E skip
+142 mqFWhlhp3C8 skip
+143 D0fABNrarCM skip
+144 AN3M4kKAPFE skip
+145 gfhIFEmq1q8 skip
+146 FlmdYZmGc5o skip
+147 hAulXjltDQs skip
+148 0mjaer4WyqA skip
+149 c-FJNzjJNOc skip
+150 piB-K3_C_aM skip
+151 Rr34IZce_v4 skip
+152 jryjy-D6Dhc skip
+153 KhFQojGN74U skip
+154 92dzxeE-jXQ skip
+155 9dkZ-R6MCyY skip
+156 PkwbKum2yhA skip
+157 nmqAgxLsB2E skip
+158 VV4P8rDTA-U skip
+134 jnOUow0dpfs FAIL Page.wait_for_selector: Timeout 120000ms exceeded.
+Call log:
+  - waiting for locator("button[data-title^=\"[TXT]\"]") to be visible
+
+136 8FJLlG8b0I8 OK 32674
+160 r0Qh8BWgwn8 OK 32614
+159 cOpy9BP0V0g OK 33550
