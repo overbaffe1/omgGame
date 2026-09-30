@@ -1,0 +1,4 @@
+# 245 UHd6SItNBzs | 1:42:22 | Backpack Inspector. Делаю свою игру в Steam на Unity. День 175.
+# https://youtu.be/UHd6SItNBzs | downsub ru-auto
+
+— [~81% стрима] Player pickup natifire refifier ent company player pickup fire drop slot entity in drop slot views filter world filter with drop slot component окей drop slot component ref drop slot entity drop slot component view jos detective Может быть, получается так, что Player Pickup Natifire вызывается тогда и вызывается и обрабатывается тогда, когда не существует ещё ни одного инициализированного дропслота. Вот в чём проблемка может заключаться. Знаете, тогда что нужно сделать? тогда [смех] аа [музыка] можно несколькими способами решить. Просто первый. Так, завис. Первый способ - это использовать только инициализированные дропслоты и не обрабатывать player pickup naifire до тех пор, пока не появится хотя бы один инициализированный слот.
