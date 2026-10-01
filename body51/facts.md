@@ -205,7 +205,7 @@
 - Голосовой ввод — Handy (Whisper Turbo) — #015
 - 3D: Tripo для Hellfarmer, купленные Synty-подобные ассеты для Backpack Inspector, Blender через Codex для White Meridian; Unity CLI вместо MCP — #015
 - Любимые игры жанра: That's Not My Neighbor, Dollmaker, No I'm Not a Human (без таймеров); не любит Papers Please — #015
-- День выхода GPT‑6 Astra: стрим #016; на X20 (Pro $200); 3D через официальный Blender MCP — #016
+- День выхода GPT‑6 Astra: стрим #016; подписка Pro за $200; 3D через официальный Blender MCP — #016
 - Не читает длинные сообщения/Discord, критику не любит («такой вот я человечек») — #016
 - Идеи приходят в душе («душ — место силы») — #016
 - Pomodoro 25/5 из‑за проблем начинать работу — #016
