@@ -1,60 +1,39 @@
-=== NGINX PATH PROBES on 80 and 443 ===
-(non-404s above; now full list)
-http:/js/ -> 404 size=162 loc=
-https:/js/ -> 404 size=162 loc=
-http:/js/sw.js -> 404 size=162 loc=
-https:/js/sw.js -> 404 size=162 loc=
-http:/css/ -> 404 size=162 loc=
-https:/css/ -> 404 size=162 loc=
-http:/mu/ -> 404 size=162 loc=
-https:/mu/ -> 404 size=162 loc=
-http:/mrong/ -> 404 size=162 loc=
-https:/mrong/ -> 404 size=162 loc=
-http:/subnow/ -> 404 size=162 loc=
-https:/subnow/ -> 404 size=162 loc=
-http:/sub/ -> 404 size=162 loc=
-https:/sub/ -> 404 size=162 loc=
-http:/login -> 404 size=162 loc=
-https:/login -> 404 size=162 loc=
-http:/panel/ -> 404 size=162 loc=
-https:/panel/ -> 404 size=162 loc=
-http:/favicon.ico -> 404 size=162 loc=
-https:/favicon.ico -> 404 size=162 loc=
-http:/sw.js -> 404 size=162 loc=
-https:/sw.js -> 404 size=162 loc=
-http:/admin -> 404 size=162 loc=
-https:/admin -> 404 size=162 loc=
-http:/clients -> 404 size=162 loc=
-https:/clients -> 404 size=162 loc=
-http:/vpn -> 404 size=162 loc=
-https:/vpn -> 404 size=162 loc=
-http:/cp -> 404 size=162 loc=
-https:/cp -> 404 size=162 loc=
-http:/xui -> 404 size=162 loc=
-https:/xui -> 404 size=162 loc=
-=== UDP FULL-ish SCAN (sudo) - top2000 ===
-Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-10-04 08:09 UTC
-Nmap scan report for 94.156.179.85
-Host is up.
-Skipping host 94.156.179.85 due to host timeout
-Nmap done: 1 IP address (1 host up) scanned in 120.58 seconds
-=== UDP -sV on 56000 + neighbours ===
-Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-10-04 08:11 UTC
-Nmap scan report for 94.156.179.85
-Host is up.
-
-PORT      STATE         SERVICE      VERSION
-53/udp    open|filtered domain
-123/udp   open|filtered ntp
-161/udp   open|filtered snmp
-1194/udp  open|filtered openvpn
-8443/udp  open|filtered pcsync-https
-18080/udp open|filtered unknown
-56000/udp open|filtered unknown
-56001/udp open|filtered unknown
-56003/udp open|filtered unknown
-
-Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 126.50 seconds
-=== DTLS cert probe 56000 ===
+=== PREP ===
+ 43007 /tmp/w1.txt
+  4751 /tmp/w2.txt
+ 47758 total
+=== BRUTE base path ===
+words: 43701
+... scanned 2000 (hits: 0)
+... scanned 4000 (hits: 0)
+... scanned 6000 (hits: 0)
+... scanned 8000 (hits: 0)
+... scanned 10000 (hits: 0)
+... scanned 12000 (hits: 0)
+... scanned 14000 (hits: 0)
+HIT /audio -> 307 size=43 loc=/audio/ body='<a href="/audio/">Temporary Redirect</a>.\n\n'
+... scanned 16000 (hits: 1)
+... scanned 18000 (hits: 1)
+HIT /css -> 307 size=41 loc=/css/ body='<a href="/css/">Temporary Redirect</a>.\n\n'
+... scanned 20000 (hits: 2)
+HIT /dist -> 307 size=42 loc=/dist/ body='<a href="/dist/">Temporary Redirect</a>.\n\n'
+... scanned 22000 (hits: 3)
+HIT /fonts -> 307 size=43 loc=/fonts/ body='<a href="/fonts/">Temporary Redirect</a>.\n\n'
+... scanned 24000 (hits: 4)
+HIT /images -> 307 size=44 loc=/images/ body='<a href="/images/">Temporary Redirect</a>.\n\n'
+... scanned 26000 (hits: 5)
+HIT /js -> 307 size=40 loc=/js/ body='<a href="/js/">Temporary Redirect</a>.\n\n'
+... scanned 28000 (hits: 6)
+HIT /mu -> 307 size=40 loc=/mu/ body='<a href="/mu/">Temporary Redirect</a>.\n\n'
+... scanned 30000 (hits: 7)
+... scanned 32000 (hits: 7)
+... scanned 34000 (hits: 7)
+... scanned 36000 (hits: 7)
+... scanned 38000 (hits: 7)
+... scanned 40000 (hits: 7)
+HIT /video -> 307 size=43 loc=/video/ body='<a href="/video/">Temporary Redirect</a>.\n\n'
+... scanned 42000 (hits: 8)
+DONE scanned=43701 hits=8
+=== SANITY ===
+control404 -> 404
 === DONE ===
