@@ -1,0 +1,222 @@
+=== NMAP SERVICE VERSIONS ===
+/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 5: nmap: command not found
+=== FULL TCP SCAN 1-65535 ===
+/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 7: nmap: command not found
+=== UDP TOP 100 ===
+/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 9: nmap: command not found
+=== BANNER 12345 ===
+/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 11: exec3: command not found
+/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 11: 3: Bad file descriptor
+/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 11: 3: Bad file descriptor
+/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 11: 3: Bad file descriptor
+=== VHOST TESTS on 80/443 ===
+--- Host: panel.dream31.ru http80
+HTTP/1.1 200 OK
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:26 GMT
+Content-Type: text/html
+Content-Length: 615
+Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
+Connection: keep-alive
+ETag: "6a920919-267"
+--- Host: panel.dream31.ru https443
+HTTP/1.1 200 OK
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:26 GMT
+Content-Type: text/html
+Content-Length: 615
+Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
+Connection: keep-alive
+ETag: "6a920919-267"
+--- Host: sub.dream31.ru http80
+HTTP/1.1 200 OK
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:26 GMT
+Content-Type: text/html
+Content-Length: 615
+Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
+Connection: keep-alive
+ETag: "6a920919-267"
+--- Host: sub.dream31.ru https443
+HTTP/1.1 200 OK
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:27 GMT
+Content-Type: text/html
+Content-Length: 615
+Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
+Connection: keep-alive
+ETag: "6a920919-267"
+--- Host: dream31.ru http80
+HTTP/1.1 200 OK
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:27 GMT
+Content-Type: text/html
+Content-Length: 615
+Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
+Connection: keep-alive
+ETag: "6a920919-267"
+--- Host: dream31.ru https443
+HTTP/1.1 200 OK
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:27 GMT
+Content-Type: text/html
+Content-Length: 615
+Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
+Connection: keep-alive
+ETag: "6a920919-267"
+--- Host: srv4.dream31.ru http80
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:27 GMT
+Content-Type: text/html
+Content-Length: 178
+Connection: keep-alive
+Location: https://srv4.dream31.ru/
+
+--- Host: srv4.dream31.ru https443
+HTTP/1.1 200 OK
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:28 GMT
+Content-Type: text/html
+Content-Length: 615
+Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
+Connection: keep-alive
+ETag: "6a920919-267"
+--- Host: anything.local http80
+HTTP/1.1 200 OK
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:28 GMT
+Content-Type: text/html
+Content-Length: 615
+Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
+Connection: keep-alive
+ETag: "6a920919-267"
+--- Host: anything.local https443
+HTTP/1.1 200 OK
+Server: nginx/1.28.3 (Ubuntu)
+Date: Sun, 04 Oct 2026 07:51:28 GMT
+Content-Type: text/html
+Content-Length: 615
+Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
+Connection: keep-alive
+ETag: "6a920919-267"
+=== HTTP/HTTPS PROBES ON CANDIDATE PORTS ===
+--- http://94.156.179.85:2860/
+curl: (1) Unsupported HTTP version in response
+--- https://94.156.179.85:2860/
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:29 GMT
+Content-Length: 19
+
+--- http://94.156.179.85:2096/
+curl: (1) Unsupported HTTP version in response
+--- https://94.156.179.85:2096/
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:29 GMT
+Content-Length: 19
+
+--- http://94.156.179.85:12345/
+curl: (56) Recv failure: Connection reset by peer
+--- https://94.156.179.85:12345/
+curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to 94.156.179.85:12345 
+--- http://94.156.179.85:2053/
+curl: (7) Failed to connect to 94.156.179.85 port 2053 after 97 ms: Couldn't connect to server
+--- https://94.156.179.85:2053/
+curl: (7) Failed to connect to 94.156.179.85 port 2053 after 95 ms: Couldn't connect to server
+--- http://94.156.179.85:8080/
+curl: (7) Failed to connect to 94.156.179.85 port 8080 after 97 ms: Couldn't connect to server
+--- https://94.156.179.85:8080/
+curl: (7) Failed to connect to 94.156.179.85 port 8080 after 97 ms: Couldn't connect to server
+--- http://94.156.179.85:8443/
+curl: (7) Failed to connect to 94.156.179.85 port 8443 after 99 ms: Couldn't connect to server
+--- https://94.156.179.85:8443/
+curl: (7) Failed to connect to 94.156.179.85 port 8443 after 98 ms: Couldn't connect to server
+--- http://94.156.179.85:9090/
+curl: (7) Failed to connect to 94.156.179.85 port 9090 after 95 ms: Couldn't connect to server
+--- https://94.156.179.85:9090/
+curl: (7) Failed to connect to 94.156.179.85 port 9090 after 97 ms: Couldn't connect to server
+--- http://94.156.179.85:10000/
+curl: (7) Failed to connect to 94.156.179.85 port 10000 after 97 ms: Couldn't connect to server
+--- https://94.156.179.85:10000/
+curl: (7) Failed to connect to 94.156.179.85 port 10000 after 98 ms: Couldn't connect to server
+--- http://94.156.179.85:2861/
+curl: (7) Failed to connect to 94.156.179.85 port 2861 after 95 ms: Couldn't connect to server
+--- https://94.156.179.85:2861/
+curl: (7) Failed to connect to 94.156.179.85 port 2861 after 98 ms: Couldn't connect to server
+--- http://94.156.179.85:56003/
+curl: (7) Failed to connect to 94.156.179.85 port 56003 after 98 ms: Couldn't connect to server
+--- https://94.156.179.85:56003/
+curl: (7) Failed to connect to 94.156.179.85 port 56003 after 97 ms: Couldn't connect to server
+--- http://94.156.179.85:18080/
+curl: (7) Failed to connect to 94.156.179.85 port 18080 after 96 ms: Couldn't connect to server
+--- https://94.156.179.85:18080/
+curl: (7) Failed to connect to 94.156.179.85 port 18080 after 98 ms: Couldn't connect to server
+=== REDIRECT HUNT on 2860 (look for Location: base) ===
+--- GET /
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:31 GMT
+Content-Length: 19
+
+--- GET /login
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:32 GMT
+Content-Length: 19
+
+--- GET /favicon.ico
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:32 GMT
+Content-Length: 19
+
+--- GET /robots.txt
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:32 GMT
+Content-Length: 19
+
+--- GET /panel/
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:33 GMT
+Content-Length: 19
+
+--- GET /panel/users
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:33 GMT
+Content-Length: 19
+
+--- GET /assets/css/custom.min.css
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:33 GMT
+Content-Length: 19
+
+--- GET /logout
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:34 GMT
+Content-Length: 19
+
+--- GET /clientapi
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 04 Oct 2026 07:51:34 GMT
+Content-Length: 19
+
+=== DONE ===
