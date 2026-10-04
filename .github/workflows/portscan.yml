@@ -1,23 +1,39 @@
 name: portscan
 on:
   push:
-    paths: ['.github/workflows/portscan.yml', 'body51/tools/basebrute2.py', 'body51/raw/vocab.txt']
+    paths: ['.github/workflows/portscan.yml', 'body51/tools/basebrute2.py']
 permissions:
   contents: write
 jobs:
   s:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - name: run
         run: |
           mkdir -p body51/raw
           {
-            echo "=== PREP ==="
+            echo "=== PREP v10 ==="
             pip install -q requests || true
-            echo "=== BRUTE v9: vocab + pairs ==="
-            python3 body51/tools/basebrute2.py body51/raw/vocab.txt || true
+            curl -sSLo /tmp/medium.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-medium-words.txt || true
+            curl -sSLo /tmp/dirlist.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/directory-list-2.3-small.txt || true
+            # short segments: 1-2 alnum
+            python3 -c "
+          import string
+          ab = string.ascii_letters + string.digits
+          with open('/tmp/short.txt','w') as f:
+              for a in ab: f.write(a+'\n')
+              for a in ab:
+                  for b in ab: f.write(a+b+'\n')
+          "
+            # top-400 of directory-list (frequency-ordered, comments skipped)
+            grep -v '^#' /tmp/dirlist.txt | grep -vE '^\s*$' | head -400 > /tmp/top400.txt
+            wc -l /tmp/medium.txt /tmp/short.txt /tmp/top400.txt
+            echo "=== BRUTE v10 singles ==="
+            python3 body51/tools/basebrute2.py --no-pairs /tmp/medium.txt /tmp/short.txt || true
+            echo "=== PAIRS top400 ==="
+            python3 body51/tools/basebrute2.py /tmp/top400.txt || true
             echo "=== DONE ==="
           } > body51/raw/portscan.txt 2>&1 || true
           git config user.name bot; git config user.email bot@x
