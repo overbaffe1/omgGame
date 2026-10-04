@@ -1,47 +1,31 @@
 name: portscan
 on:
   push:
-    paths: ['.github/workflows/portscan.yml']
+    paths: ['.github/workflows/portscan.yml', 'body51/tools/basebrute.py']
 permissions:
   contents: write
 jobs:
   s:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - name: run
         run: |
           mkdir -p body51/raw
-          IP=94.156.179.85
           {
-            echo "=== PREP WORDLISTS ==="
-            cd /tmp
-            curl -sSLo w1.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-small-words.txt || true
-            curl -sSLo w2.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt || true
-            curl -sSLo w3.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-small-directories.txt || true
-            cat w1.txt w2.txt w3.txt 2>/dev/null | grep -E '^[A-Za-z0-9._-]{2,40}$' | sort -u > words.txt
-            echo "words: $(wc -l < words.txt)"
-            echo "=== BRUTE base path on :2860 (GET, non-404 = hit) ==="
-            HITS=0; N=0
-            while IFS= read -r w; do
-              N=$((N+1))
-              R=$(curl -skS -m3 -o /tmp/bh -w '%{http_code} %{size_download} %{redirect_url}' "https://$IP:2860/$w" 2>/dev/null || echo "000 0 -")
-              code=${R%% *}
-              if [ "$code" != "404" ] && [ "$code" != "000" ]; then
-                HITS=$((HITS+1))
-                echo "HIT /$w -> $R"
-                head -c 400 /tmp/bh; echo
-              fi
-              if [ $((N % 1000)) -eq 0 ]; then echo "... scanned $N (hits so far: $HITS)"; fi
-              sleep 0.01
-            done < words.txt
-            echo "=== BRUTE DONE: $N scanned, $HITS hits ==="
-            echo "=== sanity: known-404 recheck ==="
-            curl -skS -m3 -o /dev/null -w 'nonexistent-xyz -> %{http_code}\n' "https://$IP:2860/nonexistent-xyz"
+            echo "=== PREP ==="
+            pip install -q requests || true
+            curl -sSLo /tmp/w1.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-small-words.txt || true
+            curl -sSLo /tmp/w2.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt || true
+            wc -l /tmp/w1.txt /tmp/w2.txt
+            echo "=== BRUTE base path ==="
+            python3 body51/tools/basebrute.py /tmp/w1.txt /tmp/w2.txt || true
+            echo "=== SANITY ==="
+            python3 -c "import requests,urllib3; urllib3.disable_warnings(); r=requests.get('https://94.156.179.85:2860/nonexistent-xyz', verify=False, timeout=5); print('control404 ->', r.status_code)"
             echo "=== DONE ==="
           } > body51/raw/portscan.txt 2>&1 || true
           git config user.name bot; git config user.email bot@x
-          git add body51/raw/portscan.txt || true
+          git add body51/raw/portscan.txt body51/tools/basebrute.py || true
           git commit -qm "portscan [skip ci]" || true
           for i in 1 2 3 4 5; do git pull -q --rebase -X theirs origin $GITHUB_REF_NAME && git push -q && break; sleep $((RANDOM%20+5)); done
