@@ -1,33 +1,77 @@
-=== PREP v10 ===
- 63088 /tmp/medium.txt
-  3906 /tmp/short.txt
-     1 /tmp/top400.txt
- 66995 total
-=== BRUTE v10 singles ===
-words: 65479, total probes: 65479
+=== PREP v11 ===
+-rw-r--r-- 1 runner runner     14 Oct  4 10:04 /tmp/dirlist.txt
+-rw-r--r-- 1 runner runner 348619 Oct  4 10:04 /tmp/raftsmall.txt
+grep: write error: Broken pipe
+   1 /tmp/top400d.txt
+ 400 /tmp/top400r.txt
+ 401 total
+=== BRUTE digits 0-99999 ===
+words: 100000, total probes: 100000
 ... scanned 5000 (hits: 0)
 ... scanned 10000 (hits: 0)
 ... scanned 15000 (hits: 0)
 ... scanned 20000 (hits: 0)
-HIT /audio -> 307 size=43 loc=/audio/ body='<a href="/audio/">Temporary Redirect</a>.\n\n'
-... scanned 25000 (hits: 1)
-HIT /css -> 307 size=41 loc=/css/ body='<a href="/css/">Temporary Redirect</a>.\n\n'
-... scanned 30000 (hits: 2)
-HIT /dist -> 307 size=42 loc=/dist/ body='<a href="/dist/">Temporary Redirect</a>.\n\n'
-HIT /fonts -> 307 size=43 loc=/fonts/ body='<a href="/fonts/">Temporary Redirect</a>.\n\n'
-... scanned 35000 (hits: 4)
-HIT /images -> 307 size=44 loc=/images/ body='<a href="/images/">Temporary Redirect</a>.\n\n'
-... scanned 40000 (hits: 5)
-HIT /js -> 307 size=40 loc=/js/ body='<a href="/js/">Temporary Redirect</a>.\n\n'
-... scanned 45000 (hits: 6)
-HIT /mu -> 307 size=40 loc=/mu/ body='<a href="/mu/">Temporary Redirect</a>.\n\n'
-... scanned 50000 (hits: 7)
-... scanned 55000 (hits: 7)
-... scanned 60000 (hits: 7)
-HIT /video -> 307 size=43 loc=/video/ body='<a href="/video/">Temporary Redirect</a>.\n\n'
-... scanned 65000 (hits: 8)
-DONE scanned=65479 hits=8
-=== PAIRS top400 ===
+... scanned 25000 (hits: 0)
+... scanned 30000 (hits: 0)
+... scanned 35000 (hits: 0)
+... scanned 40000 (hits: 0)
+... scanned 45000 (hits: 0)
+... scanned 50000 (hits: 0)
+... scanned 55000 (hits: 0)
+... scanned 60000 (hits: 0)
+... scanned 65000 (hits: 0)
+... scanned 70000 (hits: 0)
+... scanned 75000 (hits: 0)
+... scanned 80000 (hits: 0)
+... scanned 85000 (hits: 0)
+... scanned 90000 (hits: 0)
+... scanned 95000 (hits: 0)
+... scanned 100000 (hits: 0)
+DONE scanned=100000 hits=0
+=== PAIRS dirlist-top400 ===
 words: 0, total probes: 0
 DONE scanned=0 hits=0
+=== PAIRS raft-top400 ===
+words: 400, total probes: 160000
+HIT /css -> 307 size=41 loc=/css/ body='<a href="/css/">Temporary Redirect</a>.\n\n'
+HIT /images -> 307 size=44 loc=/images/ body='<a href="/images/">Temporary Redirect</a>.\n\n'
+HIT /js -> 307 size=40 loc=/js/ body='<a href="/js/">Temporary Redirect</a>.\n\n'
+HIT /video -> 307 size=43 loc=/video/ body='<a href="/video/">Temporary Redirect</a>.\n\n'
+HIT /./css -> 307 size=41 loc=/css/ body='<a href="/css/">Temporary Redirect</a>.\n\n'
+HIT /./images -> 307 size=44 loc=/images/ body='<a href="/images/">Temporary Redirect</a>.\n\n'
+HIT /./js -> 307 size=40 loc=/js/ body='<a href="/js/">Temporary Redirect</a>.\n\n'
+HIT /./video -> 307 size=43 loc=/video/ body='<a href="/video/">Temporary Redirect</a>.\n\n'
+... scanned 5000 (hits: 8)
+... scanned 10000 (hits: 8)
+... scanned 15000 (hits: 8)
+... scanned 20000 (hits: 8)
+... scanned 25000 (hits: 8)
+... scanned 30000 (hits: 8)
+... scanned 35000 (hits: 8)
+... scanned 40000 (hits: 8)
+... scanned 45000 (hits: 8)
+... scanned 50000 (hits: 8)
+... scanned 55000 (hits: 8)
+... scanned 60000 (hits: 8)
+... scanned 65000 (hits: 8)
+... scanned 70000 (hits: 8)
+... scanned 75000 (hits: 8)
+... scanned 80000 (hits: 8)
+... scanned 85000 (hits: 8)
+... scanned 90000 (hits: 8)
+... scanned 95000 (hits: 8)
+... scanned 100000 (hits: 8)
+... scanned 105000 (hits: 8)
+... scanned 110000 (hits: 8)
+... scanned 115000 (hits: 8)
+... scanned 120000 (hits: 8)
+... scanned 125000 (hits: 8)
+... scanned 130000 (hits: 8)
+... scanned 135000 (hits: 8)
+... scanned 140000 (hits: 8)
+... scanned 145000 (hits: 8)
+... scanned 150000 (hits: 8)
+... scanned 155000 (hits: 8)
+... scanned 160000 (hits: 8)
+DONE scanned=160000 hits=8
 === DONE ===
