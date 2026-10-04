@@ -14,48 +14,21 @@ jobs:
         run: |
           mkdir -p body51/raw
           IP=94.156.179.85
+          PORTS="22 80 443 618 2096 2860 3463 3821 4217 4663 6925 7497 8563 8879 10938 12345 13821 14376 15470 16705 18213 19000 20409 20759 24299 24607 25742 25804 26019 26317 26703 26808 28164 28199 29644 30219 32535 33161 34803 35044 35601 36312 37961 38622 40028 40671 42257 42770 43671 43792 44811 47255 49860 51338 51485 52372 52863 54487 55147 55505 55898 56255 58020 58974 61693 62398 63225 63271"
           sudo apt-get update -qq && sudo apt-get install -y -qq nmap >/dev/null 2>&1 || true
           {
-            echo "=== NMAP SERVICE VERSIONS ==="
-            nmap -Pn -sV -p22,80,443,2860,2096,12345 --version-intensity 4 $IP || true
-            echo "=== FULL TCP SCAN 1-65535 ==="
-            nmap -Pn -sT -p- --min-rate 4000 $IP || true
-            echo "=== UDP TOP 100 ==="
-            nmap -Pn -sU --top-ports 100 --max-retries 1 $IP || true
-            echo "=== BANNER/PROTO 12345 ==="
-            python3 -c '
-          import socket, time, ssl
-          IP = "94.156.179.85"
-          def grab(label, payload=None, tls=False):
-              try:
-                  s = socket.create_connection((IP, 12345), timeout=6)
-                  s.settimeout(4)
-                  if tls:
-                      ctx = ssl.create_default_context()
-                      ctx.check_hostname = False
-                      ctx.verify_mode = ssl.CERT_NONE
-                      s = ctx.wrap_socket(s, server_hostname="x")
-                  time.sleep(1)
-                  try: d1 = s.recv(2048)
-                  except Exception: d1 = b"<timeout>"
-                  if payload is not None:
-                      s.sendall(payload)
-                      time.sleep(1)
-                      try: d2 = s.recv(4096)
-                      except Exception: d2 = b"<timeout>"
-                  else:
-                      d2 = b""
-                  print(label, "| first:", repr(d1[:300]), "| after:", repr(d2[:600]))
-                  s.close()
-              except Exception as e:
-                  print(label, "| ERR:", e)
-          grab("silent")
-          grab("http-get", b"GET / HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n")
-          grab("http2", b"PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n")
-          grab("tls", None, tls=True)
-          grab("zeros", b"\x00" * 16)
-          grab("wg-like", b"\x01\x00\x00\x00" + b"\x11" * 144)
-          ' || true
+            echo "=== NMAP -sV on ALL open ports ==="
+            nmap -Pn -sV --version-intensity 4 -p "$(echo $PORTS | tr ' ' ',')" $IP || true
+            echo
+            echo "=== HTTP CONTENT of each port ==="
+            for p in $PORTS; do
+              echo "--- :$p http"
+              curl -sS -m4 -D- -o /tmp/body "http://$IP:$p/" 2>&1 | head -20 || true
+              echo "[body]"; head -c 500 /tmp/body 2>/dev/null; echo
+              echo "--- :$p https"
+              curl -skS -m4 -D- -o /tmp/body2 "https://$IP:$p/" 2>&1 | head -20 || true
+              echo "[body]"; head -c 500 /tmp/body2 2>/dev/null; echo
+            done
             echo "=== DONE ==="
           } > body51/raw/portscan.txt 2>&1 || true
           git config user.name bot; git config user.email bot@x
