@@ -7,37 +7,38 @@ permissions:
 jobs:
   s:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - name: run
         run: |
           mkdir -p body51/raw
           IP=94.156.179.85
-          sudo apt-get update -qq && sudo apt-get install -y -qq nmap >/dev/null 2>&1 || true
           {
-            echo "=== NGINX PATH PROBES on 80 and 443 ==="
-            for p in /js/ /js/sw.js /css/ /dist/ /fonts/ /images/ /mu/ /mrong/ /h/ /sub/ /subnow/ /subnow/aaaa /login /auth /panel /panel/ /clientapi /favicon.ico /sw.js /assets/ /wdtt /admin /clients /api /health /token /vpn /cabinet /lk /cp /xui /member /old /static /public /file /download /links /go /redir; do
-              for scheme in http https; do
-                out=$(curl -skS -m5 -o /tmp/b -w "%{http_code} %{size_download} %{redirect_url}" "$scheme://$IP$p" 2>/dev/null || echo "ERR")
-                code=$(echo $out | awk '{print $1}')
-                if [ "$code" != "404" ] && [ "$code" != "000" ] && [ "$code" != "ERR" ]; then
-                  echo "$scheme://$IP$p -> $out"
-                  head -c 300 /tmp/b; echo
-                fi
-              done
-            done
-            echo "(non-404s above; now full list)"
-            for p in /js/ /js/sw.js /css/ /mu/ /mrong/ /subnow/ /sub/ /login /panel/ /favicon.ico /sw.js /admin /clients /vpn /cp /xui; do
-              echo -n "http:$p -> "; curl -sS -m5 -o /tmp/b -w "%{http_code} size=%{size_download} loc=%{redirect_url}\n" "http://$IP$p" 2>/dev/null || echo ERR
-              echo -n "https:$p -> "; curl -skS -m5 -o /tmp/b -w "%{http_code} size=%{size_download} loc=%{redirect_url}\n" "https://$IP$p" 2>/dev/null || echo ERR
-            done
-            echo "=== UDP FULL-ish SCAN (sudo) - top2000 ==="
-            sudo nmap -Pn -sU --top-ports 2000 --max-retries 1 --host-timeout 120s $IP || true
-            echo "=== UDP -sV on 56000 + neighbours ==="
-            sudo nmap -Pn -sU -sV -p 56000,56001,56003,18080,53,123,161,1194,8443 $IP || true
-            echo "=== DTLS cert probe 56000 ==="
-            timeout 10 openssl s_client -dtls1_2 -connect $IP:56000 </dev/null 2>&1 | head -30 || true
+            echo "=== PREP WORDLISTS ==="
+            cd /tmp
+            curl -sSLo w1.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-small-words.txt || true
+            curl -sSLo w2.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt || true
+            curl -sSLo w3.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-small-directories.txt || true
+            cat w1.txt w2.txt w3.txt 2>/dev/null | grep -E '^[A-Za-z0-9._-]{2,40}$' | sort -u > words.txt
+            echo "words: $(wc -l < words.txt)"
+            echo "=== BRUTE base path on :2860 (GET, non-404 = hit) ==="
+            HITS=0; N=0
+            while IFS= read -r w; do
+              N=$((N+1))
+              R=$(curl -skS -m3 -o /tmp/bh -w '%{http_code} %{size_download} %{redirect_url}' "https://$IP:2860/$w" 2>/dev/null || echo "000 0 -")
+              code=${R%% *}
+              if [ "$code" != "404" ] && [ "$code" != "000" ]; then
+                HITS=$((HITS+1))
+                echo "HIT /$w -> $R"
+                head -c 400 /tmp/bh; echo
+              fi
+              if [ $((N % 1000)) -eq 0 ]; then echo "... scanned $N (hits so far: $HITS)"; fi
+              sleep 0.01
+            done < words.txt
+            echo "=== BRUTE DONE: $N scanned, $HITS hits ==="
+            echo "=== sanity: known-404 recheck ==="
+            curl -skS -m3 -o /dev/null -w 'nonexistent-xyz -> %{http_code}\n' "https://$IP:2860/nonexistent-xyz"
             echo "=== DONE ==="
           } > body51/raw/portscan.txt 2>&1 || true
           git config user.name bot; git config user.email bot@x
