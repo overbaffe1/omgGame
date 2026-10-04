@@ -37,9 +37,10 @@ def load_words(paths):
 
 def probe(w):
     hits = []
-    for path in (f"/{w}", f"/{w}/"):
+    # mux registers BOTH base ("/w/") and TrimSuffix(base,"/") — one probe is enough
+    for path in (f"/{w}",):
         try:
-            r = session().get(BASE + path, timeout=5, verify=False, allow_redirects=False)
+            r = session().get(BASE + path, timeout=8, verify=False, allow_redirects=False)
             if r.status_code != 404:
                 hits.append(
                     "HIT %s -> %s size=%s loc=%s body=%r"
@@ -55,7 +56,7 @@ def main():
     print("words:", len(words), flush=True)
     n = 0
     hits = 0
-    with cf.ThreadPoolExecutor(max_workers=4) as ex:
+    with cf.ThreadPoolExecutor(max_workers=40) as ex:
         for res in ex.map(probe, words):
             n += 1
             for line in res:
