@@ -7,28 +7,49 @@ permissions:
 jobs:
   s:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - name: run
         run: |
           mkdir -p body51/raw
           IP=94.156.179.85
-          PORTS="22 80 443 618 2096 2860 3463 3821 4217 4663 6925 7497 8563 8879 10938 12345 13821 14376 15470 16705 18213 19000 20409 20759 24299 24607 25742 25804 26019 26317 26703 26808 28164 28199 29644 30219 32535 33161 34803 35044 35601 36312 37961 38622 40028 40671 42257 42770 43671 43792 44811 47255 49860 51338 51485 52372 52863 54487 55147 55505 55898 56255 58020 58974 61693 62398 63225 63271"
-          sudo apt-get update -qq && sudo apt-get install -y -qq nmap >/dev/null 2>&1 || true
           {
-            echo "=== NMAP -sV on ALL open ports ==="
-            nmap -Pn -sV --version-intensity 4 -p "$(echo $PORTS | tr ' ' ',')" $IP || true
-            echo
-            echo "=== HTTP CONTENT of each port ==="
-            for p in $PORTS; do
-              echo "--- :$p http"
-              curl -sS -m4 -D- -o /tmp/body "http://$IP:$p/" 2>&1 | head -20 || true
-              echo "[body]"; head -c 500 /tmp/body 2>/dev/null; echo
-              echo "--- :$p https"
-              curl -skS -m4 -D- -o /tmp/body2 "https://$IP:$p/" 2>&1 | head -20 || true
-              echo "[body]"; head -c 500 /tmp/body2 2>/dev/null; echo
+            echo "=== TLS CERTS on 443 / 2860 / 2096 / 12345 ==="
+            for pt in 443 2860 2096 12345; do
+              echo "--- :$pt with SNI srv4.dream31.ru"
+              timeout 10 openssl s_client -connect $IP:$pt -servername srv4.dream31.ru </dev/null 2>&1 | openssl x509 -noout -subject -issuer -dates -ext subjectAltName 2>/dev/null || echo "(no cert)"
+              echo "--- :$pt no SNI"
+              timeout 10 openssl s_client -connect $IP:$pt </dev/null 2>&1 | grep -E "subject=|issuer=|depth=|verify error|no peer certificate|alert" | head -8 || true
             done
+            echo "=== RAW plain responses (MuxListener mystery) ==="
+            python3 -c '
+          import socket, time
+          IP = "94.156.179.85"
+          def raw(label, port, payload, wait=3):
+              try:
+                  s = socket.create_connection((IP, port), timeout=6)
+                  s.settimeout(wait)
+                  s.sendall(payload)
+                  time.sleep(0.5)
+                  chunks = b""
+                  try:
+                      while True:
+                          b = s.recv(4096)
+                          if not b: break
+                          chunks += b
+                  except Exception:
+                      pass
+                  print(label, "->", repr(chunks[:800]))
+                  s.close()
+              except Exception as e:
+                  print(label, "ERR:", e)
+          raw("plain2860-GET", 2860, b"GET / HTTP/1.1\r\nHost: srv4.dream31.ru\r\nConnection: close\r\n\r\n")
+          raw("plain2860-HEAD", 2860, b"HEAD / HTTP/1.1\r\nHost: srv4.dream31.ru\r\nConnection: close\r\n\r\n")
+          raw("plain2096-GET", 2096, b"GET / HTTP/1.1\r\nHost: srv4.dream31.ru\r\nConnection: close\r\n\r\n")
+          raw("12345-wait10", 12345, b"", wait=10)
+          raw("plain2860-path", 2860, b"GET /favicon.ico HTTP/1.1\r\nHost: srv4.dream31.ru\r\nConnection: close\r\n\r\n")
+          ' || true
             echo "=== DONE ==="
           } > body51/raw/portscan.txt 2>&1 || true
           git config user.name bot; git config user.email bot@x
