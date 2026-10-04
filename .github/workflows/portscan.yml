@@ -1,13 +1,13 @@
 name: portscan
 on:
   push:
-    paths: ['.github/workflows/portscan.yml', 'body51/tools/basebrute.py']
+    paths: ['.github/workflows/portscan.yml', 'body51/tools/basebrute2.py', 'body51/raw/vocab.txt']
 permissions:
   contents: write
 jobs:
   s:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: run
@@ -16,16 +16,11 @@ jobs:
           {
             echo "=== PREP ==="
             pip install -q requests || true
-            curl -sSLo /tmp/w1.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-small-words.txt || true
-            curl -sSLo /tmp/w2.txt https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt || true
-            wc -l /tmp/w1.txt /tmp/w2.txt
-            echo "=== BRUTE base path ==="
-            python3 body51/tools/basebrute.py /tmp/w1.txt /tmp/w2.txt || true
-            echo "=== SANITY ==="
-            python3 -c "import requests,urllib3; urllib3.disable_warnings(); r=requests.get('https://94.156.179.85:2860/nonexistent-xyz', verify=False, timeout=5); print('control404 ->', r.status_code)"
+            echo "=== BRUTE v9: vocab + pairs ==="
+            python3 body51/tools/basebrute2.py body51/raw/vocab.txt || true
             echo "=== DONE ==="
           } > body51/raw/portscan.txt 2>&1 || true
           git config user.name bot; git config user.email bot@x
-          git add body51/raw/portscan.txt body51/tools/basebrute.py || true
+          git add body51/raw/portscan.txt || true
           git commit -qm "portscan [skip ci]" || true
           for i in 1 2 3 4 5; do git pull -q --rebase -X theirs origin $GITHUB_REF_NAME && git push -q && break; sleep $((RANDOM%20+5)); done
