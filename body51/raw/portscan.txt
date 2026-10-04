@@ -1,222 +1,104 @@
 === NMAP SERVICE VERSIONS ===
-/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 5: nmap: command not found
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-10-04 07:54 UTC
+Nmap scan report for 94.156.179.85
+Host is up (0.16s latency).
+
+PORT      STATE SERVICE    VERSION
+22/tcp    open  ssh        OpenSSH 10.2p1 Ubuntu 2ubuntu3.6 (Ubuntu Linux; protocol 2.0)
+80/tcp    open  http       nginx 1.28.3 (Ubuntu)
+443/tcp   open  https?
+2096/tcp  open  ssl/http   Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+2860/tcp  open  ssl/http   Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+12345/tcp open  tcpwrapped
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 71.27 seconds
 === FULL TCP SCAN 1-65535 ===
-/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 7: nmap: command not found
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-10-04 07:56 UTC
+Warning: 94.156.179.85 giving up on port because retransmission cap hit (10).
+Nmap scan report for 94.156.179.85
+Host is up (0.16s latency).
+Not shown: 64303 closed tcp ports (conn-refused), 1164 filtered tcp ports (no-response)
+PORT      STATE SERVICE
+22/tcp    open  ssh
+80/tcp    open  http
+443/tcp   open  https
+618/tcp   open  dei-icda
+2096/tcp  open  nbx-dir
+2860/tcp  open  dialpad-voice1
+3463/tcp  open  edm-adm-notify
+3821/tcp  open  pmcp
+4217/tcp  open  vrml-multi-use
+4663/tcp  open  noteit
+6925/tcp  open  unknown
+7497/tcp  open  unknown
+8563/tcp  open  unknown
+8879/tcp  open  unknown
+10938/tcp open  unknown
+12345/tcp open  netbus
+13821/tcp open  dsmcc-download
+14376/tcp open  unknown
+15470/tcp open  unknown
+16705/tcp open  unknown
+18213/tcp open  unknown
+19000/tcp open  igrid
+20409/tcp open  unknown
+20759/tcp open  unknown
+24299/tcp open  unknown
+24607/tcp open  unknown
+25742/tcp open  unknown
+25804/tcp open  unknown
+26019/tcp open  unknown
+26317/tcp open  unknown
+26703/tcp open  unknown
+26808/tcp open  unknown
+28164/tcp open  unknown
+28199/tcp open  unknown
+29644/tcp open  unknown
+30219/tcp open  unknown
+32535/tcp open  unknown
+33161/tcp open  unknown
+34803/tcp open  unknown
+35044/tcp open  unknown
+35601/tcp open  unknown
+36312/tcp open  unknown
+37961/tcp open  unknown
+38622/tcp open  unknown
+40028/tcp open  unknown
+40671/tcp open  unknown
+42257/tcp open  unknown
+42770/tcp open  unknown
+43671/tcp open  unknown
+43792/tcp open  unknown
+44811/tcp open  unknown
+47255/tcp open  unknown
+49860/tcp open  unknown
+51338/tcp open  unknown
+51485/tcp open  unknown
+52372/tcp open  unknown
+52863/tcp open  unknown
+54487/tcp open  unknown
+55147/tcp open  unknown
+55505/tcp open  unknown
+55898/tcp open  unknown
+56255/tcp open  unknown
+58020/tcp open  unknown
+58974/tcp open  unknown
+61693/tcp open  unknown
+62398/tcp open  unknown
+63225/tcp open  unknown
+63271/tcp open  unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 58.90 seconds
 === UDP TOP 100 ===
-/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 9: nmap: command not found
-=== BANNER 12345 ===
-/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 11: exec3: command not found
-/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 11: 3: Bad file descriptor
-/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 11: 3: Bad file descriptor
-/home/runner/work/_temp/4d194c8f-bcc5-42f9-a453-c2f36e887e95.sh: line 11: 3: Bad file descriptor
-=== VHOST TESTS on 80/443 ===
---- Host: panel.dream31.ru http80
-HTTP/1.1 200 OK
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:26 GMT
-Content-Type: text/html
-Content-Length: 615
-Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
-Connection: keep-alive
-ETag: "6a920919-267"
---- Host: panel.dream31.ru https443
-HTTP/1.1 200 OK
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:26 GMT
-Content-Type: text/html
-Content-Length: 615
-Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
-Connection: keep-alive
-ETag: "6a920919-267"
---- Host: sub.dream31.ru http80
-HTTP/1.1 200 OK
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:26 GMT
-Content-Type: text/html
-Content-Length: 615
-Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
-Connection: keep-alive
-ETag: "6a920919-267"
---- Host: sub.dream31.ru https443
-HTTP/1.1 200 OK
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:27 GMT
-Content-Type: text/html
-Content-Length: 615
-Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
-Connection: keep-alive
-ETag: "6a920919-267"
---- Host: dream31.ru http80
-HTTP/1.1 200 OK
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:27 GMT
-Content-Type: text/html
-Content-Length: 615
-Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
-Connection: keep-alive
-ETag: "6a920919-267"
---- Host: dream31.ru https443
-HTTP/1.1 200 OK
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:27 GMT
-Content-Type: text/html
-Content-Length: 615
-Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
-Connection: keep-alive
-ETag: "6a920919-267"
---- Host: srv4.dream31.ru http80
-HTTP/1.1 301 Moved Permanently
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:27 GMT
-Content-Type: text/html
-Content-Length: 178
-Connection: keep-alive
-Location: https://srv4.dream31.ru/
-
---- Host: srv4.dream31.ru https443
-HTTP/1.1 200 OK
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:28 GMT
-Content-Type: text/html
-Content-Length: 615
-Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
-Connection: keep-alive
-ETag: "6a920919-267"
---- Host: anything.local http80
-HTTP/1.1 200 OK
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:28 GMT
-Content-Type: text/html
-Content-Length: 615
-Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
-Connection: keep-alive
-ETag: "6a920919-267"
---- Host: anything.local https443
-HTTP/1.1 200 OK
-Server: nginx/1.28.3 (Ubuntu)
-Date: Sun, 04 Oct 2026 07:51:28 GMT
-Content-Type: text/html
-Content-Length: 615
-Last-Modified: Fri, 28 Aug 2026 22:18:01 GMT
-Connection: keep-alive
-ETag: "6a920919-267"
-=== HTTP/HTTPS PROBES ON CANDIDATE PORTS ===
---- http://94.156.179.85:2860/
-curl: (1) Unsupported HTTP version in response
---- https://94.156.179.85:2860/
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:29 GMT
-Content-Length: 19
-
---- http://94.156.179.85:2096/
-curl: (1) Unsupported HTTP version in response
---- https://94.156.179.85:2096/
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:29 GMT
-Content-Length: 19
-
---- http://94.156.179.85:12345/
-curl: (56) Recv failure: Connection reset by peer
---- https://94.156.179.85:12345/
-curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to 94.156.179.85:12345 
---- http://94.156.179.85:2053/
-curl: (7) Failed to connect to 94.156.179.85 port 2053 after 97 ms: Couldn't connect to server
---- https://94.156.179.85:2053/
-curl: (7) Failed to connect to 94.156.179.85 port 2053 after 95 ms: Couldn't connect to server
---- http://94.156.179.85:8080/
-curl: (7) Failed to connect to 94.156.179.85 port 8080 after 97 ms: Couldn't connect to server
---- https://94.156.179.85:8080/
-curl: (7) Failed to connect to 94.156.179.85 port 8080 after 97 ms: Couldn't connect to server
---- http://94.156.179.85:8443/
-curl: (7) Failed to connect to 94.156.179.85 port 8443 after 99 ms: Couldn't connect to server
---- https://94.156.179.85:8443/
-curl: (7) Failed to connect to 94.156.179.85 port 8443 after 98 ms: Couldn't connect to server
---- http://94.156.179.85:9090/
-curl: (7) Failed to connect to 94.156.179.85 port 9090 after 95 ms: Couldn't connect to server
---- https://94.156.179.85:9090/
-curl: (7) Failed to connect to 94.156.179.85 port 9090 after 97 ms: Couldn't connect to server
---- http://94.156.179.85:10000/
-curl: (7) Failed to connect to 94.156.179.85 port 10000 after 97 ms: Couldn't connect to server
---- https://94.156.179.85:10000/
-curl: (7) Failed to connect to 94.156.179.85 port 10000 after 98 ms: Couldn't connect to server
---- http://94.156.179.85:2861/
-curl: (7) Failed to connect to 94.156.179.85 port 2861 after 95 ms: Couldn't connect to server
---- https://94.156.179.85:2861/
-curl: (7) Failed to connect to 94.156.179.85 port 2861 after 98 ms: Couldn't connect to server
---- http://94.156.179.85:56003/
-curl: (7) Failed to connect to 94.156.179.85 port 56003 after 98 ms: Couldn't connect to server
---- https://94.156.179.85:56003/
-curl: (7) Failed to connect to 94.156.179.85 port 56003 after 97 ms: Couldn't connect to server
---- http://94.156.179.85:18080/
-curl: (7) Failed to connect to 94.156.179.85 port 18080 after 96 ms: Couldn't connect to server
---- https://94.156.179.85:18080/
-curl: (7) Failed to connect to 94.156.179.85 port 18080 after 98 ms: Couldn't connect to server
-=== REDIRECT HUNT on 2860 (look for Location: base) ===
---- GET /
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:31 GMT
-Content-Length: 19
-
---- GET /login
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:32 GMT
-Content-Length: 19
-
---- GET /favicon.ico
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:32 GMT
-Content-Length: 19
-
---- GET /robots.txt
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:32 GMT
-Content-Length: 19
-
---- GET /panel/
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:33 GMT
-Content-Length: 19
-
---- GET /panel/users
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:33 GMT
-Content-Length: 19
-
---- GET /assets/css/custom.min.css
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:33 GMT
-Content-Length: 19
-
---- GET /logout
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:34 GMT
-Content-Length: 19
-
---- GET /clientapi
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-X-Content-Type-Options: nosniff
-Date: Sun, 04 Oct 2026 07:51:34 GMT
-Content-Length: 19
-
+You requested a scan type which requires root privileges.
+QUITTING!
+=== BANNER/PROTO 12345 ===
+silent | first: b'' | after: b''
+http-get | first: b'' | after: b''
+http2 | first: b'' | after: b''
+tls | ERR: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)
+zeros | first: b'' | after: b''
+wg-like | first: b'' | after: b''
 === DONE ===
