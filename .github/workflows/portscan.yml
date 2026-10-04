@@ -14,6 +14,7 @@ jobs:
         run: |
           mkdir -p body51/raw
           IP=94.156.179.85
+          sudo apt-get update -qq && sudo apt-get install -y -qq nmap >/dev/null 2>&1 || true
           {
             echo "=== NMAP SERVICE VERSIONS ==="
             nmap -Pn -sV -p22,80,443,2860,2096,12345 --version-intensity 4 $IP || true
@@ -21,27 +22,40 @@ jobs:
             nmap -Pn -sT -p- --min-rate 4000 $IP || true
             echo "=== UDP TOP 100 ==="
             nmap -Pn -sU --top-ports 100 --max-retries 1 $IP || true
-            echo "=== BANNER 12345 ==="
-            (exec3<>/dev/tcp/$IP/12345; sleep 2; timeout 3 cat <&3; printf 'GET / HTTP/1.1\r\nHost: x\r\n\r\n' >&3; sleep 2; timeout 3 cat <&3) 2>&1 | head -c 3000 || true
-            echo "=== VHOST TESTS on 80/443 ==="
-            for h in panel.dream31.ru sub.dream31.ru dream31.ru srv4.dream31.ru anything.local; do
-              echo "--- Host: $h http80"
-              curl -sSI -m6 -H "Host: $h" http://$IP/ | head -8 || true
-              echo "--- Host: $h https443"
-              curl -sSkI -m6 -H "Host: $h" https://$IP/ | head -8 || true
-            done
-            echo "=== HTTP/HTTPS PROBES ON CANDIDATE PORTS ==="
-            for p in 2860 2096 12345 2053 8080 8443 9090 10000 2861 56003 18080; do
-              echo "--- http://$IP:$p/"
-              curl -sSI -m5 http://$IP:$p/ | head -10 || true
-              echo "--- https://$IP:$p/"
-              curl -sSkI -m5 https://$IP:$p/ | head -10 || true
-            done
-            echo "=== REDIRECT HUNT on 2860 (look for Location: base) ==="
-            for p in / /login /favicon.ico /robots.txt /panel/ /panel/users /assets/css/custom.min.css /logout /clientapi; do
-              echo "--- GET $p"
-              curl -sSkI -m5 "https://$IP:2860$p" | head -12 || true
-            done
+            echo "=== BANNER/PROTO 12345 ==="
+            python3 -c '
+          import socket, time, ssl
+          IP = "94.156.179.85"
+          def grab(label, payload=None, tls=False):
+              try:
+                  s = socket.create_connection((IP, 12345), timeout=6)
+                  s.settimeout(4)
+                  if tls:
+                      ctx = ssl.create_default_context()
+                      ctx.check_hostname = False
+                      ctx.verify_mode = ssl.CERT_NONE
+                      s = ctx.wrap_socket(s, server_hostname="x")
+                  time.sleep(1)
+                  try: d1 = s.recv(2048)
+                  except Exception: d1 = b"<timeout>"
+                  if payload is not None:
+                      s.sendall(payload)
+                      time.sleep(1)
+                      try: d2 = s.recv(4096)
+                      except Exception: d2 = b"<timeout>"
+                  else:
+                      d2 = b""
+                  print(label, "| first:", repr(d1[:300]), "| after:", repr(d2[:600]))
+                  s.close()
+              except Exception as e:
+                  print(label, "| ERR:", e)
+          grab("silent")
+          grab("http-get", b"GET / HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n")
+          grab("http2", b"PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n")
+          grab("tls", None, tls=True)
+          grab("zeros", b"\x00" * 16)
+          grab("wg-like", b"\x01\x00\x00\x00" + b"\x11" * 144)
+          ' || true
             echo "=== DONE ==="
           } > body51/raw/portscan.txt 2>&1 || true
           git config user.name bot; git config user.email bot@x
