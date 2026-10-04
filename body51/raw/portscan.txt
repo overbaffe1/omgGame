@@ -1,39 +1,19 @@
 === PREP ===
- 43007 /tmp/w1.txt
-  4751 /tmp/w2.txt
- 47758 total
-=== BRUTE base path ===
-words: 43701
-... scanned 2000 (hits: 0)
-... scanned 4000 (hits: 0)
-... scanned 6000 (hits: 0)
-... scanned 8000 (hits: 0)
+=== BRUTE v9: vocab + pairs ===
+words: 266, total probes: 70756
+... scanned 5000 (hits: 0)
 ... scanned 10000 (hits: 0)
-... scanned 12000 (hits: 0)
-... scanned 14000 (hits: 0)
-HIT /audio -> 307 size=43 loc=/audio/ body='<a href="/audio/">Temporary Redirect</a>.\n\n'
-... scanned 16000 (hits: 1)
-... scanned 18000 (hits: 1)
-HIT /css -> 307 size=41 loc=/css/ body='<a href="/css/">Temporary Redirect</a>.\n\n'
-... scanned 20000 (hits: 2)
-HIT /dist -> 307 size=42 loc=/dist/ body='<a href="/dist/">Temporary Redirect</a>.\n\n'
-... scanned 22000 (hits: 3)
-HIT /fonts -> 307 size=43 loc=/fonts/ body='<a href="/fonts/">Temporary Redirect</a>.\n\n'
-... scanned 24000 (hits: 4)
-HIT /images -> 307 size=44 loc=/images/ body='<a href="/images/">Temporary Redirect</a>.\n\n'
-... scanned 26000 (hits: 5)
-HIT /js -> 307 size=40 loc=/js/ body='<a href="/js/">Temporary Redirect</a>.\n\n'
-... scanned 28000 (hits: 6)
-HIT /mu -> 307 size=40 loc=/mu/ body='<a href="/mu/">Temporary Redirect</a>.\n\n'
-... scanned 30000 (hits: 7)
-... scanned 32000 (hits: 7)
-... scanned 34000 (hits: 7)
-... scanned 36000 (hits: 7)
-... scanned 38000 (hits: 7)
-... scanned 40000 (hits: 7)
-HIT /video -> 307 size=43 loc=/video/ body='<a href="/video/">Temporary Redirect</a>.\n\n'
-... scanned 42000 (hits: 8)
-DONE scanned=43701 hits=8
-=== SANITY ===
-control404 -> 404
+... scanned 15000 (hits: 0)
+... scanned 20000 (hits: 0)
+... scanned 25000 (hits: 0)
+... scanned 30000 (hits: 0)
+... scanned 35000 (hits: 0)
+... scanned 40000 (hits: 0)
+... scanned 45000 (hits: 0)
+... scanned 50000 (hits: 0)
+... scanned 55000 (hits: 0)
+... scanned 60000 (hits: 0)
+... scanned 65000 (hits: 0)
+... scanned 70000 (hits: 0)
+DONE scanned=70756 hits=0
 === DONE ===
