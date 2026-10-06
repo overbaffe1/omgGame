@@ -177,6 +177,58 @@ def m_globe_c():
 
 
 
+# ------------------------------------------------------------------ living details (v3.1)
+def flyer(rig, name, center, radius, z, span, chord, body_r, body_mat, wing_mat, tip_mat=None, moth=False):
+    """A bird / moth that orbits `center` (bone `name`) and flaps two wings (bones nameL / nameR).
+    Built at orbit angle 0, i.e. at center + (radius, 0, 0), flying towards +Y."""
+    cx, cy = center[0] + radius, center[1]
+    rig.bone(name, (center[0], center[1], z))
+    m = rig.mark()
+    b = sphere(name + "_body", body_r, (cx, cy, z), body_mat, 16, 10)
+    b.scale = (0.7, 2.2 if not moth else 1.8, 0.7)
+    sphere(name + "_head", body_r * 0.75, (cx, cy + body_r * 2.0, z + body_r * 0.25), body_mat, 12, 8)
+    if not moth:
+        tube(name + "_beak", [(cx, cy + body_r * 2.6, z + body_r * 0.2), (cx, cy + body_r * 3.4, z + body_r * 0.05)], body_r * 0.18, "gold", 2, False)
+        tube(name + "_tail", [(cx, cy - body_r * 1.4, z), (cx, cy - body_r * 2.8, z + body_r * 0.2)], body_r * 0.35, wing_mat, 2, False)
+    rig.take(m, name)
+    for side, bn in ((-1, name + "L"), (1, name + "R")):
+        sh = (cx + side * body_r * 0.5, cy, z)
+        rig.bone(bn, sh, name)
+        m = rig.mark()
+
+        def wing(u, v, side=side):
+            c = chord * ((1 - 0.25 * u) if moth else (1 - 0.75 * u ** 1.4))
+            sweep = (-0.25 if not moth else -0.05) * chord * u
+            x = sh[0] + side * span * u
+            y = cy + sweep + c * (0.5 - v) + (0.25 * chord * u if not moth else 0.0)
+            zz = z + (0.18 * span * math.sin(math.pi * u * 0.8) if not moth else 0.04 * span * u)
+            return (x, y, zz)
+        grid_surface(bn, 8, 3, wing, wing_mat, 60)
+        if tip_mat:
+            grid_surface(bn + "_tip", 3, 2, lambda u, v, side=side: (
+                sh[0] + side * span * (0.78 + 0.22 * u), cy - 0.25 * chord * (0.78 + 0.22 * u) + 0.25 * chord * (0.78 + 0.22 * u)
+                + chord * (1 - 0.75 * (0.78 + 0.22 * u) ** 1.4) * (0.5 - v),
+                z + 0.18 * span * math.sin(math.pi * (0.78 + 0.22 * u) * 0.8) + 0.002), tip_mat, 60)
+        rig.take(m, bn)
+    return name
+
+
+def flyer_pose(name, t, turns=1, flaps=8, amp=32, bob=0.03, bob_k=2, glide=None):
+    a = amp * math.sin(TAU * flaps * t)
+    if glide:  # wings held still for part of the loop (gliding)
+        a *= 1 - pulse(t, *glide) * 0.85
+    return {name: {"rot": [((0, 0, 1), 360 * turns * t)], "loc": (0, 0, bob * math.sin(TAU * bob_k * t))},
+            name + "L": {"rot": [((0, 1, 0), a)]},
+            name + "R": {"rot": [((0, 1, 0), -a)]}}
+
+
+def puff_pose(t, k, n, rise, drift, size=1.0):
+    """Looping smoke / note particle: rises, grows, fades out (scale 0 at both ends of its life)."""
+    u = (t + k / n) % 1.0
+    sc = max(0.001, math.sin(math.pi * u) * (0.5 + 0.8 * u) * size)
+    return {"loc": (drift * math.sin(TAU * u + k), 0, rise * u), "scale": sc}
+
+
 # ------------------------------------------------------------------ animated exhibits (v3)
 # Every exhibit below returns (rig, anim, seconds): the parts move by themselves inside PowerPoint
 # (embedded glTF skin animation, looped until the end of the slide) — not a turntable spin.
@@ -328,6 +380,7 @@ def m_ship():
     box("plinth", (X1 - X0 + 0.12, Y1 - Y0 + 0.12, 0.09), ((X0 + X1) / 2, 0, ZB - 0.045), "walnut", 0.015)
     box("plate", (0.46, 0.008, 0.05), ((X0 + X1) / 2, Y0 - 0.064, ZB - 0.045), "brass", 0.003)
     rig.take(m6, "root")
+    flyer(rig, "gull", (0.15, 0.0), 0.44, 1.46, 0.30, 0.12, 0.04, "paper", "paper", tip_mat="satin")
     rig.shift(dz=-0.55)
     LAM = 1.5
 
@@ -341,6 +394,7 @@ def m_ship():
         p["pen0"] = {"rot": [((0, 0, 1), 14 * wave(t, 3, 0.0))]}
         p["pen1"] = {"rot": [((0, 0, 1), 20 * wave(t, 3, -0.16))]}
         p["pen2"] = {"rot": [((0, 0, 1), 26 * wave(t, 3, -0.32))]}
+        p.update(flyer_pose("gull", t, turns=1, flaps=10, amp=34, bob=0.05, bob_k=2, glide=(0.30, 0.38, 0.55, 0.62)))
         return p
     return rig, anim, 4.0
 
@@ -418,6 +472,25 @@ def m_harp():
             w = math.sin(math.pi * u) ** 1.3
             return {bn: w, "root": 1 - w}
         rig.take_fn(m, f"s{i}", sw)
+    # golden notes drifting up out of the strings
+    for k, (nx0, nz0) in enumerate([(-0.12, 0.36), (0.02, 0.28), (-0.22, 0.50)]):
+        head = (nx0, -0.10, nz0)
+        rig.bone(f"note{k}", head)
+        m = rig.mark()
+        hd = sphere("notehead", 0.026, head, "gold", 16, 10)
+        hd.scale = (1.35, 0.55, 1.0)
+        hd.rotation_euler = (0, math.radians(-25), 0)
+        cyl("notestem", 0.0055, 0.13, (nx0 + 0.03, -0.10, nz0 + 0.065), "gold", seg=8)
+        if k != 1:
+            tube("noteflag", [(nx0 + 0.03, -0.10, nz0 + 0.13), (nx0 + 0.07, -0.10, nz0 + 0.09), (nx0 + 0.065, -0.10, nz0 + 0.05)], 0.006, "gold", 2)
+        else:  # a pair of quavers
+            cyl("notestem2", 0.0055, 0.13, (nx0 + 0.11, -0.10, nz0 + 0.075), "gold", seg=8)
+            sphere("notehead2", 0.026, (nx0 + 0.08, -0.10, nz0 + 0.01), "gold", 16, 10).scale = (1.35, 0.55, 1.0)
+            box("notebeam", (0.09, 0.008, 0.016), (nx0 + 0.07, -0.10, nz0 + 0.135), "gold", 0.002)
+        S = 1.9  # readable size on a slide
+        xform([o for o in bpy.context.scene.objects if o not in m],
+              Matrix.Translation(head) @ Matrix.Scale(S, 4) @ Matrix.Translation(Vector(head) * -1))
+        rig.take(m, f"note{k}")
     rig.shift(dz=-0.65, dx=-0.05)
     ns = len(strings)
 
@@ -431,10 +504,16 @@ def m_harp():
                 d = t - s0
                 if d < 0:
                     continue
-                ang += 7.0 * math.exp(-d / 0.10) * math.sin(TAU * 22 * d)
+                ang += 11.0 * math.exp(-d / 0.10) * math.sin(TAU * 22 * d)
             # fade the tail so the loop closes cleanly
             ang *= 1 - ease(t, 0.97, 1.0)
             p[f"str{i}"] = {"rot": [((1, 0, 0), ang)]}
+        for k in range(3):
+            q = puff_pose(t, k, 3, 0.42, 0.06, 1.0)
+            q["loc"] = (q["loc"][0] + 0.10 * ((t + k / 3) % 1.0), 0, q["loc"][2])
+            q["rot"] = [((0, 1, 0), 18 * math.sin(TAU * ((t + k / 3) % 1.0) * 1.5))]
+            q["scale"] = min(1.0, q["scale"] * 1.25)
+            p[f"note{k}"] = q
         return p
     return rig, anim, 4.0
 
@@ -704,6 +783,9 @@ def m_dice():
     for i in range(4):
         coin("stake", (0.42, 0.22, 0.08 + i * 0.026), (0, 0, random.uniform(0, 6)), r=0.075, t=0.026)
     coin("stake", (0.30, 0.28, 0.08), (math.radians(4), 0, 1), r=0.075, t=0.026)
+    m = rig.mark()
+    coin("spinner", (-0.40, -0.24, 0.067 + 0.078), (math.radians(90), 0, 0), r=0.078, t=0.024)
+    rig.take(m, "spin", head=(-0.40, -0.24, 0.067))
     rig.shift(dz=-0.25)
     a1 = Vector((math.cos(math.radians(18)), math.sin(math.radians(18)), 0))
     a2 = Vector((-math.sin(math.radians(-28)), math.cos(math.radians(-28)), 0))
@@ -718,7 +800,8 @@ def m_dice():
         r1, z1 = roll(t, 0.0)
         r2, z2 = roll(t, 0.5)
         return {"d1": {"loc": (0, 0, z1), "rot": [(tuple(a1), -r1)]},
-                "d2": {"loc": (0, 0, z2), "rot": [(tuple(a2), r2)]}}
+                "d2": {"loc": (0, 0, z2), "rot": [(tuple(a2), r2)]},
+                "spin": {"rot": [((1, 0, 0), 7 * math.sin(TAU * 3 * t)), ((0, 0, 1), 360 * 4 * t)]}}
     return rig, anim, 4.0
 
 
@@ -925,6 +1008,13 @@ def m_candle():
     s = sphere("newdrip", 0.017, (0.069 * math.cos(a), 0.069 * math.sin(a), 0.18 + hc - 0.02), "wax", 16, 10)
     s.scale = (1, 1, 1.5)
     rig.take(m, "drop", head=(0.069 * math.cos(a), 0.069 * math.sin(a), 0.18 + hc - 0.02))
+    for k in range(3):
+        sz = fz + 0.235
+        rig.bone(f"smoke{k}", (0, 0, sz))
+        m = rig.mark()
+        sphere("smoke", 0.046, (0, 0, sz + 0.02), "concrete", 16, 10).scale = (1, 1, 1.3)
+        rig.take(m, f"smoke{k}")
+    flyer(rig, "moth", (0.0, 0.0), 0.20, fz + 0.09, 0.09, 0.075, 0.019, "brown", "sand", moth=True)
     rig.shift(dz=-0.5)
 
     def noise(t, seeds):
@@ -938,7 +1028,9 @@ def m_candle():
         return {"flame": {"scale": (1 + 0.07 * n1, 1 + 0.07 * n1, 1 + 0.16 * n2),
                           "rot": [((1, 0, 0), sway), ((0, 1, 0), 0.7 * noise(t, [(4.0, 3, 0.5), (2.0, 7, 0.1)]))]},
                 "core": {"scale": (1, 1, 1 + 0.12 * noise(t, [(0.6, 9, 0.2), (0.4, 15, 0.7)]))},
-                "drop": {"loc": (0, 0, -0.30 * smooth(d)), "scale": (1, 1, 1 + 0.8 * math.sin(math.pi * d)) if t < 0.92 else 0.001}}
+                "drop": {"loc": (0, 0, -0.30 * smooth(d)), "scale": (1, 1, 1 + 0.8 * math.sin(math.pi * d)) if t < 0.92 else 0.001},
+                **{f"smoke{k}": puff_pose(t, k, 3, 0.20, 0.025, 0.9) for k in range(3)},
+                **flyer_pose("moth", t, turns=2, flaps=24, amp=40, bob=0.035, bob_k=3)}
     return rig, anim, 4.0
 
 
