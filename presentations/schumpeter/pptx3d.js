@@ -63,10 +63,27 @@ function glbBounds(buf) {
   return { ext, center, maxExt: Math.max(...ext) };
 }
 
+// ---------- embedded (skinned) animation: loop length in ms, 0 if the glb has none ----------
+function glbAnimMs(buf) {
+  const jsonLen = buf.readUInt32LE(12);
+  const gltf = JSON.parse(buf.slice(20, 20 + jsonLen).toString("utf8"));
+  const anim = (gltf.animations || [])[0];
+  if (!anim || !(gltf.skins || []).length) return 0;  // PowerPoint only plays skinned animations
+  let t = 0;
+  for (const smp of anim.samplers) t = Math.max(t, (gltf.accessors[smp.input].max || [0])[0]);
+  return Math.round(t * 1000);
+}
+
+const A3DANIM = "http://schemas.microsoft.com/office/drawing/2018/animation/model3d";
+const animExt = (ms) => `<am3d:extLst>` +
+  `<a:ext uri="{9A65AA19-BECB-4387-8358-8AD5134E1D82}"><a3danim:embedAnim xmlns:a3danim="${A3DANIM}" animId="0"><a3danim:animPr length="${ms}" count="indefinite"/></a3danim:embedAnim></a:ext>` +
+  `<a:ext uri="{E9DE012E-A134-456F-84FE-255F9AAD75C6}"><a3danim:posterFrame xmlns:a3danim="${A3DANIM}" animId="0"/></a:ext>` +
+  `</am3d:extLst>`;
+
 const ptLight = (r, g, b, n, x, y, z) =>
   `<am3d:ptLight rad="0"><am3d:clr><a:scrgbClr r="${r}" g="${g}" b="${b}"/></am3d:clr><am3d:intensity n="${n}" d="1000000"/><am3d:pos x="${x}" y="${y}" z="${z}"/></am3d:ptLight>`;
 
-function model3dXml({ id, name, x, y, size, rot, glbRel, imgRel, bounds, guid }) {
+function model3dXml({ id, name, x, y, size, rot, glbRel, imgRel, bounds, guid, animMs }) {
   const { ext, center, maxExt } = bounds;
   const mpu = 1 / maxExt;
   const r = Math.hypot(...ext.map((e) => e / maxExt / 2));
@@ -87,6 +104,7 @@ function model3dXml({ id, name, x, y, size, rot, glbRel, imgRel, bounds, guid })
     `<am3d:scale><am3d:sx n="1000000" d="1000000"/><am3d:sy n="1000000" d="1000000"/><am3d:sz n="1000000" d="1000000"/></am3d:scale>` +
     `<am3d:rot ax="${ax}" ay="${ay}" az="${az}"/><am3d:postTrans dx="0" dy="0" dz="0"/></am3d:trans>` +
     `<am3d:raster rName="Office3DRenderer" rVer="16.0.8326"><am3d:blip r:embed="${imgRel}"/></am3d:raster>` +
+    (animMs ? animExt(animMs) : "") +
     `<am3d:objViewport viewportSz="${sz}"/>` +
     `<am3d:ambientLight><am3d:clr><a:scrgbClr r="50000" g="50000" b="50000"/></am3d:clr><am3d:illuminance n="500000" d="1000000"/></am3d:ambientLight>` +
     ptLight(100000, 75000, 50000, 9765625, 21959998, 70920001, 16344003) +
@@ -124,7 +142,7 @@ async function injectModels(zip, slides, glbDir) {
       const imgRel = /r:embed="([^"]+)"/.exec(pic)[1];
       if (!cache[e.key]) {
         const buf = fs.readFileSync(path.join(glbDir, e.key + ".glb"));
-        cache[e.key] = { buf, bounds: glbBounds(buf) };
+        cache[e.key] = { buf, bounds: glbBounds(buf), animMs: glbAnimMs(buf) };
       }
       n++;
       const target = `model3d${n}.glb`;
@@ -133,8 +151,11 @@ async function injectModels(zip, slides, glbDir) {
       rels = rels.replace("</Relationships>", `<Relationship Id="${glbRel}" Type="${REL_MODEL}" Target="../media/${target}"/></Relationships>`);
       x = x.slice(0, start) + model3dXml({
         id: spid, name: e.name, x: e.x, y: e.y, size: e.s, rot: e.rot, glbRel, imgRel, bounds: cache[e.key].bounds,
-        guid: guidFor(`${i}-${e.id}-${e.name}`),
+        guid: guidFor(`${i}-${e.id}-${e.name}`), animMs: e.anim === false ? 0 : cache[e.key].animMs,
       }) + x.slice(end);
+      // visible animated models get a looping "Scene" effect (see injectTiming)
+      if (cache[e.key].animMs && !e.ghost && e.anim !== false)
+        (slides[i]._scenes = slides[i]._scenes || []).push({ spid, ms: cache[e.key].animMs });
     }
     // declare am3d on the slide root and mark it ignorable (as PowerPoint does)
     x = x.replace(/<p:sld ([^>]*)>/, (m, attrs) => {
@@ -151,7 +172,7 @@ async function injectModels(zip, slides, glbDir) {
 }
 
 // ---------- animations ----------
-function timingXml(effects) {
+function timingXml(effects, scenes = []) {
   let id = 4;
   const nid = () => ++id;
   const par = effects.map((e, k) => {
@@ -162,6 +183,15 @@ function timingXml(effects) {
     const ctn = nid();
     const body = set + fade + anim("ppt_x", "#ppt_x", "#ppt_x") + anim("ppt_y", "#ppt_y+0.035", "#ppt_y");
     return `<p:par><p:cTn id="${ctn}" presetID="42" presetClass="entr" presetSubtype="0" fill="hold" grpId="0" nodeType="${k === 0 ? "afterEffect" : "withEffect"}"><p:stCondLst><p:cond delay="${e.delay}"/></p:stCondLst><p:childTnLst>${body}</p:childTnLst></p:cTn></p:par>`;
+  }).join("") + scenes.map((sc, k) => {
+    // 3D "Scene" playback of the embedded animation, repeated until the end of the slide
+    const ctn = nid(), bt = nid();
+    const first = !effects.length && k === 0;
+    return `<p:par><p:cTn id="${ctn}" presetID="100" presetClass="emph" presetSubtype="1" repeatCount="indefinite" fill="hold" nodeType="${first ? "afterEffect" : "withEffect"}">` +
+      `<p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst><p:anim calcmode="lin" valueType="num"><p:cBhvr>` +
+      `<p:cTn id="${bt}" dur="${sc.ms}" fill="hold"/><p:tgtEl><p:spTgt spid="${sc.spid}"/></p:tgtEl><p:attrNameLst><p:attrName>embedded1</p:attrName></p:attrNameLst></p:cBhvr>` +
+      `<p:tavLst><p:tav tm="0"><p:val><p:fltVal val="0"/></p:val></p:tav><p:tav tm="100000"><p:val><p:fltVal val="1"/></p:val></p:tav></p:tavLst></p:anim>` +
+      `</p:childTnLst></p:cTn></p:par>`;
   }).join("");
   const bld = effects.filter((e) => e.sp).map((e) => `<p:bldP spid="${e.spid}" grpId="0" animBg="1"/>`).join("");
   return `<p:timing><p:tnLst><p:par><p:cTn id="1" dur="indefinite" restart="never" nodeType="tmRoot"><p:childTnLst>` +
@@ -188,7 +218,8 @@ async function injectTiming(zip, slides) {
       effects.push({ spid: m[2], sp: m[1] === "nvSpPr", delay: 150 + groups.indexOf(a.ag) * 260, ag: a.ag });
     }
     effects.sort((a, b) => a.delay - b.delay);
-    const tail = (i > 0 ? MORPH : "") + (effects.length ? timingXml(effects) : "");
+    const scenes = slides[i]._scenes || [];
+    const tail = (i > 0 ? MORPH : "") + (effects.length || scenes.length ? timingXml(effects, scenes) : "");
     if (!x.includes("</p:clrMapOvr>")) throw new Error("no clrMapOvr on slide " + (i + 1));
     x = x.replace("</p:clrMapOvr>", "</p:clrMapOvr>" + tail);
     zip.file(f, x);
@@ -211,4 +242,4 @@ async function dedupeMedia(zip) {
   }
 }
 
-module.exports = { injectModels, injectTiming, dedupeMedia, glbBounds };
+module.exports = { injectModels, injectTiming, dedupeMedia, glbBounds, glbAnimMs };

@@ -66,6 +66,10 @@ def load_model(key):
     before = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=os.path.join(GLB, key + ".glb"))
     objs = [o for o in bpy.data.objects if o not in before]
+    for o in objs:  # importer helpers (bone-shape icosphere) must neither render nor count for framing
+        if any(c.name.startswith("glTF_not_exported") for c in o.users_collection):
+            o.hide_render = True
+    objs = [o for o in objs if not o.hide_render]
     meshes = [o for o in objs if o.type == "MESH"]
     bpy.context.view_layer.update()
     mn = Vector((1e9, 1e9, 1e9)); mx = Vector((-1e9, -1e9, -1e9))
@@ -75,6 +79,9 @@ def load_model(key):
             mn = Vector(map(min, mn, w)); mx = Vector(map(max, mx, w))
     center = (mn + mx) / 2
     ext = mx - mn
+    acts = [o.animation_data.action for o in objs if o.animation_data and o.animation_data.action]
+    if acts:  # animated model: raster = first frame of the loop (PowerPoint's poster frame)
+        bpy.context.scene.frame_set(int(acts[0].frame_range[0]))
     maxe = max(ext)
     norm = bpy.data.objects.new("norm", None)
     bpy.context.scene.collection.objects.link(norm)
