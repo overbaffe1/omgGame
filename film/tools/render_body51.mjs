@@ -17,7 +17,10 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { computeTiming, toJs, estimate } from './body51_timing.mjs';
 
-const require = createRequire(import.meta.url);
+// зависимости можно держать вне репозитория: BODY51_DEPS=/путь/к/node_modules
+// (ставится скриптом film/tools/body51_deps.sh)
+const require = createRequire(
+  process.env.BODY51_DEPS ? path.join(process.env.BODY51_DEPS, 'noop.cjs') : import.meta.url);
 const here = path.dirname(fileURLToPath(import.meta.url));
 const film = path.resolve(here, '..');
 const { createCanvas } = require('@napi-rs/canvas');
@@ -26,6 +29,8 @@ const ffmpeg = process.env.FFMPEG_BIN || (() => { try { return require('@ffmpeg-
 const argv = process.argv.slice(2);
 const arg = (name, def) => { const i = argv.indexOf('--' + name); return i < 0 ? def : argv[i + 1]; };
 const FPS = 24, SR = 44100;
+const CRF = String(arg('crf', process.env.BODY51_CRF || 21));
+const FAST = argv.includes('--fast');
 
 // ---------- длительности озвучки ----------
 function mp3Duration(file) {
@@ -78,7 +83,7 @@ function makeFX() {
         sg.globalCompositeOperation = 'copy'; sg.filter = 'contrast(1.9) brightness(.85) saturate(1.3) blur(10px)';
         sg.drawImage(cv, 0, 0, small.width, small.height); sg.filter = 'none';
         g.globalCompositeOperation = 'screen'; g.globalAlpha = O.bloom; g.drawImage(small, 0, 0, W, H);
-        g.globalAlpha = O.bloom * .5; g.filter = 'blur(30px)'; g.drawImage(small, 0, 0, W, H); g.filter = 'none';
+        if (!FAST) { g.globalAlpha = O.bloom * .5; g.filter = 'blur(30px)'; g.drawImage(small, 0, 0, W, H); g.filter = 'none'; }
       }
       if (O.leak > 0) {
         g.globalCompositeOperation = 'screen'; g.globalAlpha = 1;
@@ -199,13 +204,13 @@ const usePng = argv.includes('--png');           // PNG медленнее, но
 const args = usePng
   ? ['-y', '-hide_banner', '-loglevel', 'error',
      '-framerate', String(FPS), '-f', 'image2pipe', '-vcodec', 'png', '-i', 'pipe:0',
-     '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-t', String(t1 - t0),
-     '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p', '-r', String(FPS),
+     '-ss', String(t0), '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-t', String(t1 - t0),
+     '-c:v', 'libx264', '-preset', 'veryfast', '-crf', CRF, '-pix_fmt', 'yuv420p', '-r', String(FPS),
      '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', outMp4]
   : ['-y', '-hide_banner', '-loglevel', 'error',
      '-f', 'rawvideo', '-pix_fmt', 'rgba', '-s', '1080x1920', '-framerate', String(FPS), '-i', 'pipe:0',
-     '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-t', String(t1 - t0),
-     '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p', '-r', String(FPS),
+     '-ss', String(t0), '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-t', String(t1 - t0),
+     '-c:v', 'libx264', '-preset', 'veryfast', '-crf', CRF, '-pix_fmt', 'yuv420p', '-r', String(FPS),
      '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', outMp4];
 const proc = spawn(ffmpeg, args, { stdio: ['pipe', 'ignore', 'inherit'] });
 const frames = Math.floor((t1 - t0) * FPS);

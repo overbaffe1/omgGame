@@ -32,7 +32,7 @@ python3 film/serve.py                                # http://localhost:8080/fil
 | `film/body51-timing.js` | **собранный** хронометраж: длительности глав и текст рассказчика для субтитров |
 | `film/body51-voices/script.json` | сценарий: тексты закадровых реплик и их привязка к главам |
 | `film/body51-voices/n01…n10.mp3` | озвучка рассказчика (по клипу на главу) |
-| `film/body51.mp4` | готовый ролик: 1080×1920, 24 fps, голос + музыка |
+| `film/body51.mp4` | готовый ролик: 1080×1920, 24 fps, 5:11, голос + музыка |
 
 ## Как править
 
@@ -46,15 +46,16 @@ python3 film/serve.py                                # http://localhost:8080/fil
    ```bash
    node film/tools/render_body51.mjs --shots auto          # по кадру из каждой главы → /tmp/body51-shots
    node film/tools/render_body51.mjs --shots 0,60,190      # конкретные секунды
-   node film/tools/render_body51.mjs --range 30:60 --fast  # кусок видео, облегчённый пост-процесс
+   node film/tools/render_body51.mjs --range 30:60 --fast  # кусок видео (и звук) для проверки правки
    ```
 4. Полный рендер:
    ```bash
    DEPS=$(bash film/tools/body51_deps.sh)                  # @napi-rs/canvas + ffmpeg-static в /tmp/body51-deps
-   BODY51_DEPS=$DEPS node film/tools/render_body51.mjs     # → film/body51.mp4 (~10–15 минут)
+   BODY51_DEPS=$DEPS node film/tools/render_body51.mjs     # → film/body51.mp4 (~15–20 минут)
    ```
    Полезные переменные: `BODY51_OUT` (куда писать MP4), `BODY51_AUDIO` (готовый WAV вместо сборки),
-   `FFMPEG_BIN`, `--crf 25` (по умолчанию 25), `--fast` (без второй проходки bloom).
+   `FFMPEG_BIN`, `--crf 21` (по умолчанию 21; больше значение — меньше файл), `--fast` (без второй проходки bloom),
+   `--no-voice` (примерка кадров без озвучки — длительности считаются по скорости речи).
    Длительность видео и звука берётся из `body51-timing.js`, поэтому картинка и музыка всегда синхронны.
 
 ## Правила монтажа (важные)
