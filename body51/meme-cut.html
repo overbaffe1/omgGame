@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Бумажный монтаж тёплого мем-видео по стримам body51 — подборка проверяемых исходных моментов.">
+<title>Бумажный монтаж — body51</title>
+<style>
+  :root{
+    color-scheme:dark;--bg:#0b0d12;--panel:#11151d;--panel2:#171d27;--line:#ffffff15;
+    --ink:#f1efe9;--muted:#9ca4ae;--amber:#ffc36c;--mint:#a4efc0;--red:#ff8585;
+    --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
+    --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{background:var(--bg);scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(ellipse at 15% 0%,#202437 0,transparent 38%),var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}
+  a{color:inherit}
+  .wrap{max-width:1480px;margin:auto;padding:28px clamp(14px,3vw,42px) 48px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:26px}
+  .brand{display:flex;align-items:center;gap:12px;color:var(--muted);font:12px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+  .brand-mark{width:30px;height:30px;border:1px solid #ffc36c66;border-radius:9px;display:grid;place-items:center;color:var(--amber);font-size:16px;background:#ffc36c0a}
+  .top a{color:var(--muted);font-size:13px;text-decoration:none;border-bottom:1px solid #ffffff28;padding-bottom:3px}
+  .hero{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:26px}
+  .eyebrow{color:var(--amber);font:12px var(--mono);letter-spacing:.16em;text-transform:uppercase;margin:0 0 10px}
+  h1{font-size:clamp(28px,4vw,54px);line-height:.98;letter-spacing:-.045em;margin:0;max-width:840px}
+  .lede{color:#c2c7cf;font-size:15px;line-height:1.55;max-width:630px;margin:14px 0 0}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+  .badge{border:1px solid var(--line);background:#ffffff06;color:#c9ced5;border-radius:99px;padding:8px 11px;font:11px var(--mono);white-space:nowrap}
+  .badge.warn{border-color:#ffc36c45;color:var(--amber);background:#ffc36c0a}
+  .notice{display:flex;align-items:flex-start;gap:12px;border:1px solid #ffc36c35;background:#ffc36c0b;border-radius:13px;padding:13px 15px;margin-bottom:20px;color:#e8d8bb;font-size:13px;line-height:1.5}
+  .notice b{color:var(--amber);font-family:var(--mono);font-weight:600;white-space:nowrap}
+  .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.8fr);gap:20px;align-items:start}
+  .card{background:linear-gradient(160deg,#141923,#10131a);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px #0003}
+  .player-head{padding:15px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+  .scene-tag{font:11px var(--mono);color:var(--amber);letter-spacing:.1em;text-transform:uppercase}
+  .time{font:12px var(--mono);color:#aeb6bf}
+  .screen{position:relative;background:#080a0e;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden}
+  .screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;background:radial-gradient(circle at 50% 45%,#28232a,#090b10 65%)}
+  .empty .glyph{font:clamp(36px,6vw,72px) var(--mono);color:#ffc36c;padding:12px 22px;border:1px solid #ffc36c44;border-radius:20px;box-shadow:0 0 70px #ffc36c12;margin-bottom:16px}
+  .empty b{font-size:clamp(15px,2vw,22px);max-width:440px;line-height:1.2}
+  .empty small{font:11px var(--mono);color:var(--muted);margin-top:9px}
+  .scene-info{padding:18px 20px 20px}
+  .scene-title{font-size:20px;margin:0 0 8px;letter-spacing:-.02em}
+  .scene-copy{font-size:13px;color:#b5bdc7;line-height:1.55;margin:0 0 13px;max-width:760px}
+  .quote-list{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 18px}
+  .quote-chip{border:1px solid #a4efc033;background:#a4efc00b;color:#c7f4d6;border-radius:9px;padding:7px 9px;font-size:13px;line-height:1.25}
+  .scene-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #ffc36c55;background:#ffc36c;color:#19140e;text-decoration:none;border-radius:10px;padding:10px 13px;font-weight:750;font-size:12px;transition:transform .16s,filter .16s}
+  .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+  .btn.ghost{background:#ffffff08;color:#e8eaf0;border-color:var(--line);font-weight:550}
+  .side-head{padding:17px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .side-head h2{font-size:15px;margin:0}
+  .side-head span{font:10px var(--mono);color:var(--muted)}
+  .clip-list{padding:8px;display:grid;gap:5px;max-height:600px;overflow:auto}
+  .clip{width:100%;text-align:left;cursor:pointer;display:grid;grid-template-columns:38px 1fr auto;gap:11px;align-items:center;background:transparent;border:1px solid transparent;border-radius:12px;padding:11px 10px;color:var(--ink);transition:.16s}
+  .clip:hover{background:#ffffff08;border-color:#ffffff12}
+  .clip.on{background:#ffc36c0d;border-color:#ffc36c42}
+  .clip-num{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#ffffff08;color:var(--amber);font:12px var(--mono)}
+  .clip.on .clip-num{background:#ffc36c;color:#1b160f}
+  .clip-text b{display:block;font-size:13px;font-weight:650;line-height:1.25}
+  .clip-text small{display:block;color:var(--muted);font:10px var(--mono);margin-top:5px}
+  .clip-dur{color:#9da6b0;font:10px var(--mono);white-space:nowrap}
+  .side-foot{border-top:1px solid var(--line);padding:13px 16px;color:var(--muted);font-size:11px;line-height:1.5}
+  .side-foot strong{color:#d9dedf}
+  .lower{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+  .note{border:1px solid var(--line);background:#ffffff04;border-radius:14px;padding:15px 17px}
+  .note h3{font:12px var(--mono);color:var(--amber);letter-spacing:.08em;text-transform:uppercase;margin:0 0 9px}
+  .note p,.note li{font-size:12px;color:#adb5c0;line-height:1.55}
+  .note p{margin:0}.note ul{margin:0;padding-left:18px}
+  .foot{color:#727b86;font:10px var(--mono);margin-top:22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  @media(max-width:900px){.hero{display:block}.badges{justify-content:flex-start;margin-top:15px}.grid{grid-template-columns:1fr}.clip-list{max-height:360px}}
+  @media(max-width:580px){.wrap{padding:16px 12px 30px}.top{margin-bottom:20px}.brand{font-size:10px}.notice{font-size:11px}.notice b{white-space:normal}.lower{grid-template-columns:1fr}.player-head{padding:12px 13px}.scene-info{padding:14px}.scene-title{font-size:17px}.scene-copy{font-size:12px}.clip{padding:9px 8px}.clip-list{max-height:330px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="brand-mark">✳</span><span>body51 · бумажный монтаж · v1</span></div>
+    <a href="meme-video-cut.md">Открыть полный монтажный лист ↗</a>
+  </header>
+
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Черновой просмотр · цель ~02:20</p>
+      <h1>Нейронка, чат<br>и следующий баг</h1>
+      <p class="lede">Тёплая история из настоящих стримов: от «приветики» и неудачного ответа нейросети — к квадратному мечу, новому уровню ошибки и маленькой победе.</p>
+    </div>
+    <div class="badges"><span class="badge">9:16 · 1080×1920</span><span class="badge">оригинальный звук</span><span class="badge warn">не финальный MP4</span></div>
+  </section>
+
+  <div class="notice"><b>Ориентиры, не точные In/Out</b><span>В транскриптах нет синхронизированных таймкодов. Ссылка открывает приблизительное место в исходном стриме (возможна погрешность ±1–3 минуты); точную реплику нужно найти и подрезать вручную. Если YouTube-плеер недоступен, используй кнопку исходника.</span></div>
+
+  <main class="grid">
+    <section class="card" aria-label="Просмотр исходного фрагмента">
+      <div class="player-head"><span class="scene-tag" id="sceneTag">Сцена 01 / 07</span><span class="time" id="sceneTime">00:00–00:07</span></div>
+      <div class="screen" id="screen">
+        <div class="empty" id="empty"><span class="glyph">▶</span><b>Выбери сцену и открой исходный фрагмент</b><small>Плеер не запускается автоматически</small></div>
+      </div>
+      <div class="scene-info">
+        <h2 class="scene-title" id="sceneTitle">Приветствие</h2>
+        <p class="scene-copy" id="sceneCopy">Начать с живого приветствия, затем быстро перейти к редакторской заставке.</p>
+        <div class="quote-list" id="quoteList" aria-label="Точные поисковые реплики"></div>
+        <div class="scene-actions">
+          <button class="btn" id="loadBtn" type="button">▶ Загрузить источник</button>
+          <a class="btn ghost" id="sourceBtn" href="https://youtu.be/GOs8921_Zvs?t=15" target="_blank" rel="noopener noreferrer">Открыть на YouTube ↗</a>
+          <span class="time" id="sourceTime">#022 · ≈00:15</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card" aria-label="Список монтажных сцен">
+      <div class="side-head"><h2>Кандидаты в монтаж</h2><span id="clipCount">7 сцен</span></div>
+      <div class="clip-list" id="clipList"></div>
+      <div class="side-foot"><strong>Как проверять:</strong> выбери сцену, открой источник, найди подсвеченную реплику по тексту и отметь точные границы. Ссылки пока ведут к приблизительному месту.</div>
+    </aside>
+  </main>
+
+  <section class="lower">
+    <div class="note"><h3>Тон</h3><p>Шутка направлена на хаос разработки и промахи инструментов, не на личность автора. Сохранять исходные реакции и смех; не растягивать лицо, не подменять контекст, не добавлять голос-клон.</p></div>
+    <div class="note"><h3>Осознанные исключения</h3><p>В этой версии нет счётчика дохода, долгов, здоровья, семьи, отношений или чат-подколов про работу. В #010 брать только короткий технический гэг с панелью и Codex, не соседний личный разговор.</p></div>
+  </section>
+  <footer class="foot"><span>Сценарий: body51/meme-video-cut.md</span><span>Источники: оригинальные YouTube-стримы · цитаты сверены с локальными транскриптами</span></footer>
+</div>
+<script>
+const CUT = [
+  {
+    id:'hello', seq:'01', time:'00:00–00:07', title:'Приветствие', short:'Всем приветики', stream:'#022', video:'GOs8921_Zvs', start:15, startLabel:'≈00:15', duration:'7 сек',
+    quotes:['Всем приветики'],
+    copy:'Начать с живого приветствия, затем быстро перейти к редакторской заставке. Оставить оригинальный звук и короткую паузу.'
+  },
+  {
+    id:'inbox', seq:'02', time:'00:14–00:39', title:'Одна кнопка против десяти окон', short:'Codex не отвечает', stream:'#010', video:'njvBE0T6yIA', start:302, startLabel:'≈05:02', duration:'25 сек',
+    quotes:['И что? И что? И что? И нихуя','кодекс, ты что там спишь?'],
+    copy:'Только короткий технический фрагмент: панель, кнопка подготовки ответа и реакция на пустой результат. Перед экспортом внимательно обрезать соседний личный контекст.'
+  },
+  {
+    id:'sword', seq:'03', time:'00:39–00:55', title:'Меч опять квадратный', short:'ещё и квадратный', stream:'#061', video:'iaO_WS83PQk', start:19061, startLabel:'≈05:18:00', duration:'16 сек',
+    quotes:['ещё и квадратный'],
+    copy:'Нейро-ассет проваливает проверку формы. Добавить маленькую графическую подпись меча, но оставить реакцию автора естественной.'
+  },
+  {
+    id:'confusion', seq:'04', time:'00:55–01:08', title:'Проверка понятности', short:'Ничего непонятно', stream:'#012', video:'XG52JbNfuPc', start:14841, startLabel:'≈04:07:21', duration:'13 сек',
+    quotes:['Ничего непонятно','Что нихуя непонятно'],
+    copy:'Оставить исходную игровую ситуацию вокруг реплики, чтобы фраза была реакцией на увиденное, а не насмешкой над автором.'
+  },
+  {
+    id:'bugs', seq:'05', time:'01:08–01:34', title:'Новый уровень ошибки', short:'Я исправляю — иду дальше', stream:'#200', video:'BDMpVFVd1Io', start:5548, startLabel:'≈01:32:28', duration:'26 сек',
+    quotes:['гарантированно исправляю','я перехожу на новый уровень'],
+    copy:'Самоироничный баг-цикл. Карточки ошибок наращиваются, а затем превращаются в индикатор следующего уровня.'
+  },
+  {
+    id:'win', seq:'06', time:'01:34–01:47', title:'Маленькая победа', short:'Всё, можно релизить', stream:'#090', video:'WGsKMG9ZUbo', start:11158, startLabel:'≈03:05:58', duration:'13 сек',
+    quotes:['Всё, можно релизить.'],
+    copy:'Это реальный момент радости от получившейся текстуры. Снять иронию: дать реакции прозвучать чисто и сделать цвет/музыку теплее.'
+  },
+  {
+    id:'finish', seq:'07', time:'01:47–02:11', title:'Довести до релиза', short:'Делай, делай, делай', stream:'#200', video:'BDMpVFVd1Io', start:3048, startLabel:'≈00:50:48', duration:'24 сек',
+    quotes:['Делай, делай, делай, делай','Главное доделывать','доводить до релиза'],
+    copy:'Финальный совет оставить без мемных перебивок. После него — спокойный титр и короткий музыкальный хвост.'
+  }
+];
+const list=document.getElementById('clipList');
+const screen=document.getElementById('screen');
+let active=0;
+function selectClip(index, load=false){
+  active=(index+CUT.length)%CUT.length;
+  const c=CUT[active];
+  document.querySelectorAll('.clip').forEach((el,i)=>el.classList.toggle('on',i===active));
+  document.getElementById('sceneTag').textContent=`Сцена ${c.seq} / ${String(CUT.length).padStart(2,'0')}`;
+  document.getElementById('sceneTime').textContent=c.time;
+  document.getElementById('sceneTitle').textContent=c.title;
+  document.getElementById('sceneCopy').textContent=c.copy;
+  document.getElementById('sourceTime').textContent=`${c.stream} · ${c.startLabel}`;
+  document.getElementById('sourceBtn').href=`https://youtu.be/${c.video}?t=${c.start}`;
+  const q=document.getElementById('quoteList');q.replaceChildren();
+  c.quotes.forEach(text=>{const span=document.createElement('span');span.className='quote-chip';span.textContent=text;q.appendChild(span)});
+  if(load) loadSource(c);
+}
+function loadSource(c=CUT[active]){
+  const old=screen.querySelector('iframe'); if(old)old.remove();
+  const empty=document.getElementById('empty'); if(empty)empty.remove();
+  const iframe=document.createElement('iframe');
+  iframe.title=`Исходный стрим ${c.stream}, приблизительно от ${c.startLabel}`;
+  iframe.loading='lazy';
+  iframe.referrerPolicy='strict-origin-when-cross-origin';
+  iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  iframe.allowFullscreen=true;
+  iframe.src=`https://www.youtube-nocookie.com/embed/${c.video}?start=${c.start}&rel=0&modestbranding=1&playsinline=1`;
+  screen.appendChild(iframe);
+}
+CUT.forEach((c,i)=>{
+  const button=document.createElement('button');button.type='button';button.className='clip';
+  button.innerHTML=`<span class="clip-num">${c.seq}</span><span class="clip-text"><b></b><small></small></span><span class="clip-dur"></span>`;
+  button.querySelector('b').textContent=c.title;
+  button.querySelector('small').textContent=`${c.stream} · ${c.startLabel}`;
+  button.querySelector('.clip-dur').textContent=c.duration;
+  button.addEventListener('click',()=>selectClip(i,true));
+  list.appendChild(button);
+});
+document.getElementById('clipCount').textContent=`${CUT.length} сцен`;
+document.getElementById('loadBtn').addEventListener('click',()=>loadSource());
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();selectClip(active+1,true)}
+  if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();selectClip(active-1,true)}
+});
+selectClip(0,false);
+</script>
+</body>
+</html>
