@@ -17,6 +17,8 @@ class Slide {
   rect(o) { this.els.push({ t: "rect", ...o }); return this; }
   line(o) { this.els.push({ t: "line", ...o }); return this; }
   poly(points, o) { this.els.push({ t: "poly", points, ...o }); return this; }
+  // native PowerPoint 3D model (square frame of side o.s); raster/glb are attached at build time
+  model(key, o) { const e = { t: "model", key, rot: [0, 0, 0], ...o }; this.els.push(e); return e; }
   text(runs, o) {
     if (typeof runs === "string") runs = [{ text: runs }];
     this.els.push({ t: "text", runs, ...o });
@@ -43,13 +45,22 @@ function runOpts(r, o) {
 }
 
 function toPptx(pres, slides) {
-  slides.forEach((s) => {
+  slides.forEach((s, si) => {
     const ps = pres.addSlide();
     ps.background = { color: "080D1A" };
+    s._anims = [];
+    let k = 0;
     for (const e of s.els) {
       const base = { x: e.x, y: e.y, w: e.w, h: e.h };
       if (e.name) base.objectName = e.name;
-      if (e.t === "img") {
+      if (e.ag !== undefined) {
+        // entrance-animated element: give it a unique, findable name
+        base.objectName = e.name || `fx${si + 1}_${e.ag}_${k++}`;
+        s._anims.push({ name: base.objectName, ag: e.ag, fx: e.fx || "up" });
+      }
+      if (e.t === "model") {
+        ps.addImage({ path: e.raster, x: e.x, y: e.y, w: e.s, h: e.s, objectName: `MODEL::${e.id}::${e.name}` });
+      } else if (e.t === "img") {
         ps.addImage({ path: e.src, ...base, transparency: e.transparency, rounding: e.rounding });
       } else if (e.t === "rect") {
         const shape = e.shape === "ellipse" ? pres.ShapeType.ellipse
@@ -69,7 +80,7 @@ function toPptx(pres, slides) {
           w: Math.max(Math.abs(e.x2 - e.x1), 0.0001), h: Math.max(Math.abs(e.y2 - e.y1), 0.0001),
           flipV: (e.y2 < e.y1) !== (e.x2 < e.x1) && e.x1 !== e.x2 && e.y1 !== e.y2,
           line: { color: e.color, width: e.width || 1, transparency: e.lineT || 0, dashType: e.dash },
-          objectName: e.name,
+          objectName: base.objectName,
         });
       } else if (e.t === "poly") {
         const xs = e.points.map((p) => p[0]), ys = e.points.map((p) => p[1]);
@@ -80,7 +91,7 @@ function toPptx(pres, slides) {
           points: e.points.map((p, i) => ({ x: p[0] - x0, y: p[1] - y0, ...(i === 0 ? { moveTo: true } : {}) })),
           line: { color: e.color, width: e.width || 2, dashType: e.dash, transparency: e.lineT || 0 },
           fill: { type: "none" },
-          objectName: e.name,
+          objectName: base.objectName,
         });
       } else if (e.t === "text") {
         const runs = e.runs.map((r) => ({ text: r.text, options: runOpts(r, e) }));
@@ -152,6 +163,10 @@ function toHtml(slides, assetsDir, fontsDir) {
   }
   return slides.map((s) => {
     const parts = s.els.map((e) => {
+      if (e.t === "model") {
+        if (e.ghost) return "";
+        return `<img src="file://${path.resolve(e.raster)}" style="position:absolute;left:${e.x * PX}px;top:${e.y * PX}px;width:${e.s * PX}px;height:${e.s * PX}px">`;
+      }
       if (e.t === "img") {
         const r = e.rounding ? "border-radius:50%;" : "";
         return `<img src="file://${path.resolve(e.src)}" style="position:absolute;left:${e.x * PX}px;top:${e.y * PX}px;width:${e.w * PX}px;height:${e.h * PX}px;object-fit:fill;opacity:${1 - (e.transparency || 0) / 100};${r}">`;
