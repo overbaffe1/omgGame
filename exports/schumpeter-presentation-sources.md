@@ -1,35 +1,30 @@
-# Источники к обновлённой презентации о Йозефе Шумпетере
+# Источники к 3D-презентации о Йозефе Шумпетере
 
-## Биография и карьера
+## Биография: рождение, семья, образование, карьера
 
-- Oxford Learning Link, происхождение, образование, государственная и академическая карьера: [Joseph Schumpeter (1883–1950)](https://learninglink.oup.com/access/content/ferdinand-student-resources/ferdinand-key-thinkers-schumpeter).
-- EBSCO Research Starters, основные даты и этапы жизни: [Joseph Schumpeter](https://www.ebsco.com/research-starters/history/joseph-schumpeter/).
-- *Encyclopaedia Britannica*, место рождения, Гарвард, основные работы и дата смерти: [Joseph Schumpeter](https://kids.britannica.com/students/article/Joseph-Schumpeter/313438).
+- EBSCO Research Starters — [Joseph Schumpeter](https://www.ebsco.com/research-starters/history/joseph-schumpeter/): родился 8 февраля 1883 года в Triesch (Тршешть), Моравия; отец — владелец текстильной фабрики, умер, когда сыну было 4 года; Терезианум; доктор права в 1906; Каир (1907); первая книга (1908); Черновцы (1909); Грац (1911); министр финансов (1919); Biedermann Bank (1921–1924); Бонн (1925); президент Эконометрического общества и AEA (1948); умер 8 января 1950 года.
+- Encyclopedia.com — [Schumpeter, Joseph Alois](https://www.encyclopedia.com/people/social-sciences-and-law/economics-biographies/joseph-alois-schumpeter): единственный сын суконного фабриканта; отчим — высокопоставленный офицер; семинары Бём-Баверка и Визера; около семи месяцев в должности министра финансов в 1919 году.
+- Encyclopedia.com (IESS) — [Schumpeter, Joseph A.](https://www.encyclopedia.com/social-sciences/applied-and-social-sciences-magazines/schumpeter-joseph): приглашённый профессор Колумбийского университета; Гарвард с 1932 года.
+- HET Website (The New School) — [J. A. Schumpeter profile](https://www.hetwebsite.net/het/profiles/schumpeter.htm): отец умер в 1887; переезд в Грац, затем в Вену (1893), отчим Зигмунд фон Келер; Лондон и LSE; «Теория экономического развития» (1911).
+- Essential Scholars — [Who Is Joseph Schumpeter?](https://www.essentialscholars.org/sites/default/files/2022-12/essential-joseph-schumpeter-ch1.pdf): Тршешть примерно в 120 км от Праги; крах Biedermann Bank и долги; в 1926 году умерли мать, жена и ребёнок.
+- Prospect Magazine — [Joseph Schumpeter](https://www.prospectmagazine.co.uk/essays/52137/joseph-schumpeter): смерть жены Анни в августе 1926 года.
+- Kiddle (по Wikipedia) — [Joseph Schumpeter facts](https://kids.kiddle.co/Joseph_Schumpeter): гражданство США с 1939 года.
+- Книги: Swedberg R. *Joseph A. Schumpeter: His Life and Work* (1991); McCraw T. *Prophet of Innovation: Joseph Schumpeter and Creative Destruction* (2007). Там же рассказана «легенда о трёх мечтах»; на слайде она прямо помечена как легенда.
 
-## Временная линия идей
+## Идеи и труды
 
-Древние авторы на слайде обозначены как **предыстория хозяйственной мысли**, а не как создатели современной теории предпринимательской функции.
+- *Theorie der wirtschaftlichen Entwicklung* (1911; на титуле 1912 год; англ. пер. 1934), гл. II: новые комбинации (пять видов), предприниматель как тот, кто их осуществляет, три мотива, кредит банка (банкир — «эфор» обменной экономики), предпринимательская прибыль, сравнение почтовых карет и железной дороги. [Выдержки](https://www.panarchy.org/schumpeter/development.html).
+- *Business Cycles* (1939): трёхцикличная схема Китчина, Жюгляра и Кондратьева; длинные волны 1787–1842, 1843–1897 и с 1898 года.
+- *Capitalism, Socialism and Democracy* (1942), гл. VII: «созидательное разрушение — основной факт капитализма».
+- *History of Economic Analysis* (1954, издана посмертно).
 
-- Ксенофонт, *Oeconomicus*: [Project Gutenberg](https://www.gutenberg.org/files/1173/1173-h/1173-h.htm).
-- Платон, *Republic*: [MIT Internet Classics Archive](https://classics.mit.edu/Plato/republic.html).
-- Аристотель, *Politics*: [ToposText / Perseus translation](https://topostext.org/work/100).
-- Кантильон, *Essai sur la nature du commerce en général* (1755): [английское издание и историческое введение](https://competitionandappropriation.econ.ucla.edu/wp-content/uploads/sites/95/2017/08/Essai-sur-la-Nature-du-Commerce.pdf).
-- Сэй, *Traité d’économie politique* (1803): [Econlib](https://www.econlib.org/library/Say/sayT.html).
-- Найт, *Risk, Uncertainty and Profit* (1921): [Online Library of Liberty](https://oll.libertyfund.org/titles/knight-risk-uncertainty-and-profit).
+## Наследие
 
-## Шумпетер и теория предпринимательской функции
+- Freeman C., Perez C. — неошумпетерианское продолжение теории длинных волн (IV и V волны на слайде 12 — их схема, а не схема Шумпетера).
+- International Joseph A. Schumpeter Society, основано в 1986 году.
+- Названия «Schumpeter Mark I / Mark II» ввели позднейшие исследователи; на слайде это оговорено.
 
-- Schumpeter, J. A. *The Theory of Economic Development*, глава II — предприниматель осуществляет «новые комбинации»: [первичный текст / выдержки](https://www.panarchy.org/schumpeter/development.html).
-- Первое немецкое издание *Theorie der wirtschaftlichen Entwicklung* датируют 1911 или 1912 годом: в предисловии к английскому изданию Шумпетер пишет, что книга вышла осенью 1911-го ([текст предисловия](https://cruel.org/books/hy/shortschumpeter/SchumpeterTheoryofEconDev.html)); рецензия 1913 года в *The Economic Journal* описывает её как издание 1912 года ([Oxford Academic](https://academic.oup.com/ej/article-abstract/23/89/105/5292043)). В презентации «1911/12» — альтернативная датировка одной работы, не две публикации.
-- Schumpeter, J. A. *Capitalism, Socialism and Democracy* (1942), глава VII — созидательное разрушение; краткий обзор: [Oxford Learning Link](https://learninglink.oup.com/access/content/ferdinand-student-resources/ferdinand-key-thinkers-schumpeter).
+## Изображения
 
-## Ранние институты и позднейшее поле исследований
-
-- Майлз Мейс ввёл в HBS курс *The Management of New Enterprises* в 1947 году: [Harvard Gazette](https://news.harvard.edu/gazette/story/2000/04/myles-mace-expert-on-entrepreneurship-dies-at-88/).
-- Research Center in Entrepreneurial History при Гарварде учреждён в 1948 году: [Harvard Business School Alumni](https://www.alumni.hbs.edu/stories/Pages/story-bulletin.aspx?num=6177).
-- Журнал *Explorations in Entrepreneurial History* начал выходить в 1949 году: [Carlsson et al., “The Evolving Domain of Entrepreneurship Research” (2013)](https://link.springer.com/article/10.1007/s11187-013-9503-y). На слайде указана институциональная хронология; авторство журнала не приписывается отдельному человеку.
-- Ранние исследования технологических предприятий в MIT: [MIT Technology Review](https://www.technologyreview.com/2021/08/24/1030406/jump-starting-mits-startup-culture/); симпозиум Purdue (1970) и материалы (1972): [ERIC](https://files.eric.ed.gov/fulltext/ED079483.pdf).
-- Teece (1986), *Profiting from Technological Innovation*: [DOI](https://doi.org/10.1016/0048-7333(86)90027-2); Bailetti (2012), *Technology Entrepreneurship*: [TIM Review](https://timreview.ca/article/520); Nambisan (2017), *Digital Entrepreneurship*: [DOI](https://doi.org/10.1111/etap.12254).
-- Подробная международная и российская хронология с оговорками по ролям авторов: [timeline-predprinimatelstvo.md](../timeline-predprinimatelstvo.md) и [источники к широкой линии](predprinimatelstvo-timeline-sources.md).
-
-**Оговорки:** Шумпетер сформулировал общую теорию предпринимательской функции и экономического развития, а не пошаговое руководство для современного стартапа. Связь с технологическим предпринимательством — применение его рамки; более поздние концепции ему не приписываются. Бюст и диорамы в презентации — художественные 3D-визуализации, не архивные фотографии.
+- 3D-иллюстрации (бюст, диорамы, книги, схемы) созданы нейросетью. Это художественные визуализации, а не архивные материалы.
+- Портрет около 1910 года — [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Joseph_Schumpeter_c1910.png), общественное достояние.
