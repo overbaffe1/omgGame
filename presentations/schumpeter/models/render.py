@@ -26,6 +26,7 @@ def setup_scene(px, samples):
     sc.cycles.max_bounces = 8
     sc.cycles.transparent_max_bounces = 16
     sc.render.film_transparent = True
+    sc.cycles.film_transparent_glass = True
     sc.render.resolution_x = sc.render.resolution_y = px
     sc.render.image_settings.file_format = "PNG"
     sc.render.image_settings.color_mode = "RGBA"
@@ -131,11 +132,12 @@ def render_jobs(jobs, samples=64):
 if __name__ == "__main__":
     args = sys.argv[1:]
     if args and args[0] == "--sheet":
-        os.makedirs(os.path.join(HERE, "_look"), exist_ok=True)
+        LOOK = os.environ.get("LOOK_DIR") or os.path.join(HERE, "_look")
+        os.makedirs(LOOK, exist_ok=True)
         jobs = []
         for k in args[1:]:
             for i, rot in enumerate([(12, -30, 0), (8, 40, 0)]):
-                jobs.append({"key": k, "rot": rot, "px": 420, "out": os.path.join(HERE, "_look", f"{k}-{i}.png")})
+                jobs.append({"key": k, "rot": rot, "px": 420, "out": os.path.join(LOOK, f"{k}-{i}.png")})
         render_jobs(jobs, samples=24)
     else:
         render_jobs(json.load(open(args[0])), samples=int(os.environ.get("SAMPLES", "64")))

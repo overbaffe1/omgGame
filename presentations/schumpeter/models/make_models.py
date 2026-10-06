@@ -21,42 +21,55 @@ def reset():
 
 
 _mats = {}
-# name: (base rgb, metallic, roughness, extra) — other decks extend this dict
-PALETTE = {
-    # name: (base rgb, metallic, roughness, extra)
-    "brass":    ((0.80, 0.56, 0.26), 0.85, 0.30, {}),
-    "brass_d":  ((0.50, 0.32, 0.14), 0.85, 0.38, {}),
-    "gold":     ((1.00, 0.74, 0.32), 1.00, 0.22, {}),
-    "steel":    ((0.62, 0.64, 0.68), 1.00, 0.16, {}),
-    "chrome":   ((0.85, 0.86, 0.88), 1.00, 0.06, {}),
-    "black":    ((0.018, 0.020, 0.026), 0.20, 0.22, {"coat": 0.8}),
-    "satin":    ((0.006, 0.006, 0.008), 0.05, 0.30, {"coat": 0.3}),
-    "ivory":    ((0.72, 0.64, 0.50), 0.00, 0.38, {"coat": 0.4}),
-    "paper":    ((0.70, 0.64, 0.52), 0.00, 0.80, {}),
-    "navy":     ((0.012, 0.025, 0.075), 0.05, 0.45, {}),
-    "oxblood":  ((0.180, 0.016, 0.016), 0.05, 0.42, {}),
-    "green":    ((0.012, 0.070, 0.045), 0.05, 0.45, {}),
-    "brown":    ((0.090, 0.036, 0.016), 0.05, 0.45, {}),
-    "walnut":   ((0.110, 0.050, 0.022), 0.00, 0.40, {"coat": 0.5}),
-    "teal":     ((0.015, 0.160, 0.200), 0.30, 0.30, {}),
-    "red":      ((0.300, 0.025, 0.020), 0.20, 0.32, {"coat": 0.6}),
-    "thread":   ((0.190, 0.010, 0.010), 0.00, 0.55, {}),
-    "sand":     ((0.700, 0.460, 0.200), 0.00, 0.90, {}),
-    "glass":    ((0.880, 0.930, 1.000), 0.00, 0.02, {"alpha": 0.12}),
-    "glow":     ((1.000, 0.620, 0.260), 0.00, 0.50, {"emit": (1.0, 0.55, 0.18), "es": 6.0}),
-    "cyan":     ((0.380, 0.830, 0.940), 0.00, 0.30, {"emit": (0.38, 0.83, 0.94), "es": 3.0}),
-    "window":   ((1.000, 0.700, 0.350), 0.00, 0.30, {"emit": (1.0, 0.62, 0.28), "es": 2.5}),
-    "rubber":   ((0.030, 0.030, 0.030), 0.00, 0.80, {}),
-}
-
-
 
 
 def M(name):
     """Shared material palette — one coherent 'brass / ivory / navy' language."""
     if name in _mats and _mats[name].name in bpy.data.materials:
         return _mats[name]
-    P = PALETTE
+    P = {
+        # name: (base rgb, metallic, roughness, extra)
+        "brass":    ((0.80, 0.56, 0.26), 0.85, 0.30, {}),
+        "brass_d":  ((0.50, 0.32, 0.14), 0.85, 0.38, {}),
+        "gold":     ((1.00, 0.74, 0.32), 1.00, 0.22, {}),
+        "steel":    ((0.62, 0.64, 0.68), 1.00, 0.16, {}),
+        "chrome":   ((0.85, 0.86, 0.88), 1.00, 0.06, {}),
+        "black":    ((0.018, 0.020, 0.026), 0.20, 0.22, {"coat": 0.8}),
+        "satin":    ((0.006, 0.006, 0.008), 0.05, 0.30, {"coat": 0.3}),
+        "ivory":    ((0.72, 0.64, 0.50), 0.00, 0.38, {"coat": 0.4}),
+        "paper":    ((0.70, 0.64, 0.52), 0.00, 0.80, {}),
+        "navy":     ((0.012, 0.025, 0.075), 0.05, 0.45, {}),
+        "oxblood":  ((0.180, 0.016, 0.016), 0.05, 0.42, {}),
+        "green":    ((0.012, 0.070, 0.045), 0.05, 0.45, {}),
+        "brown":    ((0.090, 0.036, 0.016), 0.05, 0.45, {}),
+        "walnut":   ((0.110, 0.050, 0.022), 0.00, 0.40, {"coat": 0.5}),
+        "teal":     ((0.015, 0.160, 0.200), 0.30, 0.30, {}),
+        "red":      ((0.300, 0.025, 0.020), 0.20, 0.32, {"coat": 0.6}),
+        "thread":   ((0.190, 0.010, 0.010), 0.00, 0.55, {}),
+        "sand":     ((0.700, 0.460, 0.200), 0.00, 0.90, {}),
+        "glass":    ((0.880, 0.930, 1.000), 0.00, 0.02, {"alpha": 0.12}),
+        "glow":     ((1.000, 0.620, 0.260), 0.00, 0.50, {"emit": (1.0, 0.55, 0.18), "es": 6.0}),
+        "cyan":     ((0.380, 0.830, 0.940), 0.00, 0.30, {"emit": (0.38, 0.83, 0.94), "es": 3.0}),
+        "window":   ((1.000, 0.700, 0.350), 0.00, 0.30, {"emit": (1.0, 0.62, 0.28), "es": 2.5}),
+        "rubber":   ((0.030, 0.030, 0.030), 0.00, 0.80, {}),
+        # used by the Cantillon deck
+        "canvas":   ((0.760, 0.700, 0.580), 0.00, 0.85, {"sheen": 0.3}),
+        "wax":      ((0.800, 0.740, 0.610), 0.00, 0.42, {"coat": 0.3}),
+        "flame":    ((1.000, 0.780, 0.400), 0.00, 0.50, {"emit": (1.0, 0.62, 0.22), "es": 14.0}),
+        "crust":    ((0.250, 0.090, 0.020), 0.00, 0.55, {}),
+        "flour":    ((0.780, 0.700, 0.560), 0.00, 0.90, {}),
+        "water":    ((0.006, 0.030, 0.045), 0.00, 0.04, {"coat": 1.0}),
+        "iron":     ((0.070, 0.068, 0.070), 0.90, 0.42, {}),
+        "ember":    ((0.880, 0.420, 0.300), 0.00, 0.40, {"emit": (0.95, 0.42, 0.26), "es": 2.5}),
+        "wine":     ((0.190, 0.012, 0.030), 0.05, 0.35, {"coat": 0.6}),
+        "leather":  ((0.120, 0.040, 0.020), 0.00, 0.55, {"coat": 0.2}),
+        "feather":  ((0.860, 0.830, 0.770), 0.00, 0.55, {"sheen": 0.6}),
+        "ink":      ((0.004, 0.004, 0.010), 0.00, 0.08, {"coat": 1.0}),
+        "copper":   ((0.700, 0.300, 0.150), 0.95, 0.35, {}),
+        "stone":    ((0.300, 0.270, 0.240), 0.00, 0.75, {}),
+        "gold_satin": ((1.00, 0.72, 0.30), 1.00, 0.46, {}),
+        "bubble":   ((0.950, 0.970, 1.000), 0.00, 0.00, {"alpha": 0.7, "film": 380, "trans": 1.0}),
+    }
     col, met, rough, ex = P[name]
     m = bpy.data.materials.new(name)
     b = m.node_tree.nodes["Principled BSDF"]
@@ -71,6 +84,15 @@ def M(name):
         b.inputs["Alpha"].default_value = ex["alpha"]
         m.surface_render_method = "BLENDED"
         m.use_backface_culling = False
+    if "trans" in ex:
+        b.inputs["Transmission Weight"].default_value = ex["trans"]
+        b.inputs["IOR"].default_value = 1.5
+    if "film" in ex:
+        try:
+            b.inputs["Thin Film Thickness"].default_value = ex["film"]
+            b.inputs["Thin Film IOR"].default_value = 1.33
+        except KeyError:
+            pass
     if "emit" in ex:
         b.inputs["Emission Color"].default_value = (*ex["emit"], 1)
         b.inputs["Emission Strength"].default_value = ex["es"]
@@ -668,7 +690,7 @@ def m_bulb():
     rot_all(rz=0)
 
 
-def m_globe():
+def m_globe(cities=None, edges=None, arc_mat="cyan", pin_mat="ivory", spin=-80, arc_r=0.009, pin_r=0.022):
     import numpy as np
     from global_land_mask import globe as gl
     # equirectangular texture: navy ocean, brass continents, fine graticule
@@ -709,13 +731,15 @@ def m_globe():
         la, lo = math.radians(lat), math.radians(lon + 180)
         return Vector((rr * math.cos(la) * math.cos(lo), rr * math.cos(la) * math.sin(lo), rr * math.sin(la)))
 
-    cities = {"vienna": (48.2, 16.4), "cairo": (30.0, 31.2), "czernowitz": (48.3, 25.9),
-              "bonn": (50.7, 7.1), "cambridge": (42.4, -71.1)}
+    if cities is None:
+        cities = {"vienna": (48.2, 16.4), "cairo": (30.0, 31.2), "czernowitz": (48.3, 25.9),
+                  "bonn": (50.7, 7.1), "cambridge": (42.4, -71.1)}
+        route = ["vienna", "cairo", "czernowitz", "bonn", "cambridge"]
+        edges = list(zip(route, route[1:]))
     for k, (la, lo) in cities.items():
         p = ll(la, lo, R * 1.01)
-        sphere("pin_" + k, 0.022, tuple(p), "ivory", 16, 8)
-    route = ["vienna", "cairo", "czernowitz", "bonn", "cambridge"]
-    for a, b2 in zip(route, route[1:]):
+        sphere("pin_" + k, pin_r, tuple(p), pin_mat, 16, 8)
+    for a, b2 in edges:
         A, B = ll(*cities[a]), ll(*cities[b2])
         pts = []
         ang = A.angle(B)
@@ -724,10 +748,10 @@ def m_globe():
             P = A.slerp(B, t) if hasattr(A, "slerp") else (A * (1 - t) + B * t)
             P = P.normalized() * (R * (1.012 + 0.10 * math.sin(math.pi * t) * min(1.0, ang * 1.4)))
             pts.append(tuple(P))
-        tube("arc", pts, 0.009, "cyan", 3)
+        tube("arc", pts, arc_r, arc_mat, 3)
     # spin so Europe/Atlantic face the viewer (-Y), then tilt the axis
     for o in bpy.context.scene.objects:
-        o.matrix_world = Matrix.Rotation(math.radians(-80), 4, "Z") @ o.matrix_world
+        o.matrix_world = Matrix.Rotation(math.radians(spin), 4, "Z") @ o.matrix_world
     for o in bpy.context.scene.objects:
         o.matrix_world = Matrix.Rotation(math.radians(-18), 4, "X") @ o.matrix_world
         o.matrix_world = Matrix.Rotation(math.radians(23.4), 4, "Y") @ o.matrix_world

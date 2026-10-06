@@ -1,12 +1,12 @@
-# Richard Cantillon — 3D presentation
+# 3D-презентация: Ричард Кантильон
 
-Build the deck and speaker notes with:
+Использует тот же движок, что и `../schumpeter`: `lib.js`, `pptx3d.js`, `models/render.py`, а также `node_modules` из `../schumpeter`.
 
 ```bash
-npm install
-node build.js --preview
+cd ../schumpeter && npm i && cd ../cantillon
+LD_LIBRARY_PATH=/tmp/bstub python3 models/make_models.py   # .glb → models/glb (нужен pip-пакет bpy)
+python3 stage.py                                           # фон и свечение → assets/
+node build.js --preview                                    # → ../../exports/cantillon-3d-presentation.pptx
 ```
 
-The presentation embeds original `.glb` models as native PowerPoint 3D objects. Slide transitions use Morph (with a Fade fallback), and each object has a transparent fallback render. To rebuild the models, install Python dependencies (`bpy`, `global-land-mask`, `numpy`) and run `python3 models/make_models.py [keys...]` from this directory. The build script requires Blender's Cycles renderer.
-
-The portrait is Nicolas de Largillière's *The Artist and his Family* (c. 1710); its identification as Richard Cantillon is disputed, so it is shown only as a possible likeness and is explicitly captioned that way. See `../../exports/cantillon-presentation-sources.md` for the references and historical caveats.
+Чтобы собрать быстрый черновик с растрами в низком разрешении, используйте `FAST=1`.

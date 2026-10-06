@@ -1,117 +1,41 @@
-# Procedural 3D "exhibits" for the Cantillon deck, built in Blender (bpy) and exported
-# as self-contained .glb files that PowerPoint embeds as native 3D models.
-# Uses a small local helper module to keep the model pipeline self-contained.
+# Procedural 3D exhibits for the Cantillon deck (Blender / bpy -> .glb for PowerPoint 3D).
+# Re-uses the modelling helpers and the shared material palette of the Schumpeter deck.
 #
-#   python3 models/make_models.py              -> models/glb/*.glb  (all)
-#   python3 models/make_models.py ship candle  -> selected models
+#   python3 models/make_models.py              -> models/glb/*.glb   (all models)
+#   python3 models/make_models.py ship candle  -> only selected models
 #
-# Convention (same as the Schumpeter deck): Blender Z up, the front of every model faces -Y
-# (= the viewer in PowerPoint's default camera).
-import math, os, random, sys
-import bpy, bmesh
-from mathutils import Vector, Matrix
-import common_models as mm
-
+# Convention (same as the Schumpeter models): Blender Z up, the viewer looks from -Y.
+import os, sys, math, random
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "schumpeter", "models"))
+import make_models as mm  # noqa: E402
+from make_models import (bpy, bmesh, Vector, Matrix, TAU, M, finish, mesh_obj, lathe, box, cyl, sphere,  # noqa: E402
+                         torus, tube, to_mesh, profile2d, rot_all, coin, book)
+
 mm.OUT = os.path.join(HERE, "glb")
 os.makedirs(mm.OUT, exist_ok=True)
-TAU = math.tau
-
-# ---- extra materials (18th-century palette: wax, wood, canvas, parchment, ember) ----
-EXTRA = {
-    "wax":       ((0.80, 0.70, 0.52), 0.00, 0.42, {"coat": 0.2}),
-    "flame":     ((1.00, 0.55, 0.15), 0.00, 0.50, {"emit": (1.0, 0.50, 0.12), "es": 9.0}),
-    "flame2":    ((1.00, 0.90, 0.60), 0.00, 0.50, {"emit": (1.0, 0.88, 0.55), "es": 14.0}),
-    "canvas":    ((0.76, 0.68, 0.52), 0.00, 0.85, {}),
-    "wood":      ((0.120, 0.055, 0.022), 0.00, 0.50, {"coat": 0.3}),
-    "wood_m":    ((0.190, 0.090, 0.036), 0.00, 0.55, {"coat": 0.2}),
-    "wood_l":    ((0.330, 0.180, 0.080), 0.00, 0.60, {}),
-    "rope":      ((0.420, 0.300, 0.160), 0.00, 0.90, {}),
-    "water":     ((0.010, 0.050, 0.070), 0.00, 0.05, {"coat": 1.0}),
-    "seal":      ((0.330, 0.020, 0.018), 0.05, 0.35, {"coat": 0.6}),
-    "iron":      ((0.090, 0.090, 0.095), 0.90, 0.45, {}),
-    "feather":   ((0.860, 0.820, 0.740), 0.00, 0.70, {}),
-    "parchment": ((0.760, 0.660, 0.470), 0.00, 0.80, {}),
-    "inkglass":  ((0.010, 0.012, 0.016), 0.10, 0.08, {"coat": 1.0}),
-    "wheat":     ((0.780, 0.540, 0.200), 0.00, 0.55, {}),
-    "stalk":     ((0.660, 0.470, 0.190), 0.00, 0.60, {}),
-    "dice":      ((0.820, 0.770, 0.660), 0.00, 0.30, {"coat": 0.6}),
-    "pip":       ((0.020, 0.018, 0.016), 0.00, 0.30, {}),
-    "ember":     ((1.000, 0.420, 0.160), 0.00, 0.40, {"emit": (1.0, 0.40, 0.12), "es": 3.5}),
-    "bubble":    ((0.950, 0.900, 0.800), 0.00, 0.02, {"alpha": 0.10}),
-    "rose":      ((0.800, 0.720, 0.560), 0.00, 0.70, {}),
-}
-_orig_M = mm.M
 
 
-def M(name):
-    if name not in EXTRA:
-        return _orig_M(name)
-    if name in mm._mats and mm._mats[name].name in bpy.data.materials:
-        return mm._mats[name]
-    col, met, rough, ex = EXTRA[name]
-    m = bpy.data.materials.new(name)
-    b = m.node_tree.nodes["Principled BSDF"]
-    b.inputs["Base Color"].default_value = (*col, 1)
-    b.inputs["Metallic"].default_value = met
-    b.inputs["Roughness"].default_value = rough
-    if "coat" in ex:
-        b.inputs["Coat Weight"].default_value = ex["coat"]
-    if "alpha" in ex:
-        b.inputs["Alpha"].default_value = ex["alpha"]
-        m.surface_render_method = "BLENDED"
-        m.use_backface_culling = False
-    if "emit" in ex:
-        b.inputs["Emission Color"].default_value = (*ex["emit"], 1)
-        b.inputs["Emission Strength"].default_value = ex["es"]
-    mm._mats[name] = m
-    return m
+# ------------------------------------------------------------------ extra helpers
+def text_mesh(name, body, size, depth, mat, loc=(0, 0, 0), rot=(0, 0, 0), res=3, bevel=0.0):
+    cu = bpy.data.curves.new(name, "FONT")
+    cu.body = body
+    cu.size = size
+    cu.extrude = depth
+    cu.bevel_depth = bevel
+    cu.bevel_resolution = 1
+    cu.resolution_u = res
+    cu.align_x = "CENTER"
+    cu.align_y = "CENTER"
+    o = mm.link(bpy.data.objects.new(name, cu))
+    o.location = loc
+    o.rotation_euler = rot
+    return to_mesh(o, mat, 30)
 
 
-mm.M = M
-lathe, box, cyl, sphere, torus, tube = mm.lathe, mm.box, mm.cyl, mm.sphere, mm.torus, mm.tube
-profile2d, mesh_obj, finish, rot_all = mm.profile2d, mm.mesh_obj, mm.finish, mm.rot_all
-
-
-# ------------------------------------------------------------------ small helpers
-def objs():
-    return list(bpy.context.scene.objects)
-
-
-def transform(olist, Mx):
-    for o in olist:
-        o.matrix_world = Mx @ o.matrix_world
-
-
-def shift_z(dz):
-    for o in objs():
-        o.location.z += dz
-
-
-def coin_lp(name, loc, rot=(0, 0, 0), r=0.16, t=0.03, seg=28, mat="gold"):
-    """Low-poly coin (rim + recessed field)."""
-    h = t / 2
-    prof = [(0, -h + 0.004), (r * 0.82, -h + 0.004), (r * 0.86, -h), (r, -h + 0.004), (r, h - 0.004),
-            (r * 0.86, h), (r * 0.82, h - 0.004), (0, h - 0.003)]
-    o = lathe(name, prof, mat, seg, 30)
-    o.matrix_world = (Matrix.Translation(loc) @ Matrix.Rotation(rot[2], 4, "Z") @ Matrix.Rotation(rot[1], 4, "Y")
-                      @ Matrix.Rotation(rot[0], 4, "X"))
-    return o
-
-
-def bezier(P, n):
-    P = [Vector(p) for p in P]
-    out = []
-    for i in range(n + 1):
-        t = i / n
-        a = (1 - t) ** 3; b = 3 * (1 - t) ** 2 * t; c = 3 * (1 - t) * t ** 2; d = t ** 3
-        out.append(a * P[0] + b * P[1] + c * P[2] + d * P[3])
-    return out
-
-
-def grid_surface(name, fn, nu, nv, mat, smooth=60):
-    """Parametric surface fn(u, v) -> (x, y, z), u, v in [0, 1]."""
-    verts = [tuple(fn(i / nu, j / nv)) for j in range(nv + 1) for i in range(nu + 1)]
+def grid_surface(name, nu, nv, fn, mat, smooth=60):
+    """Parametric surface: fn(u, v) -> (x, y, z), u, v in [0, 1]."""
+    verts = [fn(i / nu, j / nv) for j in range(nv + 1) for i in range(nu + 1)]
     faces = []
     for j in range(nv):
         for i in range(nu):
@@ -121,23 +45,13 @@ def grid_surface(name, fn, nu, nv, mat, smooth=60):
     return finish(o, mat, smooth)
 
 
-def lathe_arc(name, loop, a0, a1, seg, mat, smooth=30):
-    """Revolve a closed (r, z) loop between angles a0..a1 and cap both ends (barrel staves)."""
-    n = len(loop)
-    verts, faces = [], []
-    for k in range(seg + 1):
-        a = a0 + (a1 - a0) * k / seg
-        for r, z in loop:
-            verts.append((r * math.cos(a), r * math.sin(a), z))
-    for k in range(seg):
-        for i in range(n):
-            p, q = k * n + i, k * n + (i + 1) % n
-            faces.append((p, q, q + n, p + n))
-    half = n // 2  # loop = outer (up) + inner (down): cap with quads between the two halves
-    for base, flip in ((0, False), (seg * n, True)):
-        for i in range(half - 1):
-            f = (base + i, base + i + 1, base + n - 2 - i, base + n - 1 - i)
-            faces.append(f[::-1] if flip else f)
+def extrude_profile(name, prof, x0, x1, mat, smooth=40):
+    """Closed (y, z) profile extruded along X with caps."""
+    n = len(prof)
+    verts = [(x0, y, z) for y, z in prof] + [(x1, y, z) for y, z in prof]
+    faces = [(i, (i + 1) % n, n + (i + 1) % n, n + i) for i in range(n)]
+    faces.append(tuple(reversed(range(n))))
+    faces.append(tuple(range(n, 2 * n)))
     o = mesh_obj(name, verts, faces)
     bm = bmesh.new(); bm.from_mesh(o.data)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
@@ -145,598 +59,555 @@ def lathe_arc(name, loop, a0, a1, seg, mat, smooth=30):
     return finish(o, mat, smooth)
 
 
-# ------------------------------------------------------------------ ship (title / finale / inside the bubble)
-def build_ship():
-    """Three-masted merchant ship, bow towards +X, ~2.4 units long. Returns created objects."""
-    before = set(objs())
-    NS, NP = 30, 12
+def xform(objs, T):
+    for o in objs:
+        o.matrix_world = T @ o.matrix_world
 
-    def width(t):
-        return max(0.004, 0.27 * (1 - t ** 3) ** 0.55 * (0.72 + 0.28 * min(1.0, t * 3.5)))
 
-    def ztop(t):
-        return 0.10 + 0.13 * (1 - t) ** 4 + 0.09 * t ** 4
+def shift_all(dx=0, dy=0, dz=0):
+    for o in bpy.context.scene.objects:
+        o.location.x += dx
+        o.location.y += dy
+        o.location.z += dz
 
-    zbot = lambda t: -0.20 + 0.12 * t ** 3
-    xs = lambda t: -1.0 + 2.0 * t
-    verts, faces, rings = [], [], []
-    for k in range(NS + 1):
-        t = k / NS
-        w, zt, zb = width(t), ztop(t), zbot(t)
-        ring = []
-        for side in (-1, 1):
-            rng = range(NP + 1) if side < 0 else range(NP - 1, -1, -1)
-            for i in rng:
-                th = (math.pi / 2) * i / NP
-                y = side * w * math.cos(th) ** 0.65
-                z = zt - (zt - zb) * math.sin(th) ** 1.4
-                ring.append(len(verts)); verts.append((xs(t), y, z))
-        rings.append(ring)
-    m = len(rings[0])
-    for A, B in zip(rings, rings[1:]):
-        for i in range(m - 1):
-            faces.append((A[i], A[i + 1], B[i + 1], B[i]))
-    faces.append(tuple(rings[0][::-1]))  # transom
-    faces.append(tuple(rings[-1]))
-    hull = finish(mesh_obj("hull", verts, faces), "wood", 50)
-    bm = bmesh.new(); bm.from_mesh(hull.data)
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    bm.to_mesh(hull.data); bm.free()
-    # deck
-    dv, df = [], []
-    for k in range(NS + 1):
-        t = k / NS
-        for side in (-1, 1):
-            dv.append((xs(t), side * width(t) * 0.97, ztop(t) - 0.012))
-    for k in range(NS):
-        a = 2 * k
-        df.append((a, a + 2, a + 3, a + 1))
-    finish(mesh_obj("deck", dv, df), "wood_l", 30)
-    # gold wale stripes + gun ports
-    for side in (-1, 1):
-        for dz, r in ((0.035, 0.008), (0.11, 0.006)):
-            pts = [(xs(t), side * width(t) * 1.002 * (1 - 0.15 * (dz > 0.05)), ztop(t) - dz) for t in [i / 16 for i in range(17)]]
-            tube("wale", pts, r, "gold", 2)
-        for k in range(7):
-            t = 0.2 + 0.09 * k
-            box("port", (0.05, 0.02, 0.04), (xs(t), side * width(t) * 0.99, ztop(t) - 0.075), "satin", 0.004)
-    # stern castle with lit windows + lantern
-    sc_t = 0.11
-    box("castle", (0.32, 2 * width(sc_t) * 0.92, 0.12), (xs(sc_t) - 0.05, 0, ztop(sc_t) + 0.04), "wood_m", 0.01)
-    box("castle_top", (0.36, 2 * width(sc_t) * 0.98, 0.02), (xs(sc_t) - 0.05, 0, ztop(sc_t) + 0.105), "wood_l", 0.004)
-    for j in range(4):
-        box("win", (0.005, 0.045, 0.05), (xs(0) - 0.003, -0.12 + 0.08 * j, ztop(0) - 0.06), "window", 0.002)
-    lathe("lantern", [(0, 0), (0.025, 0), (0.035, 0.04), (0.02, 0.08), (0.008, 0.10), (0, 0.11)], "gold", 16,
-          loc=(xs(0) - 0.02, 0, ztop(0) + 0.115))
-    # masts, yards, sails
-    masts = [(-0.48, 1.00, 2), (0.05, 1.30, 3), (0.52, 1.15, 3)]
-    tops = []
-    for mx, mh, nyard in masts:
-        t = (mx + 1) / 2
-        z0 = ztop(t) - 0.05
-        lathe("mast", [(0, z0), (0.020, z0), (0.016, z0 + mh * 0.6), (0.011, z0 + mh), (0, z0 + mh)], "wood_m", 12)
-        tops.append((mx, z0 + mh))
-        yz = [z0 + mh * f for f in (0.30, 0.62, 0.90)][:nyard] if nyard == 3 else [z0 + mh * f for f in (0.40, 0.82)]
-        yl = [0.62, 0.48, 0.34] if nyard == 3 else [0.46, 0.34]
-        for zz, L in zip(yz, yl):
-            cyl("yard", 0.008, L, (mx, 0, zz), "wood_m", rot=(math.pi / 2, 0, 0), seg=8)
-        for (zt_, Lt), (zb_, Lb) in zip(list(zip(yz, yl))[1:], list(zip(yz, yl))[:-1]):
-            pass
-        bands = list(zip(yz, yl))
-        for k in range(len(bands)):
-            ztop_s, Lt = bands[k]
-            zbot_s = bands[k - 1][0] + 0.02 if k > 0 else z0 + 0.10
-            Lb = bands[k - 1][1] if k > 0 else yl[0] * 1.05
-            if k == 0:
-                ztop_s, Lt = bands[0]
-                zbot_s, Lb = z0 + 0.12, yl[0] * 1.05
 
-            def sail(u, v, zt=ztop_s - 0.01, zb=zbot_s, lt=Lt * 0.92, lb=Lb * 0.95, mx=mx):
-                w = lt + (lb - lt) * v
-                y = (u - 0.5) * w
-                z = zt + (zb - zt) * v
-                x = mx + 0.075 * math.sin(math.pi * u) * math.sin(math.pi * (0.15 + 0.85 * v)) + 0.01
-                return (x, y, z)
-            grid_surface("sail", sail, 8, 6, "canvas", 80)
-        # pennant
-        zt_ = z0 + mh
-        grid_surface("flag", lambda u, v, mx=mx, zt_=zt_: (mx - 0.22 * u, 0.012 * math.sin(u * 7), zt_ - 0.01 - 0.05 * v * (1 - u * 0.85)), 6, 1, "seal", 80)
-    # bowsprit + jib
-    bt = ztop(1.0)
-    tube("bowsprit", [(0.97, 0, bt - 0.01), (1.40, 0, bt + 0.22)], 0.012, "wood_m", 3, False)
-    fx, fz = tops[2]
-    A, B, C = Vector((1.38, 0, bt + 0.21)), Vector((fx + 0.02, 0, fz - 0.06)), Vector((fx + 0.03, 0, bt + 0.25))
-    grid_surface("jib", lambda u, v: tuple(A.lerp(B, v) * (1 - u) + C.lerp(B, v) * u + Vector((0, 0.04 * math.sin(math.pi * u) * (1 - v), 0))), 6, 6, "canvas", 80)
-    # rigging
-    for mx, top in tops:
-        t = (mx + 1) / 2
-        for side in (-1, 1):
-            for dx in (-0.06, 0.06):
-                tube("shroud", [(mx, 0, top - 0.02), (mx + dx, side * width(t) * 0.98, ztop(t))], 0.0025, "rope", 0, False)
-    for (x1, z1), (x2, z2) in zip(tops, tops[1:]):
-        tube("stay", [(x1, 0, z1 - 0.02), (x2, 0, z2 * 0.55)], 0.0025, "rope", 0, False)
-    tube("forestay", [(fx, 0, fz - 0.02), (1.40, 0, bt + 0.22)], 0.0025, "rope", 0, False)
-    return [o for o in objs() if o not in before]
+def sail(name, corners, billow, mat="canvas", nu=10, nv=8, normal=(0, -1, 0)):
+    """Bilinear quad sail between 4 corners (tl, tr, br, bl) that bellies out along `normal`."""
+    tl, tr, br, bl = [Vector(c) for c in corners]
+    n = Vector(normal).normalized()
+
+    def f(u, v):
+        top = tl.lerp(tr, u)
+        bot = bl.lerp(br, u)
+        p = top.lerp(bot, v)
+        p = p + n * billow * math.sin(math.pi * u) * (0.35 + 0.65 * math.sin(math.pi * min(1, v * 0.9 + 0.1)))
+        return tuple(p)
+    return grid_surface(name, nu, nv, f, mat, 70)
+
+
+# ------------------------------------------------------------------ models
+def m_louis():
+    """Gold louis d'or with '1720' — the token that rolls along the progress track."""
+    r, h = 0.5, 0.035
+    lathe("coin", [(0, -h), (r * 0.94, -h), (r, -h + 0.012), (r, h - 0.012), (r * 0.94, h), (r * 0.88, h),
+                   (r * 0.86, h - 0.012), (0, h - 0.012)], "gold_satin", 72, 30)
+    torus("rim", r * 0.91, 0.013, (0, 0, h - 0.004), "gold", seg=72, mseg=8)
+    for k in range(28):
+        a = TAU * k / 28
+        s = sphere("bead", 0.012, (r * 0.80 * math.cos(a), r * 0.80 * math.sin(a), h - 0.012), "gold", 10, 6)
+        s.scale.z = 0.6
+    text_mesh("year", "1720", 0.30, 0.012, "gold", loc=(0, -0.04, h - 0.012), res=4)
+    text_mesh("rc", "R · C", 0.12, 0.010, "gold", loc=(0, 0.20, h - 0.012), res=3)
+    lathe("back", [(0, -h + 0.01), (r * 0.86, -h + 0.01)], "gold", 48)
+    rot_all(rx=90)
 
 
 def m_ship():
-    build_ship()
-    shift_z(-0.45)
-
-
-# ------------------------------------------------------------------ bubble: a ship inside a glass bubble (Mississippi bubble)
-def m_bubble():
-    R = 0.62
-    sh = build_ship()
-    transform(sh, Matrix.Translation((0, 0, 0.05)) @ Matrix.Scale(0.38, 4))
-    for o in sh:
-        o.location.z += 0.62
-    sphere("bubble", R, (0, 0, 0.66), "bubble", 64, 32)
-    # gold paper-money "share" curls in the bubble base + brass stand
-    lathe("stand", [(0, 0.0), (0.42, 0.0), (0.44, 0.03), (0.40, 0.07), (0.30, 0.10), (0.22, 0.12), (0.20, 0.16),
-                    (0.26, 0.18), (0.27, 0.20), (0, 0.20)], "walnut", 64)
-    torus("standring", 0.43, 0.012, (0, 0, 0.03), "gold", seg=64, mseg=8)
-    torus("cup", 0.265, 0.018, (0, 0, 0.19), "brass", seg=64, mseg=10)
-    random.seed(7)
-    for k in range(4):
-        coin_lp("c", (0.28 * math.cos(k * 1.7 + 0.4), -0.28 * abs(math.sin(k * 1.7 + 0.4)) - 0.05, 0.015 + 0.03 * (k % 2)),
-                (0, 0, k), r=0.075, t=0.022)
-    shift_z(-0.62)
-
-
-# ------------------------------------------------------------------ Irish harp
-def m_harp():
-    B, T = Vector((0.02, 0, 0.04)), Vector((-0.17, 0, 0.98))
-    # tapered sound box along B->T
-    ax = (T - B)
-    L = ax.length
-    d = ax.normalized()
-    nrm = Vector((d.z, 0, -d.x))  # in-plane normal pointing towards the strings (+X side)
-    vs = []
-    for s, wx, wy in ((0, 0.13, 0.11), (1, 0.06, 0.06)):
-        c = B + ax * s
-        for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
-            p = c + nrm * (sx * wx) + Vector((0, sy * wy, 0))
-            vs.append(tuple(p))
-    sb = mesh_obj("soundbox", vs, [(0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)])
-    finish(sb, "walnut", 30, 0.02, 2)
-    # sound holes
-    for s in (0.3, 0.55):
-        c = B + ax * s + nrm * (0.13 - 0.07 * s + 0.002)
-        o = cyl("hole", 0.022 - 0.008 * s, 0.01, tuple(c), "satin", seg=16)
-        o.rotation_euler = (0, math.atan2(nrm.x, nrm.z), 0)
-    neck = bezier([T + Vector((0, 0, 0.03)), (0.12, 0, 1.20), (0.45, 0, 0.82), (0.74, 0, 1.03)], 24)
-    pillar = bezier([neck[-1], (0.84, 0, 0.62), (0.60, 0, 0.12), B + Vector((0.06, 0, -0.03))], 24)
-    tube("neck", [tuple(p) for p in neck], 0.045, "walnut", 4)
-    tube("pillar", [tuple(p) for p in pillar], 0.05, "walnut", 4)
-    for p in (neck[0], neck[-1], pillar[-1]):
-        sphere("knob", 0.06, tuple(p), "gold", 24, 12)
-    tube("inlay", [tuple(p + Vector((0, -0.05, 0))) for p in pillar[2:-2]], 0.008, "gold", 2)
-    N = 18
-    for i in range(N):
-        f = i / (N - 1)
-        bot = B + ax * (0.10 + 0.80 * f) + nrm * (0.13 - 0.07 * (0.10 + 0.8 * f) + 0.005)
-        top = neck[int(round(22 - 20 * f))] + Vector((0, 0, -0.03))
-        tube("string", [tuple(bot), tuple(top)], 0.0035, "brass" if i % 3 else "red", 0, False)
-        sphere("pin", 0.012, tuple(top + Vector((0, -0.045, 0.02))), "gold", 8, 4)
-    shift_z(-0.55)
-
-
-# ------------------------------------------------------------------ strongbox with gold
-def m_chest():
-    W, D, H = 1.0, 0.58, 0.46
-    box("body", (W, D, H), (0, 0, H / 2), "wood", 0.015)
-    for x in (-0.38, 0, 0.38):
-        box("band", (0.06, D + 0.02, H + 0.01), (x, 0, H / 2), "iron", 0.005)
-    box("plate", (0.16, 0.02, 0.18), (0, -D / 2 - 0.012, H - 0.12), "gold", 0.005)
-    box("keyhole", (0.025, 0.01, 0.06), (0, -D / 2 - 0.022, H - 0.13), "satin", 0.003)
-    # gold heap + coins inside
-    lathe("heap", [(0, H + 0.10), (0.20, H + 0.08), (0.40, H + 0.02), (0.44, H - 0.02), (0, H - 0.02)], "gold", 40)
-    for o in objs()[-1:]:
-        o.scale.y = 0.55
-    random.seed(11)
-    for k in range(16):
-        a = random.uniform(0, TAU); rr = random.uniform(0, 0.38)
-        x, y = rr * math.cos(a), rr * math.sin(a) * 0.5
-        z = H + 0.09 * (1 - (rr / 0.44) ** 2) + 0.01
-        coin_lp("c", (x, y, z), (random.uniform(-0.4, 0.4), random.uniform(-0.4, 0.4), random.uniform(0, 6)), r=0.07, t=0.018)
-    # arched lid, open backwards about the hinge (back top edge)
-    R, n = D / 2, 16
-    lv, lf = [], []
-    for side in (-1, 1):
-        for i in range(n + 1):
-            th = math.pi * i / n
-            lv.append((side * W / 2, R * math.cos(th), R * math.sin(th)))
-    for i in range(n):
-        lf.append((i, i + 1, n + 2 + i, n + 1 + i))
-    lf.append(tuple(range(n + 1))[::-1])
-    lf.append(tuple(range(n + 1, 2 * n + 2)))
-    lid = finish(mesh_obj("lid", lv, lf), "wood", 40)
-    bm = bmesh.new(); bm.from_mesh(lid.data)
+    """Three-masted merchant ship on a museum stand (Atlantic trade; the escape to Surinam)."""
+    NX, NS = 44, 18
+    t0, t1 = -0.92, 1.0
+    rows = []
+    verts = []
+    for i in range(NX + 1):
+        t = t0 + (t1 - t0) * i / NX
+        x = t * 1.0
+        if t >= 0:
+            w = 0.26 * max(0.0, 1 - (t / 1.0) ** 2) ** 0.55
+        else:
+            w = 0.26 * max(0.0, 1 - (abs(t) / 1.02) ** 5) ** 0.5
+        w = max(w, 0.004)
+        ztop = 0.30 + 0.07 * t * t + (0.10 if t < -0.55 else 0.10 * max(0, (-t - 0.40) / 0.15) if t < -0.40 else 0)
+        zbot = 0.02 + 0.10 * max(0, t - 0.55) ** 1.5 * 4 + 0.04 * max(0, -t - 0.7)
+        row = []
+        for j in range(NS + 1):
+            th = math.pi * j / NS  # 0 = port deck edge, pi = starboard deck edge
+            c, s = math.cos(th), math.sin(th)
+            y = w * (abs(c) ** 0.7) * (1 if c >= 0 else -1)
+            z = ztop - (ztop - zbot) * (s ** 1.6)
+            row.append(len(verts))
+            verts.append((x, y, z))
+        rows.append(row)
+    faces = []
+    for A, B in zip(rows, rows[1:]):
+        for j in range(NS):
+            faces.append((A[j], B[j], B[j + 1], A[j + 1]))
+    hull = mesh_obj("hull", verts, faces)
+    bm = bmesh.new(); bm.from_mesh(hull.data)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    bm.to_mesh(lid.data); bm.free()
-    parts = [lid]
-    for x in (-0.38, 0, 0.38):
-        parts.append(tube("lidband", [(x, R * 1.02 * math.cos(math.pi * i / 12), R * 1.02 * math.sin(math.pi * i / 12)) for i in range(13)],
-                          0.02, "iron", 2))
-    hinge = Vector((0, R, 0))
-    Mx = Matrix.Translation((0, 0, H)) @ Matrix.Translation(hinge) @ Matrix.Rotation(math.radians(-62), 4, "X") @ Matrix.Translation(-hinge)
-    transform(parts, Mx)
-    # coins spilled in front
-    coin_lp("f1", (-0.25, -0.48, 0.009), (0, 0, 0.3), r=0.07, t=0.018)
-    coin_lp("f2", (-0.10, -0.55, 0.009), (0, 0, 1.3), r=0.07, t=0.018)
-    coin_lp("f3", (-0.17, -0.40, 0.027), (0, 0, 2.3), r=0.07, t=0.018)
-    coin_lp("lean", (0.26, -0.40, 0.066), (math.radians(78), 0, math.radians(-20)), r=0.07, t=0.018)
-    shift_z(-0.35)
+    bm.to_mesh(hull.data); bm.free()
+    for mname in ("brass_d", "black", "walnut"):
+        hull.data.materials.append(M(mname))
+    for p in hull.data.polygons:
+        z = p.center.z
+        p.material_index = 0 if z < 0.11 else (1 if z < 0.21 else 2)
+        p.use_smooth = True
+    hull.data.set_sharp_from_angle(angle=math.radians(50))
+    # deck + transom
+    dverts = []
+    for row in rows:
+        dverts.append(verts[row[0]])
+        dverts.append(verts[row[-1]])
+    dfaces = [(2 * i, 2 * i + 1, 2 * i + 3, 2 * i + 2) for i in range(len(rows) - 1)]
+    deck = mesh_obj("deck", [(x, y, z - 0.012) for x, y, z in dverts], dfaces)
+    finish(deck, "brown", 40)
+    tr = [verts[k] for k in rows[0]]
+    transom = mesh_obj("transom", tr, [tuple(range(len(tr)))])
+    finish(transom, "walnut", 0)
+    # gilded sheer stripes and gun ports
+    for side in (1, -1):
+        pts = []
+        for i in range(0, NX + 1, 2):
+            x, y, z = verts[rows[i][0 if side > 0 else -1]]
+            t = x
+            frac = 0.38
+            idx = int(round(NS * 0.18)) if side > 0 else NS - int(round(NS * 0.18))
+            px, py, pz = verts[rows[i][idx]]
+            pts.append((px, py + 0.004 * side, pz))
+        tube("stripe", pts, 0.006, "gold", 2)
+        for k in range(7):
+            x = -0.55 + k * 0.17
+            i = int(round((x - t0) / (t1 - t0) * NX))
+            idx = int(round(NS * 0.30)) if side > 0 else NS - int(round(NS * 0.30))
+            px, py, pz = verts[rows[i][idx]]
+            box("port", (0.05, 0.02, 0.04), (px, py + 0.006 * side, pz), "satin", 0.004)
+    # stern windows (warm light)
+    for k in range(3):
+        box("sternwin", (0.012, 0.05, 0.04), (t0 - 0.004, -0.08 + k * 0.08, 0.36), "window", 0.003)
+    # masts, yards and sails
+    masts = [(0.45, 1.25), (0.0, 1.45), (-0.48, 1.05)]
+    brace = math.radians(28)
+    for mx, mh in masts:
+        cyl("mast", 0.02, mh, (mx, 0, 0.30 + mh / 2), "walnut", seg=16)
+        cyl("top", 0.05, 0.015, (mx, 0, 0.30 + mh * 0.62), "walnut", seg=16)
+        levels = [(0.30 + mh * 0.58, 0.30 + mh * 0.16, 0.30 if mx != -0.48 else 0.22),
+                  (0.30 + mh * 0.95, 0.30 + mh * 0.63, 0.22 if mx != -0.48 else 0.16)]
+        d = Vector((math.sin(brace), -math.cos(brace) * 0, math.cos(brace) * 0))
+        for ztop_, zbot_, half in levels:
+            ax = Vector((-math.sin(brace), math.cos(brace), 0))  # yard direction (mostly along Y)
+            c_top = Vector((mx, 0, ztop_))
+            c_bot = Vector((mx, 0, zbot_))
+            yard = tube("yard", [tuple(c_top - ax * (half + 0.04)), tuple(c_top + ax * (half + 0.04))], 0.009, "walnut", 2, False)
+            hb = half * 1.18
+            nrm = Vector((math.cos(brace), math.sin(brace), 0)) * -1  # sails belly towards the bow side/viewer
+            sail("sail", [c_top - ax * half, c_top + ax * half, c_bot + ax * hb, c_bot - ax * hb], 0.09, normal=(nrm.x, nrm.y - 0.6, 0))
+    # bowsprit + jib
+    tube("bowsprit", [(0.95, 0, 0.38), (1.42, 0, 0.62)], 0.014, "walnut", 2, False)
+    jib = mesh_obj("jib", [(1.38, 0, 0.60), (0.47, 0, 1.40), (0.62, 0, 0.42)], [(0, 1, 2)])
+    finish(jib, "canvas", 0)
+    # pennant
+    pts = [(0.0, 0, 1.75), (0.0, 0, 1.80)]
+    pen = grid_surface("pennant", 8, 1, lambda u, v: (-0.30 * u, 0.025 * math.sin(u * 5), 1.78 + 0.035 * (1 - u) * (v - 0.5) * 2), "oxblood", 60)
+    # rigging lines (simple stays)
+    for (ax_, ah), (bx_, bh) in zip(masts, masts[1:]):
+        tube("stay", [(ax_, 0, 0.30 + ah * 0.98), (bx_, 0, 0.30 + bh * 0.62)], 0.0028, "satin", 2, False)
+    tube("forestay", [(0.45, 0, 0.30 + 1.25 * 0.98), (1.40, 0, 0.61)], 0.0028, "satin", 2, False)
+    tube("backstay", [(-0.48, 0, 0.30 + 1.05 * 0.98), (-0.90, 0, 0.42)], 0.0028, "satin", 2, False)
+    # museum stand
+    box("standbase", (1.30, 0.34, 0.06), (0, 0, -0.20), "walnut", 0.012)
+    box("standplate", (1.20, 0.26, 0.008), (0, 0, -0.166), "brass_d", 0.003)
+    for x in (-0.45, 0.45):
+        cyl("standpost", 0.018, 0.17, (x, 0, -0.09), "brass", seg=16)
+        torus("cradle", 0.07, 0.008, (x, 0, 0.03), "brass", rot=(math.radians(90), 0, 0), seg=32, mseg=6)
+    shift_all(dz=-0.55)
+    rot_all(rz=0)
 
 
-# ------------------------------------------------------------------ scales of justice
-def m_scales():
-    lathe("base", [(0, 0), (0.36, 0), (0.37, 0.025), (0.33, 0.06), (0.22, 0.09), (0.12, 0.11), (0, 0.11)], "walnut", 64)
-    torus("basering", 0.36, 0.01, (0, 0, 0.02), "gold", seg=64, mseg=8)
-    lathe("column", [(0, 0.10), (0.06, 0.10), (0.05, 0.16), (0.03, 0.22), (0.026, 1.00), (0.04, 1.03), (0.03, 1.06), (0, 1.06)], "brass", 32)
-    sphere("finial", 0.05, (0, 0, 1.13), "gold", 24, 12)
-    tilt = math.radians(11)
-    piv = Vector((0, 0, 1.03))
-    half = 0.56
-    beam = box("beam", (2 * half, 0.035, 0.03), tuple(piv), "brass", 0.008)
-    beam.rotation_euler = (0, tilt, 0)
-    for s in (-1, 1):
-        end = piv + Vector((s * half * math.cos(tilt), 0, -s * half * math.sin(tilt)))
-        sphere("tip", 0.025, tuple(end), "gold", 16, 8)
-        pan_z = end.z - 0.42
-        lathe("pan", [(0, pan_z - 0.04), (0.10, pan_z - 0.035), (0.18, pan_z - 0.01), (0.20, pan_z + 0.01), (0.195, pan_z + 0.012),
-                      (0.17, pan_z - 0.005), (0.09, pan_z - 0.025), (0, pan_z - 0.03)], "gold", 48, loc=(end.x, 0, 0))
-        for k in range(3):
-            a = TAU * k / 3 + 0.5
-            tube("chain", [tuple(end), (end.x + 0.19 * math.cos(a), 0.19 * math.sin(a), pan_z + 0.01)], 0.003, "brass", 0, False)
-        if s == 1:  # lower pan: money
-            for k in range(4):
-                coin_lp("c", (end.x + 0.02 * k - 0.03, 0.01 * k, pan_z - 0.015 + 0.02 * k), (0, 0, k), r=0.07, t=0.02)
-        else:  # higher pan: a sealed contract
-            o = cyl("scroll", 0.035, 0.24, (end.x, 0, pan_z + 0.02), "parchment", rot=(0, math.pi / 2, 0.3), seg=16)
-            cyl("sealw", 0.03, 0.012, (end.x + 0.02, -0.035, pan_z + 0.02), "seal", rot=(math.pi / 2, 0, 0), seg=16)
-    shift_z(-0.55)
+def m_harp():
+    """Irish harp — Cantillon came from County Kerry."""
+    # soundbox: tapered box along a slanted axis
+    S0, S1 = Vector((-0.02, 0, 0.06)), Vector((-0.42, 0, 1.06))
+    axis = (S1 - S0).normalized()
+    side = Vector((axis.z, 0, -axis.x))  # in-plane perpendicular, points right/down
+    N = 12
+    verts, faces = [], []
+    for i in range(N + 1):
+        t = i / N
+        c = S0.lerp(S1, t)
+        hw = 0.13 * (1 - t) + 0.05 * t
+        hd = 0.12 * (1 - t) + 0.05 * t
+        for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+            p = c + side * (hw * sx)
+            verts.append((p.x, hd * sy, p.z))
+    for i in range(N):
+        a = i * 4
+        for k in range(4):
+            faces.append((a + k, a + (k + 1) % 4, a + 4 + (k + 1) % 4, a + 4 + k))
+    faces.append((3, 2, 1, 0))
+    b = N * 4
+    faces.append((b, b + 1, b + 2, b + 3))
+    sb = mesh_obj("soundbox", verts, faces)
+    bm = bmesh.new(); bm.from_mesh(sb.data)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(sb.data); bm.free()
+    finish(sb, "walnut", 30, 0.025, 3)
+    # gold inlay line down the front of the soundbox
+    tube("inlay", [tuple(S0.lerp(S1, 0.05) + Vector((0, -0.125, 0))), tuple(S0.lerp(S1, 0.95) + Vector((0, -0.055, 0)))], 0.006, "gold", 2, False)
+    # neck (harmonic curve) and fore-pillar
+    neck = [(-0.44, 0, 1.08), (-0.34, 0, 1.20), (-0.18, 0, 1.20), (-0.02, 0, 1.10), (0.14, 0, 1.08), (0.30, 0, 1.22), (0.40, 0, 1.30)]
+    tube("neck", neck, 0.045, "walnut", 5)
+    pillar = [(0.40, 0, 1.30), (0.52, 0, 1.0), (0.56, 0, 0.6), (0.50, 0, 0.25), (0.40, 0, 0.04)]
+    tube("pillar", pillar, 0.042, "walnut", 5)
+    for z in (0.35, 0.75, 1.1):
+        # brass rings on the pillar
+        tt = (1.30 - z) / 1.26
+        torus("pring", 0.047, 0.008, (0.53 if 0.3 < z < 1.0 else 0.47, 0, z), "brass", rot=(0, math.radians(90 - 12), 0), seg=24, mseg=6)
+    box("foot", (0.56, 0.20, 0.05), (0.19, 0, 0.025), "walnut", 0.015)
+    # strings: vertical, from the soundbox up to the neck
+    import numpy as np
+    nx = np.array([p[0] for p in neck]); nz = np.array([p[2] for p in neck])
+    for k in range(13):
+        t = 0.10 + 0.80 * k / 12
+        c = S0.lerp(S1, t) + side * (0.13 * (1 - t) + 0.05 * t) * 0.9
+        x = c.x
+        if x > 0.42:
+            continue
+        ztop = float(np.interp(x, nx, nz)) - 0.03
+        h = ztop - c.z
+        if h < 0.08:
+            continue
+        cyl("string", 0.0045, h, (x, 0, c.z + h / 2), "gold", seg=8)
+        sphere("peg", 0.012, (x, -0.05, ztop + 0.01), "brass", 10, 6)
+    # small celtic knot medallion on the soundbox
+    torus("medal", 0.05, 0.008, tuple(S0.lerp(S1, 0.55) + Vector((0, -0.095, 0))), "gold", rot=(math.radians(90), 0, 0), seg=32, mseg=6)
+    shift_all(dz=-0.65, dx=-0.05)
 
 
-# ------------------------------------------------------------------ quill + inkwell + letter
+def m_chest():
+    """Iron-bound strongbox: he locked his papers in one before leaving Paris."""
+    W, D, H = 1.0, 0.58, 0.46
+    box("body", (W, D, H), (0, 0, H / 2), "walnut", 0.015)
+    R = D / 2
+    prof = [(R * math.cos(math.pi * i / 24), H + R * 0.62 * math.sin(math.pi * i / 24)) for i in range(25)]
+    extrude_profile("lid", prof, -W / 2, W / 2, "walnut")
+    for x in (-0.34, 0.34):
+        # bands around body and lid
+        box("bandF", (0.06, 0.012, H), (x, -D / 2 - 0.006, H / 2), "iron", 0.004)
+        box("bandB", (0.06, 0.012, H), (x, D / 2 + 0.006, H / 2), "iron", 0.004)
+        box("bandBot", (0.06, D + 0.024, 0.012), (x, 0, 0.006), "iron", 0.004)
+        bp = [((R + 0.012) * math.cos(math.pi * i / 24), H + (R * 0.62 + 0.012) * math.sin(math.pi * i / 24)) for i in range(25)]
+        bp = bp + [(p[0] * 0.92, H + (p[1] - H) * 0.92 - 0.004) for p in reversed(bp)]
+        extrude_profile("bandLid", bp, x - 0.03, x + 0.03, "iron")
+        for z in (0.08, 0.23, 0.38):
+            s = sphere("stud", 0.013, (x, -D / 2 - 0.013, z), "brass", 12, 6)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            box("corner", (0.08, 0.08, 0.08), (sx * (W / 2 - 0.03), sy * (D / 2 - 0.03), 0.04), "iron", 0.008)
+    # side handles
+    for sx in (-1, 1):
+        torus("handle", 0.07, 0.012, (sx * (W / 2 + 0.025), 0, H * 0.62), "iron", rot=(0, math.radians(90), 0), seg=32, mseg=8)
+    # lock plate + keyhole + key
+    box("lockplate", (0.18, 0.016, 0.20), (0, -D / 2 - 0.01, H - 0.06), "gold", 0.006)
+    box("hasp", (0.07, 0.02, 0.16), (0, -D / 2 - 0.02, H + 0.02), "brass_d", 0.006)
+    cyl("keyhole", 0.016, 0.03, (0, -D / 2 - 0.02, H - 0.09), "satin", rot=(math.radians(90), 0, 0), seg=16)
+    # key sticking out of the lock
+    tube("keyshaft", [(0, -D / 2 - 0.03, H - 0.09), (0, -D / 2 - 0.20, H - 0.09)], 0.011, "brass", 3, False)
+    torus("keybow", 0.045, 0.011, (0, -D / 2 - 0.245, H - 0.09), "brass", rot=(0, 0, 0), seg=32, mseg=8)
+    xform([o for o in bpy.context.scene.objects if o.name.startswith("keybow")], Matrix.Identity(4))
+    shift_all(dz=-0.38)
+
+
+def m_bubble():
+    """Mississippi bubble: share certificates and gold under a fragile glass bubble."""
+    random.seed(7)
+    for i in range(9):
+        o = box("share", (0.62, 0.42, 0.007), (random.uniform(-0.02, 0.02), random.uniform(-0.02, 0.02), 0.004 + i * 0.009),
+                "paper", 0.002, rot=(0, 0, random.uniform(-0.12, 0.12)))
+    # red wax seal + ribbon on the top certificate
+    lathe("seal", [(0, 0.10), (0.05, 0.10), (0.055, 0.092), (0.055, 0.084), (0, 0.084)], "wine", 32)
+    for o in bpy.context.scene.objects:
+        if o.name.startswith("seal"):
+            o.location = (0.16, -0.10, 0.0)
+    box("ribbon", (0.05, 0.44, 0.004), (0.16, 0, 0.088), "wine", 0.001)
+    t = 0.04
+    for i in range(6):
+        coin("c", (-0.42 + random.uniform(-0.01, 0.01), -0.12, 0.02 + i * t), (0, 0, random.uniform(0, 6)), r=0.10, t=t)
+    for i in range(3):
+        coin("c2", (-0.30, 0.10, 0.02 + i * t), (0, 0, random.uniform(0, 6)), r=0.10, t=t)
+    # the bubble itself
+    sphere("bubble", 0.40, (0.02, 0, 0.50), "bubble", 64, 32)
+    # tiny paper scroll floating inside the bubble
+    cyl("scroll", 0.035, 0.34, (0.02, 0, 0.50), "paper", rot=(0, math.radians(90), math.radians(-20)), seg=24)
+    for sx in (-1, 1):
+        cyl("scrollend", 0.042, 0.02, (0.02 + sx * 0.16 * math.cos(math.radians(-20)), sx * 0.16 * math.sin(math.radians(-20)), 0.50),
+            "brass", rot=(0, math.radians(90), math.radians(-20)), seg=24)
+    box("base", (0.95, 0.62, 0.04), (0, 0, -0.025), "walnut", 0.01)
+    shift_all(dz=-0.5)
+
+
+def m_rook():
+    """Black rook = the Bastille that John Law threatened him with."""
+    prof = [(0, 0), (0.34, 0), (0.35, 0.012), (0.35, 0.06), (0.32, 0.08), (0.33, 0.10), (0.29, 0.14), (0.24, 0.16),
+            (0.22, 0.20), (0.23, 0.22), (0.19, 0.25), (0.165, 0.45), (0.16, 0.68), (0.17, 0.72), (0.23, 0.76),
+            (0.25, 0.80), (0.25, 0.94), (0.20, 0.94), (0.20, 0.86), (0, 0.86)]
+    lathe("rook", prof, "black", 96, 40)
+    n = 6
+    for k in range(n):
+        a = TAU * (k + 0.5) / n
+        o = box("merlon", (0.11, 0.075, 0.11), (0.225 * math.cos(a), 0.225 * math.sin(a), 0.99), "black", 0.012, rot=(0, 0, a))
+    torus("band1", 0.252, 0.012, (0, 0, 0.80), "gold", seg=72, mseg=8)
+    torus("band2", 0.226, 0.010, (0, 0, 0.21), "gold", seg=72, mseg=8)
+    torus("band3", 0.343, 0.010, (0, 0, 0.065), "gold", seg=72, mseg=8)
+    # arrow-slit windows and a gate facing the viewer
+    for z in (0.40, 0.58):
+        box("slit", (0.03, 0.03, 0.09), (0, -0.168, z), "window", 0.006)
+    # a broken chain lying next to it
+    for i in range(7):
+        a = i * 0.9
+        torus("link", 0.04, 0.009, (0.42 + i * 0.055, -0.16 + 0.02 * math.sin(i), 0.012), "steel",
+              rot=(math.radians(90) if i % 2 else 0, 0, math.radians(20)), seg=20, mseg=6)
+    shift_all(dz=-0.5)
+
+
 def m_quill():
-    lathe("inkwell", [(0, 0), (0.20, 0), (0.22, 0.015), (0.22, 0.13), (0.19, 0.17), (0.11, 0.20), (0.075, 0.22), (0.075, 0.26),
-                      (0.065, 0.26), (0.065, 0.21), (0, 0.21)], "inkglass", 56)
-    torus("neckring", 0.078, 0.012, (0, 0, 0.245), "brass", seg=40, mseg=8)
-    torus("basering", 0.215, 0.01, (0, 0, 0.012), "brass", seg=56, mseg=8)
-    # quill: curved shaft + asymmetric vane in the XZ plane (faces the viewer)
-    P = bezier([(0.01, 0, 0.17), (0.12, -0.01, 0.55), (0.30, -0.02, 0.95), (0.52, -0.03, 1.22)], 40)
-    tube("shaft", [tuple(p) for p in P], 0.008, "ivory", 3)
-    n = len(P)
-    vs, fs = [], []
-    cols = 7
-    for i in range(n):
-        t = i / (n - 1)
-        tang = (P[min(n - 1, i + 1)] - P[max(0, i - 1)]).normalized()
-        side = tang.cross(Vector((0, 1, 0))).normalized()
-        u = max(0.0, (t - 0.22) / 0.78)
-        s = math.sin(math.pi * min(1.0, u * 1.08)) ** 0.6 if u > 0 else 0
-        wl, wr = 0.055 * s, 0.10 * s
-        for j in range(cols):
-            f = -1 + 2 * j / (cols - 1)
-            w = wl if f < 0 else wr
-            p = P[i] + side * (f * w) + Vector((0, 0.025 * f * f * s, 0)) - tang * (0.03 * abs(f) * s)
-            vs.append(tuple(p))
-    for i in range(n - 1):
-        for j in range(cols - 1):
-            a = i * cols + j
-            fs.append((a, a + 1, a + cols + 1, a + cols))
-    finish(mesh_obj("vane", vs, fs), "feather", 70)
-    # letter with a curled edge and a red wax seal
-    def sheet(u, v):
-        x = -0.85 + 0.62 * u
-        y = -0.38 + 0.45 * v
-        z = 0.004
-        if u > 0.82:
-            a = (u - 0.82) / 0.18 * math.pi * 0.9
-            r = 0.05
-            x = -0.85 + 0.62 * 0.82 + r * math.sin(a)
-            z = 0.004 + r * (1 - math.cos(a))
-        return (x, y, z)
-    grid_surface("letter", sheet, 24, 4, "parchment", 70)
-    cyl("seal", 0.045, 0.012, (-0.65, -0.24, 0.012), "seal", seg=24, bevel=0.003)
-    shift_z(-0.55)
+    """Old book 'ESSAI', ink pot and goose quill."""
+    book("essai", 0.62, 0.86, 0.13, "leather", (0, 0, 0.065), rz=math.radians(8), bands=3)
+    t = text_mesh("title", "ESSAI", 0.11, 0.004, "gold", loc=(0, 0, 0.131), rot=(0, 0, math.radians(8 + 90)), res=3)
+    t2 = text_mesh("year", "1755", 0.06, 0.004, "gold", loc=(0, 0, 0.131), rot=(0, 0, math.radians(8 + 90)), res=3)
+    t.location = (0.10 * math.cos(math.radians(8)), 0.10 * math.sin(math.radians(8)), 0.131)
+    t2.location = (-0.12 * math.cos(math.radians(8)), -0.12 * math.sin(math.radians(8)), 0.131)
+    # rotate the texts so they read along the book's long side
+    for o in (t, t2):
+        o.rotation_euler = (0, 0, math.radians(8))
+    # ink pot
+    ip = (0.52, -0.05, 0.0)
+    lathe("inkpot", [(0, 0), (0.13, 0), (0.15, 0.02), (0.15, 0.10), (0.12, 0.15), (0.06, 0.17), (0.06, 0.20), (0.075, 0.21),
+                     (0.075, 0.23), (0.05, 0.23), (0.05, 0.19), (0, 0.19)], "ink", 64, 40, loc=ip)
+    torus("collar", 0.07, 0.01, (ip[0], ip[1], 0.215), "brass", seg=32, mseg=6)
+    torus("potring", 0.15, 0.009, (ip[0], ip[1], 0.06), "brass", seg=48, mseg=6)
+    # quill: shaft + two vanes, standing in the ink pot and leaning back
+    base = Vector((ip[0], ip[1], 0.18))
+    tip_dir = Vector((-0.42, 0.25, 1.0)).normalized()
+    Lq = 0.95
+    pts = []
+    for i in range(9):
+        u = i / 8
+        p = base + tip_dir * (Lq * u) + Vector((-0.06, 0.0, 0)) * (u ** 2)
+        pts.append(tuple(p))
+    tube("shaft", pts, 0.007, "ivory", 3)
+    side = tip_dir.cross(Vector((0, -1, 0))).normalized()
+    for sgn, wmax in ((1, 0.075), (-1, 0.05)):
+        def vane(u, v, sgn=sgn, wmax=wmax):
+            uu = 0.22 + 0.78 * u
+            p = base + tip_dir * (Lq * uu) + Vector((-0.06, 0.0, 0)) * (uu ** 2)
+            prof = math.sin(math.pi * min(1, (u ** 0.8))) ** 0.6 * (1 - 0.25 * u)
+            notch = 0.82 if 0.38 < u < 0.42 or 0.66 < u < 0.69 else 1.0
+            w = wmax * prof * notch * v
+            curl = 0.03 * v * v
+            q = p + side * (w * sgn) + Vector((0, -1, 0)) * curl - tip_dir * (0.05 * v)
+            return tuple(q)
+        grid_surface("vane", 24, 3, vane, "feather", 70)
+    shift_all(dx=-0.2, dz=-0.4)
 
 
-# ------------------------------------------------------------------ wheat sheaf (land = source of wealth)
-def m_wheat():
-    random.seed(5)
-    waist = 0.42
-    for k in range(20):
-        a = TAU * k / 20 + random.uniform(-0.1, 0.1)
-        rb = 0.11 + random.uniform(-0.02, 0.02)
-        fan = (k / 19 - 0.5) * 2  # -1..1 across the sheaf
-        top = Vector((fan * 0.36 + random.uniform(-0.04, 0.04), random.uniform(-0.12, 0.12), 0.98 + 0.12 * (1 - fan * fan) + random.uniform(-0.04, 0.04)))
-        bot = Vector((rb * math.cos(a), rb * math.sin(a), 0.0))
-        mid = Vector((0.045 * math.cos(a), 0.045 * math.sin(a), waist))
-        tube("stalk", [tuple(bot), tuple(mid), tuple(mid + (top - mid) * 0.5 + Vector((0, 0, 0.03))), tuple(top)], 0.007, "stalk", 1)
-        # ear
-        d = (top - mid).normalized()
-        side = d.cross(Vector((0, 1, 0))).normalized()
-        for g in range(14):
-            f = g / 13
-            c = top + d * (0.02 + 0.17 * f)
-            sgn = 1 if g % 2 else -1
-            p = c + side * (sgn * 0.016 * (1 - 0.5 * f))
-            o = sphere("grain", 1.0, tuple(p), "wheat", 8, 5)
-            o.scale = (0.014, 0.012, 0.028 * (1 - 0.3 * f))
-            q = d.to_track_quat("Z", "Y")
-            o.rotation_mode = "QUATERNION"
-            o.rotation_quaternion = q @ Matrix.Rotation(sgn * 0.35, 4, "Y").to_quaternion()
-            if g % 2 == 0:
-                tube("awn", [tuple(p + d * 0.02), tuple(p + d * 0.13 + side * sgn * 0.03)], 0.0012, "wheat", 0, False)
-    torus("band", 0.058, 0.016, (0, 0, waist), "rope", seg=40, mseg=8)
-    torus("band2", 0.060, 0.008, (0, 0, waist + 0.03), "gold", seg=40, mseg=6)
-    shift_z(-0.6)
-
-
-# ------------------------------------------------------------------ dice (uncertainty)
-PIPS = {1: [(0, 0)], 2: [(-1, -1), (1, 1)], 3: [(-1, -1), (0, 0), (1, 1)], 4: [(-1, -1), (1, -1), (-1, 1), (1, 1)],
-        5: [(-1, -1), (1, -1), (0, 0), (-1, 1), (1, 1)], 6: [(-1, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (1, 1)]}
-
-
-def die(name, s, Mx, faces):
-    parts = [box(name, (s, s, s), (0, 0, 0), "dice", 0.07 * s / 0.5, seg=3)]
-    h = s / 2
-    axes = {"+z": (Vector((0, 0, 1)), Vector((1, 0, 0)), Vector((0, 1, 0))), "-z": (Vector((0, 0, -1)), Vector((1, 0, 0)), Vector((0, -1, 0))),
-            "-y": (Vector((0, -1, 0)), Vector((1, 0, 0)), Vector((0, 0, 1))), "+y": (Vector((0, 1, 0)), Vector((-1, 0, 0)), Vector((0, 0, 1))),
-            "+x": (Vector((1, 0, 0)), Vector((0, 1, 0)), Vector((0, 0, 1))), "-x": (Vector((-1, 0, 0)), Vector((0, -1, 0)), Vector((0, 0, 1)))}
-    for f, val in faces.items():
-        n, u, v = axes[f]
-        for a, b in PIPS[val]:
-            p = n * (h - 0.004) + u * (a * s * 0.27) + v * (b * s * 0.27)
-            o = sphere("pip", s * 0.075, tuple(p), "pip", 14, 7)
-            o.scale = Vector((1, 1, 1)) - Vector((abs(n.x), abs(n.y), abs(n.z))) * 0.6
-            parts.append(o)
-    transform(parts, Mx)
+def die(name, size, loc, rot):
+    o = box(name, (size, size, size), (0, 0, 0), "ivory", size * 0.14, seg=4)
+    parts = [o]
+    h = size / 2
+    q = size * 0.26
+    r = size * 0.085
+    faces = {  # face normal -> pip layout
+        (0, 0, 1): [(0, 0)],
+        (0, 0, -1): [(-q, -q), (-q, 0), (-q, q), (q, -q), (q, 0), (q, q)],
+        (0, -1, 0): [(-q, -q), (q, q)],
+        (0, 1, 0): [(-q, -q), (-q, q), (q, -q), (q, q), (0, 0)],
+        (1, 0, 0): [(-q, -q), (0, 0), (q, q)],
+        (-1, 0, 0): [(-q, -q), (-q, q), (q, -q), (q, q)],
+    }
+    for n, pips in faces.items():
+        nv = Vector(n)
+        a = Vector((1, 0, 0)) if abs(nv.x) < 0.5 else Vector((0, 1, 0))
+        b = nv.cross(a)
+        for (u, v) in pips:
+            c = nv * (h - r * 0.35) + a * u + b * v
+            s = sphere("pip", r, tuple(c), "satin", 16, 8)
+            parts.append(s)
+    T = Matrix.Translation(loc) @ Matrix.Rotation(rot[2], 4, "Z") @ Matrix.Rotation(rot[1], 4, "Y") @ Matrix.Rotation(rot[0], 4, "X")
+    xform(parts, T)
+    return parts
 
 
 def m_dice():
-    die("d1", 0.5, Matrix.Translation((-0.30, 0.05, 0.25)) @ Matrix.Rotation(math.radians(18), 4, "Z"),
-        {"+z": 5, "-z": 2, "-y": 3, "+y": 4, "+x": 1, "-x": 6})
-    die("d2", 0.5, Matrix.Translation((0.34, -0.12, 0.33)) @ Matrix.Rotation(math.radians(-28), 4, "Z") @ Matrix.Rotation(math.radians(24), 4, "Y")
-        @ Matrix.Rotation(math.radians(12), 4, "X"), {"+z": 6, "-z": 1, "-y": 2, "+y": 5, "+x": 4, "-x": 3})
-    shift_z(-0.3)
+    """Two dice — income 'at an uncertain price'."""
+    die("d1", 0.42, (-0.22, 0.05, 0.21), (0, 0, math.radians(22)))
+    die("d2", 0.42, (0.30, -0.12, 0.30), (math.radians(35), math.radians(20), math.radians(-30)))
+    shift_all(dz=-0.3)
 
 
-# ------------------------------------------------------------------ barrel (buy now, sell at an unknown price)
-def m_barrel():
-    H, N = 1.0, 20
-    rz = lambda z: 0.34 + 0.07 * math.sin(math.pi * z / H)
-    zs = [H * i / 12 for i in range(13)]
-    loop = [(rz(z), z) for z in zs] + [(rz(z) - 0.03, z) for z in reversed(zs)]
-    gap = 0.006
-    for k in range(N):
-        a0, a1 = TAU * k / N + gap, TAU * (k + 1) / N - gap
-        lathe_arc("stave", loop, a0, a1, 3, "wood_m" if k % 3 else "wood", 25)
-    for z in (0.07, 0.22, 0.78, 0.93):
-        o = torus("hoop", rz(z) + 0.004, 0.012, (0, 0, z), "iron", seg=48, mseg=6)
-        o.scale.z = 2.4
-    for z in (0.03, 0.97):
-        cyl("head", rz(z) - 0.02, 0.025, (0, 0, z), "wood_l", seg=40)
-    # spigot
-    cyl("tap", 0.03, 0.14, (0, -rz(0.2) - 0.05, 0.2), "brass", rot=(math.pi / 2, 0, 0), seg=16)
-    lathe("tapend", [(0, 0), (0.04, 0), (0.035, 0.03), (0, 0.035)], "brass", 16, loc=(0, -rz(0.2) - 0.12, 0.2))
-    objs()[-1].rotation_euler = (math.pi / 2, 0, 0)
-    box("handle", (0.10, 0.02, 0.025), (0, -rz(0.2) - 0.09, 0.25), "brass", 0.006)
-    shift_z(-0.5)
+def m_scales():
+    """Balance: a certain price on one side, an uncertain one on the other."""
+    lathe("base", [(0, 0), (0.36, 0), (0.37, 0.02), (0.34, 0.06), (0.22, 0.09), (0.12, 0.11), (0, 0.11)], "walnut", 72)
+    lathe("pillar", [(0, 0.10), (0.06, 0.10), (0.05, 0.16), (0.035, 0.22), (0.03, 0.95), (0.045, 0.98), (0.03, 1.02), (0, 1.02)],
+          "brass", 40)
+    sphere("finial", 0.045, (0, 0, 1.12), "brass", 24, 12)
+    tilt = math.radians(9)
+    L = 0.62
+    piv = Vector((0, 0, 1.02))
+    d = Vector((math.cos(tilt), 0, -math.sin(tilt)))  # left end goes down (heavier)
+    endL = piv - d * L
+    endR = piv + d * L
+    tube("beam", [tuple(endL), tuple(piv + Vector((0, 0, 0.03))), tuple(endR)], 0.018, "gold", 4)
+    sphere("pivot", 0.04, tuple(piv), "brass", 24, 12)
+    for e in (endL, endR):
+        sphere("end", 0.025, tuple(e), "brass", 16, 8)
+    for e, drop, name in ((endL, 0.52, "L"), (endR, 0.52, "R")):
+        pan_c = e - Vector((0, 0, drop))
+        lathe("pan" + name, [(0, 0.0), (0.12, 0.0), (0.20, 0.035), (0.22, 0.06), (0.215, 0.065), (0.19, 0.04), (0.11, 0.008), (0, 0.008)],
+              "brass", 64, 40, loc=tuple(pan_c))
+        for k in range(3):
+            a = TAU * k / 3 + 0.5
+            tube("chain", [tuple(e), tuple(pan_c + Vector((0.21 * math.cos(a), 0.21 * math.sin(a), 0.06)))], 0.0035, "steel", 2, False)
+        if name == "L":
+            for i in range(5):
+                coin("coin", tuple(pan_c + Vector((0.0, 0.0, 0.03 + i * 0.03))), (0, 0, i * 1.3), r=0.09, t=0.03)
+        else:
+            die("pd", 0.15, tuple(pan_c + Vector((0, 0, 0.09))), (math.radians(12), math.radians(-18), math.radians(30)))
+    shift_all(dz=-0.55)
 
 
-# ------------------------------------------------------------------ ripple bowl (Cantillon effect)
+def m_bread():
+    """A baker's loaf: Cantillon's textbook entrepreneur buys flour at a known price."""
+    random.seed(11)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=72, ring_count=40, radius=0.42)
+    o = bpy.context.active_object
+    o.name = "loaf"
+    me = o.data
+    for v in me.vertices:
+        x, y, z = v.co
+        z = z * 0.70 if z > 0 else z * 0.22
+        r = math.hypot(x, y)
+        # two crossing score lines on the crown
+        g = min(abs(x * 0.92 - y * 0.39), abs(x * 0.39 + y * 0.92))
+        if z > 0.10 and g < 0.018:
+            z -= 0.03 * (1 - g / 0.018)
+        n = 1 + 0.02 * math.sin(7 * x + 3 * y) + 0.015 * math.sin(11 * y - 5 * z)
+        v.co = (x * n, y * n, z * n)
+    finish(o, "crust", 0)
+    o.data.materials.append(M("flour"))
+    for p in me.polygons:
+        x, y, z = p.center
+        g = min(abs(x * 0.92 - y * 0.39), abs(x * 0.39 + y * 0.92))
+        if z > 0.08 and g < 0.014:
+            p.material_index = 1
+        p.use_smooth = True
+    o.location.z = 0.10
+    # cutting board + a small roll + a scattering of flour-coloured grains
+    lathe("board", [(0, 0), (0.62, 0), (0.64, 0.015), (0.64, 0.045), (0.62, 0.06), (0, 0.06)], "walnut", 72, 40, loc=(0.05, 0, -0.06))
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=40, ring_count=20, radius=0.15, location=(0.44, -0.25, 0.04))
+    roll = bpy.context.active_object
+    roll.scale = (1.35, 0.9, 0.62)
+    finish(roll, "crust", 80)
+    for i in range(14):
+        a = random.uniform(0, TAU)
+        rr = random.uniform(0.45, 0.58)
+        s = sphere("grain", 0.012, (0.05 + rr * math.cos(a), rr * math.sin(a), 0.006), "flour", 8, 4)
+        s.scale = (1.8, 1, 0.6)
+    shift_all(dz=-0.2)
+
+
 def m_ripple():
-    lathe("bowl", [(0, 0), (0.40, 0), (0.48, 0.02), (0.60, 0.10), (0.66, 0.15), (0.68, 0.17), (0.66, 0.18), (0.62, 0.16),
-                   (0.55, 0.11), (0.40, 0.05), (0, 0.04)], "brass", 72)
-    torus("rim", 0.67, 0.012, (0, 0, 0.172), "gold", seg=72, mseg=8)
-    NR, NA = 42, 72
-    vs, fs = [(0, 0, 0.142)], []
+    """A coin dropping into water: new money spreads in rings — the Cantillon effect."""
+    R = 0.62
+    lathe("bowl", [(0, -0.10), (R * 0.85, -0.10), (R, -0.06), (R + 0.04, 0.03), (R + 0.06, 0.05), (R + 0.04, 0.065), (R, 0.04),
+                   (R * 0.86, -0.06), (0, -0.07)], "brass", 96, 40)
+    NR, NA = 48, 96
+    verts, faces = [(0, 0, 0.012)], []
     for i in range(1, NR + 1):
-        r = 0.62 * i / NR
-        z = 0.13 + 0.016 * math.cos(30 * r) * math.exp(-2.2 * r)
+        r = R * 0.985 * i / NR
         for j in range(NA):
             a = TAU * j / NA
-            vs.append((r * math.cos(a), r * math.sin(a), z))
+            z = 0.022 * math.cos(r * 34) * math.exp(-r * 3.2) + 0.004
+            verts.append((r * math.cos(a), r * math.sin(a), z))
     for j in range(NA):
-        fs.append((0, 1 + j, 1 + (j + 1) % NA))
+        faces.append((0, 1 + j, 1 + (j + 1) % NA))
     for i in range(NR - 1):
         for j in range(NA):
-            a, b = 1 + i * NA + j, 1 + i * NA + (j + 1) % NA
-            fs.append((a, b, b + NA, a + NA))
-    finish(mesh_obj("water", vs, fs), "water", 80)
-    # splash crown + falling coin
-    for k in range(9):
-        a = TAU * k / 9
-        sphere("drop", 0.016 - 0.004 * (k % 2), (0.07 * math.cos(a), 0.07 * math.sin(a), 0.17 + 0.03 * (k % 3)), "water", 12, 6)
-    sphere("drop", 0.02, (0, 0, 0.24), "water", 12, 6)
-    coin_lp("coin", (0, 0, 0.44), (math.radians(62), math.radians(18), 0), r=0.12, t=0.024, seg=40)
-    shift_z(-0.2)
-
-
-# ------------------------------------------------------------------ compass (he was first)
-def star_loop(n, r_out, r_in, rot=0.0):
-    pts = []
-    for i in range(2 * n):
-        a = rot + math.pi * i / n
-        r = r_out if i % 2 == 0 else r_in
-        pts.append((r * math.cos(a), r * math.sin(a)))
-    return pts
+            a = 1 + i * NA + j
+            b = 1 + i * NA + (j + 1) % NA
+            faces.append((a, a + NA, b + NA, b))
+    w = mesh_obj("water", verts, faces)
+    finish(w, "water", 80)
+    # splash crown + the coin
+    for k in range(10):
+        a = TAU * k / 10
+        s = sphere("drop", 0.016, (0.07 * math.cos(a), 0.07 * math.sin(a), 0.07 + 0.03 * (k % 3)), "chrome", 12, 6)
+    coin("coin", (0.0, 0.0, 0.34), (math.radians(62), math.radians(12), 0), r=0.13, t=0.025)
+    shift_all(dz=-0.12)
 
 
 def m_compass():
-    lathe("case", [(0, 0), (0.50, 0), (0.52, 0.02), (0.52, 0.15), (0.50, 0.17), (0.46, 0.17), (0.46, 0.06), (0, 0.06)], "brass", 72)
-    torus("bezel", 0.485, 0.018, (0, 0, 0.17), "gold", seg=72, mseg=10)
-    cyl("rose", 0.455, 0.01, (0, 0, 0.065), "rose", seg=72)
-    o = profile2d("star8", [star_loop(8, 0.40, 0.10, math.pi / 8)], 0.006, 0.002, "brass_d", 1)
-    o.location.z = 0.072
-    o = profile2d("star4", [star_loop(4, 0.43, 0.08)], 0.009, 0.002, "gold", 1)
-    o.location.z = 0.075
+    """Pocket compass: steering by judgement under uncertainty."""
+    Rr, h = 0.5, 0.10
+    lathe("case", [(0, -h), (Rr - 0.02, -h), (Rr, -h + 0.02), (Rr + 0.01, 0), (Rr, h - 0.01), (Rr - 0.03, h), (Rr - 0.05, h - 0.005),
+                   (Rr - 0.05, 0.02), (0, 0.02)], "brass", 96, 40)
+    lathe("dial", [(0, 0.021), (Rr - 0.05, 0.021)], "ivory", 72)
     for k in range(32):
         a = TAU * k / 32
-        box("tick", (0.035 if k % 4 == 0 else 0.018, 0.006, 0.004), (0.43 * math.cos(a), 0.43 * math.sin(a), 0.072), "pip", 0, rot=(0, 0, a))
-    # needle (north red)
-    nN = profile2d("needleN", [[(0, 0.36), (0.04, 0), (-0.04, 0)]], 0.012, 0.002, "seal", 1)
-    nS = profile2d("needleS", [[(0, -0.36), (-0.04, 0), (0.04, 0)]], 0.012, 0.002, "steel", 1)
-    for o in (nN, nS):
-        o.location.z = 0.09
-        o.rotation_euler = (0, 0, math.radians(-25))
-    sphere("pivot", 0.025, (0, 0, 0.105), "gold", 16, 8)
-    lathe("glass", [(0.46, 0.165), (0.30, 0.19), (0, 0.20)], "glass", 64)
-    # ring handle at the back
-    torus("loop", 0.07, 0.014, (0, 0.56, 0.12), "gold", rot=(0, math.pi / 2, 0), seg=32, mseg=8)
-    shift_z(-0.1)
+        long = k % 8 == 0
+        Ln = 0.07 if long else (0.045 if k % 4 == 0 else 0.03)
+        rr = Rr - 0.09 - Ln / 2
+        box("tick", (Ln, 0.008 if not long else 0.014, 0.003), (rr * math.cos(a), rr * math.sin(a), 0.024), "satin", 0, rot=(0, 0, a))
+    torus("dialring", Rr - 0.16, 0.004, (0, 0, 0.024), "brass_d", seg=72, mseg=4)
+    for txt, a in (("N", 90), ("E", 0), ("S", -90), ("W", 180)):
+        rr = Rr - 0.22
+        text_mesh("lt" + txt, txt, 0.07, 0.003, "ember" if txt == "N" else "satin",
+                  loc=(rr * math.cos(math.radians(a)), rr * math.sin(math.radians(a)), 0.025), rot=(0, 0, math.radians(a - 90)), res=3)
+    # needle (north half red)
+    an = math.radians(68)
+    dn = Vector((math.cos(an), math.sin(an), 0)); pn = Vector((-dn.y, dn.x, 0))
+    for sgn, mat in ((1, "oxblood"), (-1, "steel")):
+        tip = dn * (0.30 * sgn)
+        verts = [(0, 0, 0.04), tuple(pn * 0.03 + Vector((0, 0, 0.035))), tuple(tip + Vector((0, 0, 0.035))), tuple(-pn * 0.03 + Vector((0, 0, 0.035))),
+                 (0, 0, 0.03)]
+        o = mesh_obj("needle", verts, [(0, 1, 2), (0, 2, 3), (4, 2, 1), (4, 3, 2)])
+        finish(o, mat, 0)
+    cyl("pin", 0.018, 0.03, (0, 0, 0.045), "brass", seg=16)
+    lathe("glass", [(0, 0.075), (Rr - 0.04, 0.07)], "glass", 72)
+    # bow and crown
+    cyl("crown", 0.04, 0.08, (0, Rr + 0.04, 0), "brass", rot=(math.radians(90), 0, 0), seg=24)
+    torus("bow", 0.09, 0.016, (0, Rr + 0.15, 0), "brass", rot=(0, math.radians(90), 0), seg=32, mseg=8)
+    rot_all(rx=62)
 
 
-# ------------------------------------------------------------------ candle (the night of 14 May 1734)
 def m_candle():
-    lathe("dish", [(0, 0), (0.36, 0), (0.40, 0.02), (0.42, 0.05), (0.41, 0.06), (0.37, 0.035), (0.10, 0.03), (0, 0.03)], "brass", 64)
-    lathe("socket", [(0, 0.03), (0.09, 0.03), (0.08, 0.06), (0.10, 0.13), (0.115, 0.15), (0.11, 0.16), (0, 0.16)], "brass", 40)
-    torus("handle", 0.075, 0.014, (0.46, 0, 0.06), "brass", rot=(math.pi / 2, 0, 0), seg=32, mseg=8)
-    H = 0.80
-    prof = [(0, 0.15), (0.085, 0.15), (0.085, H - 0.03), (0.08, H - 0.005), (0.065, H), (0.04, H - 0.015), (0, H - 0.02)]
-    lathe("candle", prof, "wax", 40)
-    random.seed(2)
+    """Brass chamberstick with a burning candle — the night of 14 May 1734."""
+    lathe("pan", [(0, 0), (0.30, 0), (0.33, 0.015), (0.34, 0.045), (0.32, 0.05), (0.29, 0.025), (0.06, 0.02), (0, 0.02)], "brass", 80)
+    lathe("socket", [(0, 0.02), (0.07, 0.02), (0.09, 0.05), (0.075, 0.08), (0.085, 0.16), (0.11, 0.18), (0.10, 0.20), (0.075, 0.19), (0, 0.19)],
+          "brass", 64)
+    torus("handle", 0.075, 0.016, (0.40, 0, 0.11), "brass", rot=(math.radians(90), 0, 0), seg=40, mseg=8)
+    box("handlebar", (0.10, 0.03, 0.012), (0.32, 0, 0.04), "brass", 0.004)
+    hc = 0.62
+    prof = [(0, 0.18), (0.068, 0.18)]
+    for i in range(1, 12):
+        z = 0.18 + hc * i / 11
+        prof.append((0.068 - 0.002 * math.sin(i), z))
+    prof += [(0.062, 0.18 + hc + 0.01), (0.04, 0.18 + hc - 0.01), (0, 0.18 + hc - 0.015)]
+    lathe("candle", prof, "wax", 48, 50)
+    random.seed(5)
     for k in range(5):
-        a = TAU * k / 5 + 0.3
-        L = random.uniform(0.08, 0.28)
-        p0 = Vector((0.087 * math.cos(a), 0.087 * math.sin(a), H - 0.01))
-        p1 = Vector((0.092 * math.cos(a), 0.092 * math.sin(a), H - 0.01 - L))
-        tube("drip", [tuple(p0), tuple((p0 + p1) / 2 + Vector((0.004 * math.cos(a), 0.004 * math.sin(a), 0))), tuple(p1)], 0.012, "wax", 2)
-        sphere("dripend", 0.016, tuple(p1), "wax", 12, 6)
-    tube("wick", [(0, 0, H - 0.025), (0.004, 0, H + 0.03), (0.012, 0, H + 0.05)], 0.005, "satin", 2)
-    flame = [(0, H + 0.02)]
-    for i in range(1, 16):
-        t = i / 16
-        flame.append((0.045 * math.sin(math.pi * t ** 0.7) * (1 - t) ** 0.35 + 0.001, H + 0.02 + 0.22 * t))
-    flame.append((0, H + 0.245))
-    lathe("flame", flame, "flame", 24, 80)
-    core = [(0, H + 0.03)] + [(0.018 * math.sin(math.pi * (i / 8) ** 0.8) + 0.001, H + 0.03 + 0.09 * i / 8) for i in range(1, 8)] + [(0, H + 0.125)]
-    lathe("core", core, "flame2", 16, 80)
-    shift_z(-0.5)
+        a = random.uniform(0, TAU)
+        ln = random.uniform(0.08, 0.22)
+        z0 = 0.18 + hc - 0.01
+        s = sphere("drip", 0.016, (0.067 * math.cos(a), 0.067 * math.sin(a), z0 - ln / 2), "wax", 16, 10)
+        s.scale = (1, 1, ln / 0.032)
+    tube("wick", [(0, 0, 0.18 + hc - 0.02), (0.004, 0, 0.18 + hc + 0.04), (0.012, 0, 0.18 + hc + 0.07)], 0.004, "satin", 2)
+    fz = 0.18 + hc + 0.04
+    lathe("flame", [(0, fz), (0.022, fz + 0.02), (0.03, fz + 0.06), (0.024, fz + 0.11), (0.012, fz + 0.15), (0, fz + 0.19)], "flame", 32, 80)
+    shift_all(dz=-0.5)
 
 
-# ------------------------------------------------------------------ key (to the theory of entrepreneurship)
-def circle(c, r, n=32):
-    return [(c[0] + r * math.cos(TAU * i / n), c[1] + r * math.sin(TAU * i / n)) for i in range(n)][::-1]
-
-
-def m_key():
-    t = 0.06
-    bx = -0.78
-    outer = [(bx + (0.28 + 0.025 * math.cos(8 * TAU * i / 96)) * math.cos(TAU * i / 96),
-              (0.28 + 0.025 * math.cos(8 * TAU * i / 96)) * math.sin(TAU * i / 96)) for i in range(96)]
-    holes = [circle((bx + 0.13 * math.cos(a), 0.13 * math.sin(a)), 0.068, 24) for a in (0, math.pi / 2, math.pi, 3 * math.pi / 2)]
-    holes.append(circle((bx, 0), 0.03, 16))
-    profile2d("bow", [outer] + holes, t, 0.012, "gold", 2)
-    cyl("shaft", 0.042, 1.06, (0.05, 0, t / 2), "gold", rot=(0, math.pi / 2, 0), seg=24)
-    for x, r in ((-0.48, 0.065), (-0.36, 0.055), (0.56, 0.05)):
-        torus("collar", r - 0.01, 0.018, (x, 0, t / 2), "gold", rot=(0, math.pi / 2, 0), seg=32, mseg=8)
-    bit = [(0.28, -0.03), (0.52, -0.03), (0.52, -0.30), (0.46, -0.30), (0.46, -0.22), (0.41, -0.22), (0.41, -0.30),
-           (0.35, -0.30), (0.35, -0.16), (0.31, -0.16), (0.31, -0.30), (0.28, -0.30)]
-    profile2d("bit", [bit], t, 0.008, "gold", 2)
-    # tassel ribbon through the bow
-    tube("ribbon", [(bx - 0.25, 0.0, t / 2), (bx - 0.40, -0.03, -0.12), (bx - 0.38, -0.05, -0.40)], 0.022, "seal", 3)
-    rot_all(rx=90)
-
-
-# ------------------------------------------------------------------ small coin that rolls along the progress track
-def m_coin_s():
-    r, t = 1.0, 0.16
-    lathe("coin", [(0, -t / 2), (0.86 * r, -t / 2), (r, -t / 2 + 0.03), (r, t / 2 - 0.03), (0.86 * r, t / 2), (0.80 * r, t / 2 - 0.02),
-                   (0, t / 2 - 0.02)], "gold", 48)
-    for k in range(24):
-        a = TAU * k / 24
-        sphere("bead", 0.035, (0.72 * math.cos(a), 0.72 * math.sin(a), t / 2 - 0.01), "brass", 8, 4)
-    # a big raised "C" — asymmetric, so the rolling is visible
-    outer = [(0.50 * math.cos(a), 0.50 * math.sin(a)) for a in [math.radians(40 + 280 * i / 40) for i in range(41)]]
-    inner = [(0.30 * math.cos(a), 0.30 * math.sin(a)) for a in [math.radians(40 + 280 * i / 40) for i in range(40, -1, -1)]]
-    o = profile2d("C", [outer + inner], 0.05, 0.015, "brass", 1)
-    o.location.z = t / 2 - 0.03
-    rot_all(rx=90)
-
-
-# ------------------------------------------------------------------ globe with Cantillon's route (Kerry -> ... -> Suriname)
-def m_globe():
-    import numpy as np
-    from global_land_mask import globe as gl
-    W, Hh = 1024, 512
-    lats = np.linspace(89.9, -89.9, Hh)
-    lons = np.linspace(-180, 179.9, W)
-    LON, LAT = np.meshgrid(lons, lats)
-    land = gl.is_land(LAT, LON)
-    img = np.zeros((Hh, W, 4), dtype=np.float32)
-    ocean = np.array([0.055, 0.030, 0.020, 1])
-    landc = np.array([0.72, 0.52, 0.25, 1])
-    img[:] = ocean
-    img[land] = landc
-    grid = (np.abs(((LAT + 90) % 15) - 7.5) > 7.32) | (np.abs(((LON + 180) % 15) - 7.5) > 7.38)
-    img[grid & ~land] = ocean * 0.4 + landc * 0.35
-    img[..., 3] = 1
-    im = bpy.data.images.new("earth", W, Hh, alpha=False)
-    im.pixels = img[::-1].ravel().tolist()
-    im.filepath_raw = os.path.join(mm.OUT, "_earth.png")
-    im.file_format = "PNG"
-    im.save()
-    m = bpy.data.materials.new("earth")
-    nt = m.node_tree
-    b = nt.nodes["Principled BSDF"]
-    tex = nt.nodes.new("ShaderNodeTexImage")
-    tex.image = im
-    nt.links.new(tex.outputs["Color"], b.inputs["Base Color"])
-    b.inputs["Metallic"].default_value = 0.35
-    b.inputs["Roughness"].default_value = 0.38
-    R = 0.5
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=72, ring_count=36, radius=R)
-    s = bpy.context.active_object
-    s.name = "earth"
-    finish(s, m, 80)
-
-    def ll(lat, lon, rr=R):
-        la, lo = math.radians(lat), math.radians(lon + 180)
-        return Vector((rr * math.cos(la) * math.cos(lo), rr * math.cos(la) * math.sin(lo), rr * math.sin(la)))
-
-    cities = {"kerry": (52.27, -9.70), "paris": (48.86, 2.35), "madrid": (40.42, -3.70), "amsterdam": (52.37, 4.90),
-              "london": (51.51, -0.13), "suriname": (5.85, -55.20)}
-    for k, (la, lo) in cities.items():
-        sphere("pin_" + k, 0.02, tuple(ll(la, lo, R * 1.01)), "ivory" if k != "suriname" else "seal", 16, 8)
-    route = [("kerry", "paris", "ember"), ("paris", "madrid", "ember"), ("paris", "amsterdam", "ember"),
-             ("amsterdam", "london", "ember"), ("london", "suriname", "seal")]
-    for a, b2, mat in route:
-        A, B = ll(*cities[a]), ll(*cities[b2])
-        ang = A.angle(B)
-        pts = []
-        for i in range(25):
-            t = i / 24
-            P = A.slerp(B, t) if hasattr(A, "slerp") else (A * (1 - t) + B * t)
-            P = P.normalized() * (R * (1.012 + 0.10 * math.sin(math.pi * t) * min(1.0, ang * 1.4)))
-            pts.append(tuple(P))
-        tube("arc", pts, 0.008, mat, 3)
-    for o in objs():
-        o.matrix_world = Matrix.Rotation(math.radians(-62), 4, "Z") @ o.matrix_world
-    for o in objs():
-        o.matrix_world = Matrix.Rotation(math.radians(-14), 4, "X") @ o.matrix_world
-        o.matrix_world = Matrix.Rotation(math.radians(23.4), 4, "Y") @ o.matrix_world
-        o.matrix_world = Matrix.Translation((0, 0, 0.72)) @ o.matrix_world
-    ax = Matrix.Translation((0, 0, 0.72)) @ Matrix.Rotation(math.radians(23.4), 4, "Y")
-    pts = [tuple(ax @ Vector((-0.56 * math.cos(math.radians(-95 + 190 * i / 60)), 0, 0.56 * math.sin(math.radians(-95 + 190 * i / 60))))) for i in range(61)]
-    tube("meridian", pts, 0.016, "brass", 6)
-    for zz in (0.585, -0.585):
-        cyl("pivot", 0.02, 0.06, tuple(ax @ Vector((0, 0, zz))), "brass", seg=16)
-    lathe("stand", [(0, 0.0), (0.30, 0.0), (0.31, 0.02), (0.29, 0.05), (0.18, 0.08), (0.10, 0.10), (0.06, 0.14),
-                    (0.045, 0.20), (0.04, 0.16), (0.0, 0.16)], "walnut", 72)
-    tube("post", [(0, 0, 0.12), (0, 0, 0.17), tuple(ax @ Vector((0, 0, -0.56)))], 0.03, "brass", 6, False)
-    torus("standring", 0.295, 0.01, (0, 0, 0.022), "brass", seg=64, mseg=8)
-    shift_z(-0.62)
+def m_globe_c():
+    """Cantillon's banking map: Kerry -> Paris hub -> London, Amsterdam, Brussels, Vienna, Cadiz, Louisiana."""
+    cities = {"kerry": (52.2, -9.6), "paris": (48.86, 2.35), "london": (51.5, -0.13), "amsterdam": (52.37, 4.9),
+              "brussels": (50.85, 4.35), "vienna": (48.2, 16.4), "cadiz": (36.5, -6.3), "louisiana": (30.0, -90.1)}
+    edges = [("kerry", "paris"), ("paris", "london"), ("paris", "amsterdam"), ("paris", "brussels"), ("paris", "vienna"),
+             ("paris", "cadiz"), ("paris", "louisiana")]
+    mm.m_globe(cities, edges, arc_mat="ember", pin_mat="ivory", spin=-62, arc_r=0.013, pin_r=0.026)
 
 
 MODELS = {
-    "ship": m_ship, "harp": m_harp, "globe": m_globe, "chest": m_chest, "bubble": m_bubble, "scales": m_scales,
-    "quill": m_quill, "wheat": m_wheat, "dice": m_dice, "barrel": m_barrel, "ripple": m_ripple, "compass": m_compass,
-    "candle": m_candle, "key": m_key, "coin_s": m_coin_s,
+    "louis": m_louis, "ship": m_ship, "harp": m_harp, "chest": m_chest, "bubble": m_bubble, "rook": m_rook,
+    "quill": m_quill, "dice": m_dice, "scales": m_scales, "bread": m_bread, "ripple": m_ripple, "compass": m_compass,
+    "candle": m_candle, "globe_c": m_globe_c,
 }
 
 if __name__ == "__main__":

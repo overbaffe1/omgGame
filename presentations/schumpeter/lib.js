@@ -47,7 +47,7 @@ function runOpts(r, o) {
 function toPptx(pres, slides) {
   slides.forEach((s, si) => {
     const ps = pres.addSlide();
-    ps.background = { color: "080D1A" };
+    ps.background = { color: s.bg || "080D1A" };
     s._anims = [];
     let k = 0;
     for (const e of s.els) {
