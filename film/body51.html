@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Вайбкодер из Мурманска — мультик по фактам @body51</title>
+<meta name="description" content="Процедурный вертикальный мультфильм про инди-разработчика @body51: 12 глав, всё нарисовано кодом, музыка синтезирована, реплики — титрами по субтитрам стримов.">
+<style>
+  html,body{margin:0;height:100%;background:#05060a;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#eef2f8;overflow:hidden}
+  #wrap{position:relative;height:min(98vh,min(96vw,170vh));aspect-ratio:9/16;max-width:96vw}
+  canvas{width:100%;height:100%;display:block;border-radius:12px;background:#05060a;box-shadow:0 0 80px #000a}
+  #intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#05060ad9;border-radius:12px;text-align:center;padding:24px}
+  #intro h1{font-size:clamp(22px,4vw,40px);margin:0;letter-spacing:-.02em}
+  #intro h1 span{color:#ffc06a}
+  #intro p{margin:0;max-width:44ch;color:#a9b2c0;font-size:14px;line-height:1.5}
+  #intro button,#intro a{font:inherit;font-size:18px;padding:12px 26px;border-radius:30px;border:1px solid #ffc06a;background:#0000;color:#ffc06a;cursor:pointer;text-decoration:none}
+  #intro button:hover,#intro a:hover{background:#ffc06a1f}
+  .foot{position:fixed;left:14px;bottom:10px;right:14px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:12px;color:#7c8595;text-align:center}
+  .foot a{color:#9fd8ff;text-decoration:none;border-bottom:1px dotted #9fd8ff66}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="c" width="1080" height="1920"></canvas>
+  <div id="intro">
+    <h1>Вайбкодер<br><span>из Мурманска</span></h1>
+    <p>12 глав про инди-разработчика <b>@body51</b>: десять лет без релиза, 7 принтеров, ноль контуров,
+       кот Гуччи и автокормушка Валера. Всё нарисовано кодом, музыка синтезирована, реплики — титрами дословно по субтитрам стримов.</p>
+    <button id="play">▶ Смотреть (~5 минут)</button>
+    <p style="opacity:.7">Голос за кадром — рассказчик, не Артём. Фанатский мультик по фактам, а не нарезка стримов.</p>
+  </div>
+</div>
+<div class="foot">
+  <span>Музыка и картинка — код · <a href="body51.mp4" download>скачать MP4</a></span>
+  <span>Как собрано: <a href="tools/README.md">film/tools/README.md</a></span>
+  <span>Факты и мем-библия: <a href="../body51/facts.md">body51/facts.md</a></span>
+  <span><a href="index.html">← в галерею процедурного кино</a></span>
+</div>
+<script>
+  // своё интро поверх плеера: прячем его и стартуем воспроизведение в том же клике
+  // (клик пользователя — единственный способ разбудить Web Audio)
+  const intro=document.getElementById('intro');
+  document.getElementById('play').addEventListener('click',()=>{
+    intro.style.display='none';
+    const cv=document.getElementById('c');cv.click();
+  });
+</script>
+<script src="body51-timing.js"></script>
+<script src="fx.js"></script>
+<script src="player.js"></script>
+<script src="body51-film.js"></script>
+<script src="body51-scenes.js"></script>
+<script src="body51-score.js"></script>
+<script src="body51-run.js"></script>
+</body>
+</html>

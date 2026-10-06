@@ -3,10 +3,58 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="0; url=meme-video.html">
-<title>Сгенерированный ролик — body51</title>
+<title>body51 — мультик, мем-монтаж и материал</title>
+<style>
+  :root{color-scheme:dark}
+  body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#25253a,#090b12 60%);
+       color:#f1eee6;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+       display:flex;align-items:center;justify-content:center;padding:28px}
+  main{width:min(100%,760px)}
+  h1{font:italic 34px Georgia,serif;color:#f4d9a0;margin:0 0 6px}
+  p.sub{color:#a4a9b5;margin:0 0 26px;font-size:15px}
+  a.card{display:block;text-decoration:none;color:inherit;border:1px solid #ffffff1c;border-radius:16px;
+         padding:16px 18px;margin-bottom:12px;background:#ffffff08;transition:.2s}
+  a.card:hover{background:#ffffff12;border-color:#ffc97855;transform:translateY(-1px)}
+  a.card b{display:block;font-size:19px;margin-bottom:4px}
+  a.card span{color:#a4a9b5;font-size:14px}
+  .tag{display:inline-block;font:11px ui-monospace,monospace;padding:3px 8px;border-radius:9px;
+       background:#ffffff14;margin:8px 6px 0 0;color:#cfd6e2}
+  .tiny{color:#7c8595;font-size:12px;margin-top:18px}
+</style>
 </head>
 <body>
-<p>Открываю <a href="meme-video.html">сгенерированный мем-монтаж</a>…</p>
+<main>
+  <h1>@body51</h1>
+  <p class="sub">Фанатские материалы по стримам: мультик, мем-монтаж и разобранные факты.</p>
+
+  <a class="card" href="../film/body51.html">
+    <b>🎬 Мультик «Вайбкодер из Мурманска»</b>
+    <span>12 глав про 10 лет без релиза, лысого кота Гуччи и лимиты Codex. Картинка и музыка — код,
+    реплики — титрами по субтитрам стримов.</span>
+    <span class="tag">~5 мин</span><span class="tag">9:16 · 1080×1920</span><span class="tag">MP4 готов</span>
+  </a>
+
+  <a class="card" href="meme-video.html">
+    <b>📼 Мем-монтаж «Нейронка, чат и следующий баг»</b>
+    <span>Тёплая процедурная анимация 2:20 с плашками цитат и монтажным листом.</span>
+    <span class="tag">2:20</span><span class="tag">9:16</span><span class="tag">монтажный лист в .md</span>
+  </a>
+
+  <a class="card" href="meme-cut.html">
+    <b>🔎 Подборка источников</b>
+    <span>Кандидаты на сцены: точные фразы, ссылки и таймкоды для проверки по исходным стримам.</span>
+    <span class="tag">интерактивно</span>
+  </a>
+
+  <a class="card" href="facts.md">
+    <b>📚 Факты и мем-библия</b>
+    <span><code>facts.md</code> — факты с номерами стримов, <code>meme-bible.md</code> — коронные фразы и
+    список тем, которые в видео не берём.</span>
+    <span class="tag">facts.md</span><span class="tag">meme-bible.md</span>
+  </a>
+
+  <p class="tiny">Открывать через статический сервер из корня репозитория: <code>python3 -m http.server 8080</code>,
+  затем <code>/body51/</code> или <code>/film/</code>.</p>
+</main>
 </body>
 </html>
