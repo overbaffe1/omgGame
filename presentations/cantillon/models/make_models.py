@@ -1034,10 +1034,259 @@ def m_candle():
     return rig, anim, 4.0
 
 
+# ------------------------------------------------------------------ v4: exhibits for the extra slides
+def m_globe_a():
+    """Context of the era: the globe of 1700-1730 turns on its axis inside the meridian ring —
+    trade routes of the colonial powers (silver fleet, Louisiana, the Indies) glow on it."""
+    rig = Rig()
+    cities = {"london": (51.5, -0.13), "paris": (48.86, 2.35), "amsterdam": (52.37, 4.9), "cadiz": (36.5, -6.3),
+              "vienna": (48.2, 16.4), "neworleans": (30.0, -90.1), "veracruz": (19.2, -96.1), "caribbean": (18.0, -72.0),
+              "boston": (42.4, -71.1)}
+    edges = [("cadiz", "veracruz"), ("paris", "neworleans"), ("london", "boston"), ("amsterdam", "caribbean"),
+             ("paris", "london"), ("paris", "vienna")]
+    mm.m_globe(cities, edges, arc_mat="gold", pin_mat="ivory", spin=-55, arc_r=0.0075, pin_r=0.022)
+    objs = [o for o in bpy.context.scene.objects if o.name.split(".")[0] in ("earth", "arc") or o.name.startswith("pin_")]
+    c = [o for o in objs if o.name.startswith("earth")][0].matrix_world.translation.copy()
+    rig.bone("earth", tuple(c))
+    rig.take_objs(objs, "earth")
+    ax = (math.sin(math.radians(23.4)), 0, math.cos(math.radians(23.4)))
+
+    def anim(t):
+        return {"earth": {"rot": [(ax, 360 * t)]}}
+    return rig, anim, 8.0
+
+
+def magnifier(rig, name, at, r=0.17, tilt=0):
+    m = rig.mark()
+    torus(name + "_rim", r, 0.018, at, "brass", seg=64, mseg=10)
+    cyl(name + "_lens", r - 0.01, 0.01, at, "glass", seg=48)
+    tube(name + "_handle", [(at[0] + r + 0.01, at[1] - 0.02, at[2]), (at[0] + r + 0.09, at[1] - 0.07, at[2] + 0.01)], 0.02, "brass", 3, False)
+    lathe(name + "_grip", [(0, 0), (0.028, 0), (0.032, 0.05), (0.03, 0.17), (0.034, 0.21), (0, 0.22)], "walnut", 24, 40,
+          loc=(0, 0, 0))
+    g = [o for o in bpy.context.scene.objects if o.name.startswith(name + "_grip")][-1]
+    g.matrix_world = (Matrix.Translation((at[0] + r + 0.08, at[1] - 0.065, at[2] + 0.01))
+                      @ Matrix.Rotation(math.radians(-90), 4, "Y") @ Matrix.Rotation(math.radians(-33), 4, "X"))
+    T = Matrix.Translation(at) @ Matrix.Rotation(math.radians(tilt), 4, "X") @ Matrix.Translation(-Vector(at))
+    xform([o for o in bpy.context.scene.objects if o not in m], T)
+    return m
+
+
+def m_books_c():
+    """Who influenced him: Petty, Locke and Law on the desk; a magnifying glass reads them one by one,
+    the ribbon bookmark sways."""
+    rig = Rig()
+    z = 0
+    specs = [(1.20, 0.84, 0.20, "brown", 3, 3, "PETTY · 1690"), (1.08, 0.78, 0.17, "navy", -4, 2, "LOCKE · 1692"),
+             (1.00, 0.72, 0.15, "oxblood", 5, 2, "LAW · 1705")]
+    for i, (w, d, t, col, rz, bands, lab) in enumerate(specs):
+        book(f"b{i}", w, d, t, col, Vector((0.02 * i, 0.01 * i, z + t / 2)), rz, bands)
+        a = math.radians(rz)
+        # gilt title on the front edge (the side that faces the audience)
+        fx, fy = 0.02 * i + math.sin(a) * (d / 2 + 0.004), 0.01 * i - math.cos(a) * (d / 2 + 0.004)
+        text_mesh(f"t{i}", lab, t * 0.5, 0.004, "gold", loc=(fx, fy, z + t / 2), rot=(math.radians(90), 0, a), res=2)
+        z += t
+    top = z
+    # an open letter on top of the stack
+    box("letter", (0.42, 0.30, 0.004), (-0.12, -0.02, top + 0.002), "paper", 0.0, rot=(0, 0, math.radians(-12)))
+    for k in range(5):
+        box("line", (0.30 - 0.04 * (k % 2), 0.008, 0.0015), (-0.13, 0.08 - 0.045 * k, top + 0.005), "ink", 0.0, rot=(0, 0, math.radians(-12)))
+    # ribbon bookmark (own bone, sways)
+    rp = (0.30, -0.36, top - 0.03)
+    m = rig.mark()
+    tube("ribbon", [rp, (0.31, -0.42, top - 0.08), (0.32, -0.44, top - 0.20), (0.32, -0.44, top - 0.33)], 0.012, "oxblood", 2)
+    rig.take(m, "ribbon", head=rp)
+    # the magnifier hovers over the letter and sweeps across the stack
+    piv = (0.0, 0.0, top + 0.16)
+    m = magnifier(rig, "mag", (-0.16, -0.10, top + 0.16), r=0.23, tilt=48)
+    rig.take(m, "mag", head=piv)
+    rig.shift(dz=-top / 2 - 0.08)
+    rig.rotate(rz=-8)
+
+    def anim(t):
+        sweep = 38 * math.sin(TAU * t)
+        return {"mag": {"rot": [((0, 0, 1), sweep), ((1, 0, 0), 6 * math.sin(TAU * 2 * t))],
+                        "loc": (0, 0, 0.03 * math.sin(TAU * 2 * t + 0.6))},
+                "ribbon": {"rot": [((1, 0, 0), 9 * math.sin(TAU * 2 * t)), ((0, 1, 0), 5 * math.sin(TAU * t + 1))]}}
+    return rig, anim, 6.0
+
+
+def m_hourglass_c():
+    """Strengths and weaknesses — the test of time: sand runs down, then the hourglass flips itself over.
+    Seamless loop: the frame is symmetric under the 180-degree turn, and the full pile is swapped for a
+    mirrored funnel while the glass is horizontal."""
+    rig = Rig()
+    H = 0.60
+    rig.bone("frame", (0, 0, 0))
+    m = rig.mark()
+    for z, sg in ((-H - 0.06, 1), (H + 0.06, -1)):
+        lathe("plate", [(0, z - 0.05 * sg), (0.42, z - 0.05 * sg), (0.44, z - 0.03 * sg), (0.44, z + 0.03 * sg), (0.42, z + 0.05 * sg),
+                        (0, z + 0.05 * sg)], "walnut", 72)
+        torus("platering", 0.44, 0.012, (0, 0, z), "brass", seg=72, mseg=8)
+    for k in range(3):
+        a = TAU * k / 3 + math.pi / 2  # 90/210/330 deg: the set maps onto itself under the flip about Y
+        prof = [(0, -H), (0.03, -H), (0.045, -H + 0.04), (0.03, -H + 0.10), (0.035, -0.2), (0.05, 0), (0.035, 0.2), (0.03, H - 0.10),
+                (0.045, H - 0.04), (0.03, H), (0, H)]
+        lathe("post", prof, "brass", 24, 40, loc=(0.36 * math.cos(a), 0.36 * math.sin(a), 0))
+    gp = []
+    for i in range(49):
+        z = -H + 2 * H * i / 48
+        u = abs(z) / H
+        r = 0.035 + 0.26 * math.sin(min(1, u) * math.pi * 0.62) ** 1.3
+        if u > 0.93:
+            r = 0.24 + (1 - u) * 0.3
+        gp.append((r, z))
+    lathe("glass", gp, "glass", 64, 60)
+    rig.take(m, "frame")
+    top = [(0, 0.06), (0.05, 0.08), (0.16, 0.22), (0.19, 0.28), (0, 0.28)]
+    m = rig.mark(); lathe("sandA", top, "sand", 48, 60); rig.take(m, "sandA", head=(0, 0, 0.06), parent="frame")
+    m = rig.mark(); lathe("sandC", [(r, -z) for r, z in top], "sand", 48, 60); rig.take(m, "sandC", head=(0, 0, -0.06), parent="frame")
+    m = rig.mark()
+    lathe("sandB", [(0, -H + 0.02), (0.235, -H + 0.02), (0.245, -0.40), (0.15, -0.33), (0.04, -0.27), (0, -0.26)], "sand", 48, 60)
+    rig.take(m, "sandB", head=(0, 0, -H + 0.02), parent="frame")
+    m = rig.mark(); cyl("stream", 0.008, 0.50, (0, 0, -0.25 + 0.06), "sand", seg=8); rig.take(m, "stream", head=(0, 0, 0.06), parent="frame")
+
+    def anim(t):
+        d = smooth(clamp01(t / 0.78))
+        a = 1 - d
+        sw = smooth(clamp01((t - 0.86) / 0.08))
+        b = d * (1 - sw)
+        flow = 1.0 if 0.015 < t < 0.77 else 0.001
+        return {"frame": {"rot": [((0, 1, 0), 180 * ease(t, 0.80, 1.0))]},
+                "sandA": {"scale": (max(0.001, a ** 0.35), max(0.001, a ** 0.35), max(0.001, a))},
+                "sandB": {"scale": (max(0.001, 0.55 + 0.45 * b), max(0.001, 0.55 + 0.45 * b), max(0.001, b))},
+                "sandC": {"scale": (max(0.001, sw ** 0.35), max(0.001, sw ** 0.35), max(0.001, sw))},
+                "stream": {"scale": (flow, flow, flow)}}
+    return rig, anim, 5.0
+
+
+def m_padlock():
+    """Our conclusions — the key to the theory: the key slides in, turns, the shackle pops and swings open."""
+    rig = Rig()
+    W, T, Hh = 0.62, 0.24, 0.52
+    prof = []
+    for i in range(25):  # rounded-rectangle outline in XZ, extruded along Y
+        a = TAU * i / 24
+        prof.append((0, 0))
+    m0 = rig.mark()
+    body = box("body", (W, T, Hh), (0, 0, Hh / 2), "brass", 0.05, seg=4)
+    box("face", (W - 0.10, 0.01, Hh - 0.12), (0, -T / 2 - 0.002, Hh / 2), "brass_d", 0.01)
+    for x in (-1, 1):
+        for zz in (0.08, Hh - 0.08):
+            sphere("rivet", 0.018, (x * (W / 2 - 0.09), -T / 2 - 0.008, zz), "gold", 16, 8)
+    # keyhole escutcheon
+    cyl("esc", 0.075, 0.012, (0, -T / 2 - 0.01, Hh * 0.46), "gold", rot=(math.radians(90), 0, 0), seg=40)
+    cyl("hole", 0.022, 0.014, (0, -T / 2 - 0.013, Hh * 0.50), "black", rot=(math.radians(90), 0, 0), seg=20)
+    box("slot", (0.018, 0.014, 0.06), (0, -T / 2 - 0.013, Hh * 0.44), "black", 0.0)
+    text_mesh("mark", "1730", 0.05, 0.004, "gold", loc=(0, -T / 2 - 0.01, 0.075), rot=(math.radians(90), 0, 0))
+    # shackle: built in the OPEN-UP position's footprint but closed; long leg at x=+0.17 is the pivot
+    lx = 0.17
+    m = rig.mark()
+    pts = [(-lx, 0, Hh - 0.02), (-lx, 0, Hh + 0.16)]
+    for i in range(1, 12):
+        a = math.pi * i / 12
+        pts.append((-lx * math.cos(a), 0, Hh + 0.16 + lx * math.sin(a)))
+    pts += [(lx, 0, Hh + 0.16), (lx, 0, Hh - 0.10)]
+    tube("shackle", pts, 0.038, "satin", 4, False)
+    rig.take(m, "shackle", head=(lx, 0, Hh))
+    # key: shaft along Y, bow outside in front of the lock
+    kz, ky = Hh * 0.50, -T / 2 - 0.01
+    m = rig.mark()
+    ko = -0.16  # built pulled out (= first frame of the loop)
+    cyl("shaft", 0.022, 0.30, (0, ky - 0.09 + ko, kz), "gold", rot=(math.radians(90), 0, 0), seg=20)
+    for dz in (-0.03, -0.065):
+        box("bit", (0.022, 0.05, 0.035), (0, ky + 0.035 + ko, kz + dz), "gold", 0.004)
+    torus("bow", 0.09, 0.024, (0, ky - 0.30 + ko, kz), "gold", rot=(math.radians(90), 0, 0), seg=48, mseg=10)
+    torus("bowi", 0.04, 0.014, (0, ky - 0.30 + ko, kz), "gold", rot=(math.radians(90), 0, 0), seg=32, mseg=8)
+    cyl("collar", 0.034, 0.03, (0, ky - 0.20 + ko, kz), "gold", rot=(math.radians(90), 0, 0), seg=24)
+    rig.take(m, "key", head=(0, ky, kz))
+    rig.shift(dz=-0.42)
+
+    def anim(t):
+        ins = 1 - ease(t, 0.04, 0.18) + ease(t, 0.84, 0.97)      # 1 = pulled out
+        turn = 90 * (ease(t, 0.20, 0.32) - ease(t, 0.72, 0.82))
+        lift = 0.10 * (back_out(clamp01((t - 0.33) / 0.10), 2.0) - ease(t, 0.62, 0.70))
+        swing = 100 * (ease(t, 0.38, 0.52) - ease(t, 0.54, 0.64))
+        return {"key": {"loc": (0, 0.16 * (1 - ins), 0), "rot": [((0, 1, 0), turn)]},
+                "shackle": {"loc": (0, 0, max(0.0, lift)), "rot": [((0, 0, 1), swing)]}}
+    return rig, anim, 5.0
+
+
+def m_jack():
+    """Fun facts: a jack-in-the-box — the crank turns, the lid flies open and a jester pops out on a spring.
+    Built in the popped-out pose (rest pose = maximum extent, so PowerPoint frames it fully)."""
+    rig = Rig()
+    S = 0.56
+    box("bx_floor", (S, S, 0.04), (0, 0, 0.02), "walnut", 0.008)
+    for x in (-1, 1):
+        box("bx_wx", (0.04, S, S), (x * (S / 2 - 0.02), 0, S / 2), "oxblood", 0.008)
+        box("bx_wy", (S, 0.04, S), (0, x * (S / 2 - 0.02), S / 2), "oxblood", 0.008)
+    for x in (-1, 1):
+        for y in (-1, 1):
+            box("bx_edge", (0.05, 0.05, S + 0.02), (x * (S / 2 - 0.01), y * (S / 2 - 0.01), S / 2), "gold", 0.01)
+    for txt, (x, y, rz) in (("?", (0, -S / 2 - 0.004, 0)), ("!", (-S / 2 - 0.004, 0, -90))):
+        text_mesh("bx_t" + txt, txt, 0.30, 0.012, "gold", loc=(x, y, S / 2), rot=(math.radians(90), 0, math.radians(rz)))
+    # crank on the right side
+    m = rig.mark()
+    cyl("axle", 0.02, 0.10, (S / 2 + 0.05, 0, S * 0.55), "brass", rot=(0, math.radians(90), 0), seg=16)
+    box("arm", (0.02, 0.03, 0.16), (S / 2 + 0.10, 0, S * 0.55 + 0.07), "brass", 0.006)
+    cyl("knob", 0.025, 0.08, (S / 2 + 0.14, 0, S * 0.55 + 0.14), "walnut", rot=(0, math.radians(90), 0), seg=16)
+    rig.take(m, "crank", head=(S / 2 + 0.05, 0, S * 0.55))
+    # lid hinged at the back top edge, built OPEN (standing up behind the box)
+    m = rig.mark()
+    box("lid", (S + 0.02, 0.04, S + 0.02), (0, S / 2 + 0.02, S + S / 2 + 0.01), "oxblood", 0.01)
+    box("lidtrim", (S - 0.08, 0.012, S - 0.08), (0, S / 2 - 0.0, S + S / 2 + 0.01), "gold", 0.004)
+    rig.take(m, "lid", head=(0, S / 2, S))
+    # spring from the floor to the head
+    zs, ze = 0.06, S + 0.30
+    m = rig.mark()
+    pts = [(0.10 * math.cos(TAU * 7 * i / 140), 0.10 * math.sin(TAU * 7 * i / 140), zs + (ze - zs) * i / 140) for i in range(141)]
+    tube("spring", pts, 0.011, "satin", 2, False)
+    rig.take(m, "spring", head=(0, 0, zs))
+    # jester head + collar + hat with bells
+    hz = ze + 0.14
+    m = rig.mark()
+    for k in range(10):
+        a = TAU * k / 10
+        sphere("ruff", 0.07, (0.11 * math.cos(a), 0.11 * math.sin(a), ze + 0.02), "ivory" if k % 2 else "gold", 16, 8).scale = (1, 1, 0.55)
+    sphere("head", 0.15, (0, 0, hz), "clay", 32, 16)
+    sphere("nose", 0.035, (0, -0.15, hz - 0.005), "red", 16, 8)
+    for x in (-1, 1):
+        sphere("eye", 0.022, (x * 0.055, -0.13, hz + 0.04), "black", 12, 6)
+        sphere("cheek", 0.03, (x * 0.085, -0.115, hz - 0.03), "oxblood", 12, 6).scale = (1, 0.5, 0.7)
+    tube("smile", [(-0.06, -0.135, hz - 0.05), (0, -0.15, hz - 0.08), (0.06, -0.135, hz - 0.05)], 0.008, "oxblood", 3)
+    lathe("hatband", [(0.15, hz + 0.05), (0.155, hz + 0.08), (0.12, hz + 0.13), (0, hz + 0.14)], "gold", 32)
+    for x, col in ((-1, "navy"), (1, "red")):
+        pts = [(x * 0.05, 0, hz + 0.12), (x * 0.16, 0, hz + 0.25), (x * 0.27, 0, hz + 0.22), (x * 0.30, 0, hz + 0.13)]
+        tube("horn", pts, 0.05, col, 4)
+        sphere("bell", 0.035, (x * 0.30, 0, hz + 0.10), "gold", 16, 8)
+    rig.take(m, "head", head=(0, 0, ze))
+    rig.shift(dz=-0.55)
+    drop = 0.62  # how far the head sinks when packed into the box
+
+    def anim(t):
+        t = (t + 0.55) % 1.0  # loop starts with the jester out (= rest pose = PowerPoint poster frame)
+        crank = -720 * ease(t, 0.0, 0.26) - 360 * ease(t, 0.80, 0.98)
+        o = clamp01((t - 0.26) / 0.62)
+        out = 0.0
+        if t > 0.26:
+            out = 1 - math.exp(-o / 0.08) * abs(math.cos(TAU * 3.0 * o))  # bounces up to the rest height, never above
+        out *= 1 - ease(t, 0.80, 0.90)
+        lid = 0 if 0.27 < t < 0.88 else 1
+        lidang = 90 * (1 - smooth(clamp01((t - 0.255) / 0.05))) if t < 0.5 else 90 * ease(t, 0.89, 0.96)
+        wob = 18 * math.exp(-o / 0.2) * math.sin(TAU * 4 * o) * (t > 0.26) * (1 - ease(t, 0.78, 0.86))
+        sz = (ze - zs - drop * (1 - out)) / (ze - zs)
+        return {"crank": {"rot": [((1, 0, 0), crank)]},
+                "lid": {"rot": [((1, 0, 0), lidang)]},
+                "spring": {"scale": (1, 1, max(0.05, sz))},
+                "head": {"loc": (0, 0, -drop * (1 - out)), "scale": 0.74 + 0.26 * out, "rot": [((0, 1, 0), wob), ((0, 0, 1), 0.6 * wob)]}}
+    return rig, anim, 4.5
+
+
 MODELS = {
     "louis": m_louis, "ship": m_ship, "harp": m_harp, "chest": m_chest, "bubble": m_bubble, "rook": m_rook,
     "quill": m_quill, "dice": m_dice, "scales": m_scales, "bread": m_bread, "ripple": m_ripple, "compass": m_compass,
     "candle": m_candle, "globe_c": m_globe_c,
+    "globe_a": m_globe_a, "books_c": m_books_c, "hourglass_c": m_hourglass_c, "padlock": m_padlock, "jack": m_jack,
 }
 
 if __name__ == "__main__":
