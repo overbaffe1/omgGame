@@ -12,7 +12,7 @@ import bpy, math, os, sys, json
 from mathutils import Vector, Matrix
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-GLB = os.path.join(HERE, "glb")
+GLB = os.environ.get("GLB_DIR") or os.path.join(HERE, "glb")
 HDRI = os.path.join(bpy.utils.system_resource("DATAFILES"), "studiolights", "world", "studio.exr")
 
 
