@@ -1,2 +1,7 @@
+node_modules/
 preview/
+models/rasters/*.png
+models/rasters/_jobs.json
 models/_look/
+__pycache__/
+models/__pycache__/

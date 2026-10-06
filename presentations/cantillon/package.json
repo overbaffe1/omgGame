@@ -1,0 +1,13 @@
+{
+  "name": "cantillon-3d-presentation",
+  "private": true,
+  "description": "Builds exports/cantillon-3d-presentation.pptx with embedded PowerPoint 3D models",
+  "scripts": { "build": "node build.js", "preview": "node build.js --preview" },
+  "dependencies": { "jszip": "^3.10.1", "pptxgenjs": "^4.0.1" },
+  "devDependencies": {
+    "@fontsource/arimo": "^5.0.0",
+    "@fontsource/noto-serif": "^5.0.0",
+    "@sparticuz/chromium": "*",
+    "puppeteer-core": "*"
+  }
+}

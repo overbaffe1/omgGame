@@ -1,27 +1,12 @@
-# Кантильон: 3D-презентация
+# Richard Cantillon — 3D presentation
 
-Результат — `exports/cantillon-3d-presentation.pptx`: 17 слайдов 16:9.
-
-- **3D-экспонаты.** На каждом слайде стоит настоящая 3D-модель (.glb, PowerPoint 3D Model).
-- **Morph.** Экспонаты улетают и влетают с поворотом при смене слайда.
-- **Шкала прогресса.** По ней катится золотой луидор 1720 года.
-- **Анимации.** Элементы появляются по очереди сами, без кликов.
-- **Заметки докладчика.** Текст выступления есть в заметках и в файле `exports/cantillon-presentation-script.md`.
-
-Движок общий с презентацией о Шумпетере: `../schumpeter/lib.js`, `../schumpeter/pptx3d.js`, `../schumpeter/models/render.py`, хелперы моделирования из `../schumpeter/models/make_models.py`. Зависимости npm тоже берутся из `../schumpeter/node_modules`.
-
-| | |
-|---|---|
-| `models/make_models.py` | 15 процедурных экспонатов (bpy) → `models/glb/` |
-| `models/rasters/` | кэш Cycles-рендеров (статичная картинка модели внутри .pptx) |
-| `stage.py` | тёплый «свечной» фон, свечение и тень → `assets/` |
-| `build.js` | слайды, заметки, хореография Morph |
+Build the deck and speaker notes with:
 
 ```bash
-(cd ../schumpeter && npm install)
-python3 models/make_models.py      # пересобрать модели (нужен bpy)
-node build.js                      # .pptx + текст выступления
-node build.js --preview            # плюс PNG-превью в preview/
+npm install
+node build.js --preview
 ```
 
-3D видно в PowerPoint 2019/2021/365 и PowerPoint для Mac 16+. В других программах вместо модели будет её рендер, а вместо Morph — Fade.
+The presentation embeds original `.glb` models as native PowerPoint 3D objects. Slide transitions use Morph (with a Fade fallback), and each object has a transparent fallback render. To rebuild the models, install Python dependencies (`bpy`, `global-land-mask`, `numpy`) and run `python3 models/make_models.py [keys...]` from this directory. The build script requires Blender's Cycles renderer.
+
+The portrait is Nicolas de Largillière's *The Artist and his Family* (c. 1710); its identification as Richard Cantillon is disputed, so it is shown only as a possible likeness and is explicitly captioned that way. See `../../exports/cantillon-presentation-sources.md` for the references and historical caveats.
