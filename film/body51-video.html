@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Вайбкодер из Мурманска — MP4</title>
+<style>
+  html,body{margin:0;height:100%;background:#05060b;color:#e9edf5;font-family:system-ui,sans-serif;overflow:hidden}
+  .app{display:flex;height:100%}
+  main{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;position:relative}
+  video{height:94vh;aspect-ratio:9/16;max-width:100%;border-radius:12px;background:#000;box-shadow:0 20px 80px #000}
+  aside{width:330px;flex:none;padding:26px 22px;border-left:1px solid #ffffff14;overflow:auto;background:linear-gradient(#0c0f18,#05060b)}
+  h1{font-size:22px;margin:0 0 6px;letter-spacing:-.02em}
+  .sub{color:#8c95a6;font-size:13px;line-height:1.5;margin-bottom:18px}
+  .row{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:#c8cfdb;padding:9px 0;border-bottom:1px solid #ffffff10}
+  .row b{color:#ffc06a;font-variant-numeric:tabular-nums}
+  a{color:#a8ebc2}
+  .btn{display:inline-block;margin:14px 8px 0 0;padding:9px 14px;border:1px solid #ffffff26;border-radius:10px;color:#e9edf5;text-decoration:none;font-size:13px}
+  .btn:hover{background:#ffffff10}
+  @media (max-width:820px){.app{flex-direction:column}aside{width:auto;border:0;border-top:1px solid #ffffff14;padding:14px}video{height:74vh}}
+</style>
+</head>
+<body>
+<div class="app">
+  <main><video id="v" controls playsinline preload="metadata" poster="body51-poster.jpg" src="body51.mp4"></video></main>
+  <aside>
+    <h1>Вайбкодер из Мурманска</h1>
+    <div class="sub">Мультфильм по фактам стримов @body51: 12 глав, 1080×1920, 24 кадра/с, 5 минут 11 секунд.<br>Картинка нарисована кодом, музыка синтезирована. Закадровый голос — рассказчик, реплики Артёма — дословно по субтитрам.</div>
+    <div class="row"><span>Мурманск · знакомство</span><b>0:00</b></div>
+    <div class="row"><span>Кот Гуччи и Валера</span><b>0:33</b></div>
+    <div class="row"><span>Мастерская</span><b>1:02</b></div>
+    <div class="row"><span>Стрим как дисциплина</span><b>1:37</b></div>
+    <div class="row"><span>Караванщик</span><b>2:02</b></div>
+    <div class="row"><span>Директор нейронок</span><b>2:27</b></div>
+    <div class="row"><span>Нейронка творит</span><b>2:55</b></div>
+    <div class="row"><span>Железяка, врубайся</span><b>3:13</b></div>
+    <div class="row"><span>Релизная девственность</span><b>3:35</b></div>
+    <div class="row"><span>Рюкзаки и вишлисты</span><b>4:04</b></div>
+    <div class="row"><span>Дальше</span><b>4:32</b></div>
+    <div class="row"><span>Источники</span><b>4:57</b></div>
+    <a class="btn" href="body51.html">Интерактивная версия</a>
+    <a class="btn" href="body51.mp4" download>Скачать MP4</a>
+    <a class="btn" href="index.html">Галерея</a>
+  </aside>
+</div>
+<script>
+  const v=document.getElementById('v');
+  const q=new URLSearchParams(location.search);
+  if(q.get('t'))v.addEventListener('loadedmetadata',()=>v.currentTime=+q.get('t'));
+  addEventListener('keydown',e=>{if(e.target===v)return;
+    if(e.code==='Space'){e.preventDefault();v.paused?v.play():v.pause()}
+    if(e.code==='ArrowLeft')v.currentTime-=5;if(e.code==='ArrowRight')v.currentTime+=5;if(e.code==='KeyF')v.requestFullscreen?.()});
+</script>
+</body>
+</html>
