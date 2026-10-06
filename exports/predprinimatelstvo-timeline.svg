@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#091321"/>
+    <stop offset="0.52" stop-color="#102039"/>
+    <stop offset="1" stop-color="#0a1d2c"/>
+  </linearGradient>
+  <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#efb85f"/>
+    <stop offset="0.49" stop-color="#e98369"/>
+    <stop offset="1" stop-color="#64d2c3"/>
+  </linearGradient>
+  <linearGradient id="topline" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#efb85f"/>
+    <stop offset="0.55" stop-color="#f07f70"/>
+    <stop offset="1" stop-color="#68dcc8"/>
+  </linearGradient>
+  <linearGradient id="highlight" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#342b2b"/>
+    <stop offset="1" stop-color="#1d2634"/>
+  </linearGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+    <path d="M44 0H0V44" fill="none" stroke="#91b1c9" stroke-opacity="0.045" stroke-width="1"/>
+  </pattern>
+  <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="14" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+    <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000711" flood-opacity="0.34"/>
+  </filter>
+</defs>
+
+<!-- Background -->
+<rect width="1920" height="1080" fill="url(#bg)"/>
+<rect width="1920" height="1080" fill="url(#grid)"/>
+<circle cx="95" cy="340" r="300" fill="#e7a950" opacity="0.055"/>
+<circle cx="1810" cy="240" r="330" fill="#52d0c0" opacity="0.055"/>
+<circle cx="1000" cy="900" r="430" fill="#7395d2" opacity="0.035"/>
+<rect x="0" y="0" width="1920" height="8" fill="url(#topline)"/>
+
+<!-- Header -->
+<text x="78" y="57" fill="#79d9cb" font-family="DejaVu Sans, Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="3.2">ИДЕИ  ·  РЫНОК  ·  ИННОВАЦИИ</text>
+<text x="78" y="119" fill="#f4f6fb" font-family="DejaVu Sans, Arial, sans-serif" font-size="43" font-weight="700">От древнего хозяйства к технопредпринимательству</text>
+<text x="80" y="164" fill="#b8c6d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="21" font-weight="400">Как менялось понимание предпринимателя — от древней мысли до технологических компаний</text>
+<rect x="1539" y="39" width="303" height="42" rx="21" fill="#132a3e" stroke="#355771" stroke-width="1.5"/>
+<circle cx="1562" cy="60" r="5" fill="#69d8c6"/>
+<text x="1578" y="66" fill="#d8e4ef" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.2">ХРОНОЛОГИЯ · ДО 2025</text>
+<text x="1840" y="114" text-anchor="end" fill="#8195ac" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" letter-spacing="1.4">ВРЕМЕННАЯ ШКАЛА НЕ В МАСШТАБЕ</text>
+
+<!-- Timeline rail and connectors -->
+<line x1="155" y1="565" x2="1808" y2="565" stroke="#243c56" stroke-width="10" stroke-linecap="round"/>
+<line x1="155" y1="565" x2="1808" y2="565" stroke="url(#rail)" stroke-width="3" stroke-linecap="round"/>
+<path d="M1808 556 L1827 565 L1808 574 Z" fill="#67d4c4"/>
+<g stroke="#49617c" stroke-width="2" fill="none" opacity="0.88">
+  <line x1="155" y1="492" x2="155" y2="565"/>
+  <line x1="425" y1="565" x2="425" y2="648"/>
+  <line x1="695" y1="492" x2="695" y2="565"/>
+  <line x1="965" y1="565" x2="965" y2="648"/>
+  <line x1="1235" y1="492" x2="1235" y2="565"/>
+  <line x1="1505" y1="565" x2="1505" y2="648"/>
+  <line x1="1775" y1="492" x2="1775" y2="565"/>
+</g>
+
+<!-- Cards -->
+<!-- Ancient -->
+<g filter="url(#shadow)">
+  <rect x="33" y="242" width="244" height="250" rx="20" fill="#14263a" stroke="#b88a4b" stroke-opacity="0.78" stroke-width="1.5"/>
+  <rect x="34" y="243" width="242" height="4" rx="2" fill="#e7b65f"/>
+</g>
+<text x="52" y="278" fill="#f0c26e" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1.1">V–III ВВ. ДО Н. Э.</text>
+<text x="52" y="315" fill="#f2f5fa" font-family="DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="700">Ксенофонт · Платон</text>
+<text x="52" y="340" fill="#f2f5fa" font-family="DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="700">Аристотель · Каутилья*</text>
+<text x="52" y="378" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">Хозяйство, обмен,</text>
+<text x="52" y="400" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">разделение труда,</text>
+<text x="52" y="422" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">торговля и управление.</text>
+<text x="52" y="460" fill="#e7b65f" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" font-weight="700">ПРЕДЫСТОРИЯ, НЕ ТЕОРИЯ</text>
+
+<!-- Ibn Khaldun -->
+<g filter="url(#shadow)">
+  <rect x="303" y="648" width="244" height="250" rx="20" fill="#14263a" stroke="#987fba" stroke-opacity="0.75" stroke-width="1.5"/>
+  <rect x="304" y="649" width="242" height="4" rx="2" fill="#ad91d2"/>
+</g>
+<text x="322" y="685" fill="#c8afe8" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1.1">XIV ВЕК</text>
+<text x="322" y="723" fill="#f2f5fa" font-family="DejaVu Sans, Arial, sans-serif" font-size="21" font-weight="700">Ибн Хальдун</text>
+<text x="322" y="765" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">Труд, производство,</text>
+<text x="322" y="787" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">прибыль и развитие городов.</text>
+<text x="322" y="825" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">Важный предшественник</text>
+<text x="322" y="847" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">экономической мысли —</text>
+<text x="322" y="869" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">не теории предпринимателя.</text>
+
+<!-- Cantillon -->
+<g filter="url(#shadow)">
+  <rect x="573" y="242" width="244" height="250" rx="20" fill="#14263a" stroke="#4c9d9b" stroke-opacity="0.8" stroke-width="1.5"/>
+  <rect x="574" y="243" width="242" height="4" rx="2" fill="#61d4c5"/>
+</g>
+<text x="592" y="278" fill="#73ded0" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1.1">1755</text>
+<text x="592" y="316" fill="#f2f5fa" font-family="DejaVu Sans, Arial, sans-serif" font-size="20" font-weight="700">Ричард Кантильон</text>
+<text x="592" y="365" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">Предприниматель покупает</text>
+<text x="592" y="387" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">по известной цене, продаёт</text>
+<text x="592" y="409" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">по неизвестной — действует</text>
+<text x="592" y="431" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">в условиях неопределённости.</text>
+
+<!-- Say -->
+<g filter="url(#shadow)">
+  <rect x="843" y="648" width="244" height="250" rx="20" fill="#14263a" stroke="#4c9d9b" stroke-opacity="0.8" stroke-width="1.5"/>
+  <rect x="844" y="649" width="242" height="4" rx="2" fill="#61d4c5"/>
+</g>
+<text x="862" y="685" fill="#73ded0" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1.1">1803</text>
+<text x="862" y="723" fill="#f2f5fa" font-family="DejaVu Sans, Arial, sans-serif" font-size="19.5" font-weight="700">Жан-Батист Сэй</text>
+<text x="862" y="770" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">Предприниматель —</text>
+<text x="862" y="792" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">организатор</text>
+<text x="862" y="814" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">производства: соединяет</text>
+<text x="862" y="836" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">труд, капитал и ресурсы.</text>
+
+<!-- Schumpeter highlight -->
+<g filter="url(#shadow)">
+  <rect x="1113" y="242" width="244" height="250" rx="20" fill="url(#highlight)" stroke="#eaa96d" stroke-width="2.5"/>
+  <rect x="1114" y="243" width="242" height="5" rx="2" fill="#f3a36f"/>
+  <circle cx="1328" cy="276" r="13" fill="#f3a36f" opacity="0.18"/>
+  <path d="M1328 267 L1330.8 273 L1337 274 L1332.5 278.2 L1333.6 284.3 L1328 281.2 L1322.4 284.3 L1323.5 278.2 L1319 274 L1325.2 273 Z" fill="#ffc77a"/>
+</g>
+<text x="1132" y="278" fill="#f5b87a" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1.1">1911 / 1912</text>
+<text x="1132" y="316" fill="#fff5e9" font-family="DejaVu Sans, Arial, sans-serif" font-size="20" font-weight="700">Йозеф Шумпетер</text>
+<text x="1132" y="365" fill="#d8c9c2" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">«Новые комбинации»:</text>
+<text x="1132" y="387" fill="#d8c9c2" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">предприниматель внедряет</text>
+<text x="1132" y="409" fill="#d8c9c2" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">инновации и перестраивает</text>
+<text x="1132" y="431" fill="#d8c9c2" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">рынок.</text>
+<rect x="1132" y="452" width="182" height="24" rx="12" fill="#65443b"/>
+<text x="1223" y="469" text-anchor="middle" fill="#ffd298" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" font-weight="700" letter-spacing="0.8">ПОВОРОТ К ИННОВАЦИЯМ</text>
+
+<!-- Knight -->
+<g filter="url(#shadow)">
+  <rect x="1383" y="648" width="244" height="250" rx="20" fill="#14263a" stroke="#6486b1" stroke-opacity="0.82" stroke-width="1.5"/>
+  <rect x="1384" y="649" width="242" height="4" rx="2" fill="#81a5d3"/>
+</g>
+<text x="1402" y="685" fill="#9ebce1" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1.1">1921</text>
+<text x="1402" y="723" fill="#f2f5fa" font-family="DejaVu Sans, Arial, sans-serif" font-size="21" font-weight="700">Фрэнк Найт</text>
+<text x="1402" y="770" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">Различает измеримый</text>
+<text x="1402" y="792" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">риск и неопределённость.</text>
+<text x="1402" y="814" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">Прибыль связана с</text>
+<text x="1402" y="836" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">ответственностью за решения</text>
+<text x="1402" y="858" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="15.5">о неизвестном будущем.</text>
+
+<!-- Modern technology entrepreneurship -->
+<g filter="url(#shadow)">
+  <rect x="1653" y="242" width="244" height="250" rx="20" fill="#14263a" stroke="#4c9d9b" stroke-opacity="0.82" stroke-width="1.5"/>
+  <rect x="1654" y="243" width="242" height="4" rx="2" fill="#61d4c5"/>
+</g>
+<text x="1672" y="278" fill="#73ded0" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1.1">1964–2025</text>
+<text x="1672" y="313" fill="#f2f5fa" font-family="DejaVu Sans, Arial, sans-serif" font-size="17.5" font-weight="700">Технологическое</text>
+<text x="1672" y="336" fill="#f2f5fa" font-family="DejaVu Sans, Arial, sans-serif" font-size="17.5" font-weight="700">предпринимательство</text>
+<text x="1672" y="373" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="13.8">MIT (1964) → Purdue</text>
+<text x="1672" y="393" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="13.8">(1970/72) · Робертс · Купер</text>
+<text x="1672" y="413" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="13.8">Байлетти (2012) · Намбисан</text>
+<text x="1672" y="433" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="13.8">(2017): цифровая ветка</text>
+<text x="1672" y="453" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="13.8">Наука → продукт → рынок;</text>
+<text x="1672" y="473" fill="#b9c7d9" font-family="DejaVu Sans, Arial, sans-serif" font-size="13.8">платформы и экосистемы.</text>
+
+<!-- Timeline nodes -->
+<g font-family="DejaVu Sans, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle">
+  <g><circle cx="155" cy="565" r="28" fill="#edb65f" opacity="0.13" filter="url(#softGlow)"/><circle cx="155" cy="565" r="21" fill="#192b3d" stroke="#e8b45d" stroke-width="2.5"/><text x="155" y="570" fill="#f4c877">01</text></g>
+  <g><circle cx="425" cy="565" r="28" fill="#ad91d2" opacity="0.13" filter="url(#softGlow)"/><circle cx="425" cy="565" r="21" fill="#192b3d" stroke="#b19ad0" stroke-width="2.5"/><text x="425" y="570" fill="#d2bbea">02</text></g>
+  <g><circle cx="695" cy="565" r="28" fill="#61d4c5" opacity="0.13" filter="url(#softGlow)"/><circle cx="695" cy="565" r="21" fill="#192b3d" stroke="#61d4c5" stroke-width="2.5"/><text x="695" y="570" fill="#8de6d8">03</text></g>
+  <g><circle cx="965" cy="565" r="28" fill="#61d4c5" opacity="0.13" filter="url(#softGlow)"/><circle cx="965" cy="565" r="21" fill="#192b3d" stroke="#61d4c5" stroke-width="2.5"/><text x="965" y="570" fill="#8de6d8">04</text></g>
+  <g><circle cx="1235" cy="565" r="31" fill="#f0a36f" opacity="0.24" filter="url(#softGlow)"/><circle cx="1235" cy="565" r="23" fill="#382c30" stroke="#ffc17e" stroke-width="3"/><text x="1235" y="570" fill="#ffd298">05</text></g>
+  <g><circle cx="1505" cy="565" r="28" fill="#81a5d3" opacity="0.13" filter="url(#softGlow)"/><circle cx="1505" cy="565" r="21" fill="#192b3d" stroke="#81a5d3" stroke-width="2.5"/><text x="1505" y="570" fill="#b6d0ed">06</text></g>
+  <g><circle cx="1775" cy="565" r="28" fill="#61d4c5" opacity="0.13" filter="url(#softGlow)"/><circle cx="1775" cy="565" r="21" fill="#192b3d" stroke="#61d4c5" stroke-width="2.5"/><text x="1775" y="570" fill="#8de6d8">07</text></g>
+</g>
+
+<!-- Thesis and sources -->
+<rect x="42" y="920" width="1836" height="77" rx="18" fill="#102a3c" stroke="#315667" stroke-width="1.4"/>
+<rect x="42" y="920" width="7" height="77" rx="3.5" fill="url(#topline)"/>
+<text x="72" y="951" fill="#75d9cb" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">ГЛАВНЫЙ ПЕРЕХОД</text>
+<text x="270" y="951" fill="#f1f4f8" font-family="DejaVu Sans, Arial, sans-serif" font-size="17.5" font-weight="600">Античность — предыстория; Кантильон формулирует функцию предпринимателя; Шумпетер ставит инновацию в центр развития.</text>
+<text x="270" y="977" fill="#a9bbce" font-family="DejaVu Sans, Arial, sans-serif" font-size="14.5">От управления хозяйством → к экономической функции → к инновациям → к технологическим компаниям и экосистемам.</text>
+<text x="78" y="1027" fill="#93a8bd" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.2">ИСТОЧНИКИ: Xenophon, Oeconomicus; Plato, Republic; Aristotle, Politics; Olivelle (2013); Ibn Khaldun, Muqaddimah; Cantillon (1755); Say (1803); Schumpeter (1911/12); Knight (1921); Roberts/MIT; Purdue (1970/72); Bailetti (2012); Nambisan (2017).</text>
+<text x="78" y="1052" fill="#71869b" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5">* Артхашастра традиционно связывается с Каутильей; её датировка и формирование текста дискуссионны. Античность показана как предыстория, не как готовая теория предпринимателя.</text>
+</svg>
