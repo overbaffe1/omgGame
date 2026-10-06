@@ -1,35 +1,35 @@
 # Источники к обновлённой презентации о Йозефе Шумпетере
 
-## Биография и временная линия
+## Биография и карьера
 
-- Oxford University Press, “Key thinkers: Joseph Schumpeter (1883–1950)” — происхождение, образование, пост министра финансов, работа в банке, Бонн, Гарвард и обзор работ: [Oxford Learning Link](https://learninglink.oup.com/access/content/ferdinand-student-resources/ferdinand-key-thinkers-schumpeter).
-- EBSCO Research Starters, Cait Caffrey (2022), “Joseph Schumpeter” — даты и этапы карьеры, включая Вену, Черновцы, Грац, Biedermann Bank и Гарвард: [EBSCO](https://www.ebsco.com/research-starters/history/joseph-schumpeter/).
-- *Encyclopaedia Britannica*, “Joseph Schumpeter” — даты жизни, Трешть, профессура в Гарварде, книги и место смерти: [Britannica Students](https://kids.britannica.com/students/article/Joseph-Schumpeter/313438).
+- Oxford Learning Link, происхождение, образование, государственная и академическая карьера: [Joseph Schumpeter (1883–1950)](https://learninglink.oup.com/access/content/ferdinand-student-resources/ferdinand-key-thinkers-schumpeter).
+- EBSCO Research Starters, основные даты и этапы жизни: [Joseph Schumpeter](https://www.ebsco.com/research-starters/history/joseph-schumpeter/).
+- *Encyclopaedia Britannica*, место рождения, Гарвард, основные работы и дата смерти: [Joseph Schumpeter](https://kids.britannica.com/students/article/Joseph-Schumpeter/313438).
 
-## История идей на временной линии
+## Временная линия идей
 
-Античные авторы на слайде обозначены как **предыстория хозяйственной мысли**, а не как создатели современной теории предпринимательской функции.
+Древние авторы на слайде обозначены как **предыстория хозяйственной мысли**, а не как создатели современной теории предпринимательской функции.
 
-- Ксенофонт, *Oeconomicus* — ранний текст о ведении хозяйства и управлении: [Project Gutenberg](https://www.gutenberg.org/files/1173/1173-h/1173-h.htm).
+- Ксенофонт, *Oeconomicus*: [Project Gutenberg](https://www.gutenberg.org/files/1173/1173-h/1173-h.htm).
 - Платон, *Republic*: [MIT Internet Classics Archive](https://classics.mit.edu/Plato/republic.html).
 - Аристотель, *Politics*: [ToposText / Perseus translation](https://topostext.org/work/100).
-- Для российской и международной исследовательских линий после Шумпетера — подробная хронология и комментарии к ролям авторов: [timeline-predprinimatelstvo.md](../timeline-predprinimatelstvo.md) и [источники к широкой временной линии](predprinimatelstvo-timeline-sources.md). В частности, работы Александра Чепуренко и Андрея Яковлева о контексте предпринимательства: [статья](https://rjm.spbu.ru/article/view/257); Степана Земцова и Александра Чернова о росте высокотехнологичных компаний в России: [статья](https://ideas.repec.org/a/nea/journl/y2019i41p68-99.html).
+- Кантильон, *Essai sur la nature du commerce en général* (1755): [английское издание и историческое введение](https://competitionandappropriation.econ.ucla.edu/wp-content/uploads/sites/95/2017/08/Essai-sur-la-Nature-du-Commerce.pdf).
+- Сэй, *Traité d’économie politique* (1803): [Econlib](https://www.econlib.org/library/Say/sayT.html).
+- Найт, *Risk, Uncertainty and Profit* (1921): [Online Library of Liberty](https://oll.libertyfund.org/titles/knight-risk-uncertainty-and-profit).
 
-## Теория предпринимательства
+## Шумпетер и теория предпринимательской функции
 
-- Schumpeter, J. A. *The Theory of Economic Development*, гл. II — предприниматель как тот, кто осуществляет новые комбинации; среди них новый продукт, способ производства, рынок, источник сырья и организация отрасли: [выдержки из первичного текста](https://www.panarchy.org/schumpeter/development.html).
-- Первое немецкое издание *Theorie der wirtschaftlichen Entwicklung* источники датируют 1911 или 1912 годом: в предисловии к английскому изданию Шумпетер указывает осень 1911-го ([текст предисловия](https://cruel.org/books/hy/shortschumpeter/SchumpeterTheoryofEconDev.html)); рецензия 1913 года в *The Economic Journal* описывает книгу как издание 1912 года ([Oxford Academic](https://academic.oup.com/ej/article-abstract/23/89/105/5292043)). В презентации «1911/12» — альтернативные даты одного издания, не две публикации.
-- Schumpeter, J. A. *Capitalism, Socialism and Democracy* (1942), гл. VII — созидательное разрушение; краткое пояснение также у [Oxford Learning Link](https://learninglink.oup.com/access/content/ferdinand-student-resources/ferdinand-key-thinkers-schumpeter).
-- Cantillon, R. *Essai sur la nature du commerce en général* (1755): [английское издание и введение](https://competitionandappropriation.econ.ucla.edu/wp-content/uploads/sites/95/2017/08/Essai-sur-la-Nature-du-Commerce.pdf).
-- Say, J.-B. *Traité d’économie politique* (1803): [Econlib](https://www.econlib.org/library/Say/sayT.html).
-- Knight, F. *Risk, Uncertainty and Profit* (1921): [Online Library of Liberty](https://oll.libertyfund.org/titles/knight-risk-uncertainty-and-profit).
+- Schumpeter, J. A. *The Theory of Economic Development*, глава II — предприниматель осуществляет «новые комбинации»: [первичный текст / выдержки](https://www.panarchy.org/schumpeter/development.html).
+- Первое немецкое издание *Theorie der wirtschaftlichen Entwicklung* датируют 1911 или 1912 годом: в предисловии к английскому изданию Шумпетер пишет, что книга вышла осенью 1911-го ([текст предисловия](https://cruel.org/books/hy/shortschumpeter/SchumpeterTheoryofEconDev.html)); рецензия 1913 года в *The Economic Journal* описывает её как издание 1912 года ([Oxford Academic](https://academic.oup.com/ej/article-abstract/23/89/105/5292043)). В презентации «1911/12» — альтернативная датировка одной работы, не две публикации.
+- Schumpeter, J. A. *Capitalism, Socialism and Democracy* (1942), глава VII — созидательное разрушение; краткий обзор: [Oxford Learning Link](https://learninglink.oup.com/access/content/ferdinand-student-resources/ferdinand-key-thinkers-schumpeter).
 
-## Связь с технологическим предпринимательством
+## Ранние институты и позднейшее поле исследований
 
-- Roberts и ранняя программа исследований технологических предприятий в MIT: [MIT Technology Review](https://www.technologyreview.com/2021/08/24/1030406/jump-starting-mits-startup-culture/).
-- Симпозиум Purdue (1970) и опубликованный сборник (1972): [ERIC — список докладов и авторов](https://files.eric.ed.gov/fulltext/ED079483.pdf).
-- Teece, D. (1986), *Profiting from Technological Innovation*: [DOI](https://doi.org/10.1016/0048-7333(86)90027-2).
-- Bailetti, T. (2012), *Technology Entrepreneurship: Overview, Definition, and Distinctive Aspects*: [TIM Review](https://timreview.ca/article/520).
-- Nambisan, S. (2017), *Digital Entrepreneurship*: [DOI](https://doi.org/10.1111/etap.12254).
+- Майлз Мейс ввёл в HBS курс *The Management of New Enterprises* в 1947 году: [Harvard Gazette](https://news.harvard.edu/gazette/story/2000/04/myles-mace-expert-on-entrepreneurship-dies-at-88/).
+- Research Center in Entrepreneurial History при Гарварде учреждён в 1948 году: [Harvard Business School Alumni](https://www.alumni.hbs.edu/stories/Pages/story-bulletin.aspx?num=6177).
+- Журнал *Explorations in Entrepreneurial History* начал выходить в 1949 году: [Carlsson et al., “The Evolving Domain of Entrepreneurship Research” (2013)](https://link.springer.com/article/10.1007/s11187-013-9503-y). На слайде указана институциональная хронология; авторство журнала не приписывается отдельному человеку.
+- Ранние исследования технологических предприятий в MIT: [MIT Technology Review](https://www.technologyreview.com/2021/08/24/1030406/jump-starting-mits-startup-culture/); симпозиум Purdue (1970) и материалы (1972): [ERIC](https://files.eric.ed.gov/fulltext/ED079483.pdf).
+- Teece (1986), *Profiting from Technological Innovation*: [DOI](https://doi.org/10.1016/0048-7333(86)90027-2); Bailetti (2012), *Technology Entrepreneurship*: [TIM Review](https://timreview.ca/article/520); Nambisan (2017), *Digital Entrepreneurship*: [DOI](https://doi.org/10.1111/etap.12254).
+- Подробная международная и российская хронология с оговорками по ролям авторов: [timeline-predprinimatelstvo.md](../timeline-predprinimatelstvo.md) и [источники к широкой линии](predprinimatelstvo-timeline-sources.md).
 
-**Оговорка:** Шумпетер дал влиятельную теорию инновационной функции предпринимателя, но не пошаговое руководство для современных стартапов. Связь со стартапами на заключительном слайде — применение его рамки, а не приписывание ему более поздних концепций. Обложечный бюст и иллюстрации — художественные 3D-визуализации, не архивные фотографии.
+**Оговорки:** Шумпетер сформулировал общую теорию предпринимательской функции и экономического развития, а не пошаговое руководство для современного стартапа. Связь с технологическим предпринимательством — применение его рамки; более поздние концепции ему не приписываются. Бюст и диорамы в презентации — художественные 3D-визуализации, не архивные фотографии.
