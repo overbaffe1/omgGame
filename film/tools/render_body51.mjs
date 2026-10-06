@@ -61,7 +61,8 @@ for (const v of script.voices) {
 const timing = computeTiming({ durations, texts });
 fs.writeFileSync(path.join(film, 'body51-timing.js'), toJs(timing, 'длительности из mp3 озвучки (render_body51.mjs)'));
 const TOTAL = timing.total;
-console.log('хронометраж:', `${Math.floor(TOTAL / 60)}:${String(Math.round(TOTAL % 60)).padStart(2, '0')}`, '· глав:', timing.scenes.length);
+const mm = v => `${Math.floor(Math.round(v) / 60)}:${String(Math.round(v) % 60).padStart(2, '0')}`;
+console.log('хронометраж:', mm(TOTAL), '· глав:', timing.scenes.length);
 
 // ---------- сцена рисования (тот же код, что в браузере) ----------
 const cv = createCanvas(1080, 1920);
@@ -140,7 +141,8 @@ if (shots) {
 function renderMusic() {
   const ev = vm.runInContext('BODY51_SCORE(window.B.SC, window.B.TOTAL)', sandbox);
   const n = Math.ceil(SR * (TOTAL + 1.5));
-  const L = new Float32Array(n), R = new Float32Array(n);
+  const ML = new Float32Array(n), MR = new Float32Array(n);          // музыка
+  const VL = new Float32Array(n), VR = new Float32Array(n);          // голос за кадром
   const harm = { sine: [[1, 1]], triangle: [[1, 1], [3, .12], [5, .05]], square: [[1, 1], [3, .33]], sawtooth: [[1, 1], [2, .5], [3, .3]] };
   for (const e of ev) {
     const from = Math.max(0, Math.floor(e.at * SR)), len = Math.floor(Math.min(e.dur, 8) * SR);
@@ -152,42 +154,53 @@ function renderMusic() {
       let s = 0;
       for (const [k, amp] of (harm[e.type] || harm.sine)) s += amp * Math.sin(2 * Math.PI * e.f * k * age);
       const v = e.vol * env * s;
-      L[idx] += v; R[idx] += v * .96;
+      ML[idx] += v; MR[idx] += v * .96;
     }
   }
-  // мягкая стерео-ширина
-  const d = Math.floor(SR * .012), R2 = new Float32Array(n);
-  for (let i = d; i < n; i++) R2[i] = R[i - d] * .5 + R[i] * .6;
-  // подмешиваем закадровый голос и приглушаем музыку под репликами
+  // мягкая стерео-ширина (задержка Хааса только для музыки)
+  const d = Math.floor(SR * .012), MR2 = new Float32Array(n);
+  for (let i = d; i < n; i++) MR2[i] = MR[i - d] * .5 + MR[i] * .6;
+  // голос: ровно по таймингу глав, без общего приглушения
   const duck = new Float32Array(n).fill(1);
-  for (const s of timing.scenes) {
-    if (!s.narr || !narFiles[s.narr]) continue;
-    const pcm = decodeMp3(narFiles[s.narr]);
-    const at = Math.floor((s.start + (s.narrAt || .6)) * SR);
-    for (let i = 0; i < pcm.length; i++) if (at + i < n) { L[at + i] += pcm[i] * 1.05; R2[at + i] += pcm[i] * 1.05; }
-    const from = Math.max(0, at - Math.floor(.2 * SR)), to = Math.min(n, at + pcm.length + Math.floor(.18 * SR));
-    for (let i = from; i < to; i++) duck[i] = .36;
+  for (const sc of timing.scenes) {
+    if (!sc.narr || !narFiles[sc.narr]) continue;
+    const pcm = decodeMp3(narFiles[sc.narr]);
+    const at = Math.floor((sc.start + (sc.narrAt || .6)) * SR);
+    for (let i = 0; i < pcm.length; i++) if (at + i < n) { VL[at + i] += pcm[i]; VR[at + i] += pcm[i]; }
+    const from = Math.max(0, at - Math.floor(.25 * SR)), to = Math.min(n, at + pcm.length + Math.floor(.22 * SR));
+    for (let i = from; i < to; i++) duck[i] = .38;                    // приглушаем только музыку
   }
-  // сглаживание «приглушения»
   const smooth = new Float32Array(n);
   let acc = 1;
   for (let i = 0; i < n; i++) { acc += (duck[i] - acc) * (duck[i] < acc ? .012 : .0016); smooth[i] = acc; }
-  const clip = new Float32Array(n * 2);
+  // баланс: музыка −22 LUFS-подобно, голос +2.5 дБ
+  const MUS = 3.1, VOX = 1.34;
+  const out = new Float32Array(n * 2);
+  let peak = 0;
   for (let i = 0; i < n; i++) {
     const fade = Math.min(1, i / (SR * 1.2), (n - i) / (SR * 1.6));
-    clip[i * 2] = Math.max(-1, Math.min(1, L[i] * smooth[i] * .62 * fade));
-    clip[i * 2 + 1] = Math.max(-1, Math.min(1, R2[i] * smooth[i] * .62 * fade));
+    const l = (ML[i] * MUS * smooth[i] + VL[i] * VOX) * fade;
+    const r = (MR2[i] * MUS * smooth[i] + VR[i] * VOX) * fade;
+    out[i * 2] = l; out[i * 2 + 1] = r;
+    const a = Math.max(Math.abs(l), Math.abs(r)); if (a > peak) peak = a;
   }
+  // нормализация до −0.7 dBFS с мягким ограничителем
+  const g = peak > 0 ? Math.min(12, .92 / peak) : 1;
+  const soft = x => { const y = x * g; return Math.abs(y) <= .8 ? y : Math.sign(y) * (.8 + .2 * Math.tanh((Math.abs(y) - .8) / .2)); };
+  const clip = new Float32Array(n * 2);
+  let fp = 0;
+  for (let i = 0; i < out.length; i++) { const y = soft(out[i]); clip[i] = y; const a = Math.abs(y); if (a > fp) fp = a; }
+  console.log('звук: усиление ×' + g.toFixed(2) + ' · пик после мастеринга ' + (20 * Math.log10(fp)).toFixed(1) + ' dBFS');
   const wav = Buffer.alloc(44 + clip.length * 2);
   wav.write('RIFF', 0); wav.writeUInt32LE(36 + clip.length * 2, 4); wav.write('WAVE', 8); wav.write('fmt ', 12);
   wav.writeUInt32LE(16, 16); wav.writeUInt16LE(1, 20); wav.writeUInt16LE(2, 22); wav.writeUInt32LE(SR, 24);
   wav.writeUInt32LE(SR * 4, 28); wav.writeUInt16LE(4, 32); wav.writeUInt16LE(16, 34); wav.write('data', 36);
   wav.writeUInt32LE(clip.length * 2, 40);
-  for (let i = 0; i < clip.length; i++) wav.writeInt16LE(Math.round(clip[i] * 32767), 44 + i * 2);
-  const out = path.join('/tmp', 'body51-score.wav');
-  fs.writeFileSync(out, wav);
-  console.log('звук:', out, (wav.length / 1048576).toFixed(1) + ' МБ');
-  return out;
+  for (let i = 0; i < clip.length; i++) wav.writeInt16LE(Math.round(Math.max(-1, Math.min(1, clip[i])) * 32767), 44 + i * 2);
+  const outPath = path.join('/tmp', 'body51-score.wav');
+  fs.writeFileSync(outPath, wav);
+  console.log('звук:', outPath, (wav.length / 1048576).toFixed(1) + ' МБ');
+  return outPath;
 }
 const audioPath = process.env.BODY51_AUDIO || renderMusic();
 
@@ -198,8 +211,8 @@ const outMp4 = process.env.BODY51_OUT || path.join(film, 'body51.mp4');
 const args = [
   '-y', '-hide_banner', '-loglevel', 'error',
   '-framerate', String(FPS), '-f', 'image2pipe', '-vcodec', 'mjpeg', '-i', 'pipe:0',
-  '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0',
-  '-ss', '0', '-t', String(t1 - t0),
+  '-ss', String(t0), '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0',
+  '-t', String(t1 - t0),
   '-c:v', 'libx264', '-preset', 'veryfast', '-crf', CRF, '-pix_fmt', 'yuv420p', '-r', String(FPS),
   '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', outMp4,
 ];
