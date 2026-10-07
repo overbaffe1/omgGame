@@ -50,6 +50,9 @@ const SC=[];{let t=0;for(const d of DEFS){
   SC.push({id:d.id,title:d.title,fact:d.fact,start:t,dur,kind:d.id,narr:m?m.narr:null,narrAt:(m&&m.narrAt)||.6,
   narrDur:m?(m.narrDur||Math.max(4,dur-2.9)):0,narrText:m?(m.narrText||''):'',quotes:QUOTES[d.id]||[]});
   t+=dur}}
+// если у главы есть озвученный блок цитат — титры-цитаты рисуем блоком (см. hud)
+for(const s of SC){const m=T&&T.scenes?T.scenes.find(x=>x.id===s.id):null;
+  if(m&&m.quote){s.quote=m.quote;s.quotes=[]}}
 const TOTAL=SC[SC.length-1].start+SC[SC.length-1].dur;
 const sceneAt=t=>{for(const s of SC)if(t>=s.start&&t<s.start+s.dur)return s;return SC[SC.length-1]};
 
@@ -183,6 +186,29 @@ function hud(sc,t){
   // название главы + факты
   txt(sc.title,CX,168,40,'#f1e9dc',800,'center');
   panel(CX-190,196,380,54,27,.4);txt('факты: '+sc.fact,CX,224,26,'#ffd8a0',700,'center');
+  // блок озвученных цитат: второй голос читает, титры идут с ним синхронно
+  if(sc.quote){
+    const qt=t-sc.start-sc.quote.at;
+    if(qt>=-0.4&&qt<=sc.quote.dur+1.0){
+      const k=Math.min(1,Math.max(0,(qt+0.4)/0.4),Math.max(0,Math.min(1,(sc.quote.dur+1.0-qt)/0.5)));
+      g.save();g.globalAlpha=clamp(k);
+      g.font='italic 700 44px Georgia,serif';
+      const l=[];for(const line of sc.quote.lines){
+        const words=line.split(' ');let cur='';
+        for(const w of words){const cand=cur?cur+' '+w:w;
+          if(g.measureText(cand).width>860&&cur){l.push(cur);cur=w}else cur=cand}
+        if(cur)l.push(cur);
+        l.push('␣');
+      }
+      if(l[l.length-1]==='␣')l.pop();
+      const hh=l.length*58+104,y0=Math.min(1420,1560-hh);
+      panel(CX-505,y0,1010,hh,28,.88);
+      g.fillStyle=AMBER;rr(CX-505+26,y0+22,8,hh-44,4);g.fill();
+      txt('ЦИТАТА СО СТРИМА · голос со стрима читает второй диктор',CX-455,y0+42,23,'#ffd8a0',700,'left','ui-monospace,monospace');
+      l.forEach((p,i)=>txt(p==='␣'?'':p,CX-404,y0+86+i*58,44,'#fff6e6',700,'left','Georgia,serif'));
+      txt(sc.quote.who,CX+478,y0+hh-24,23,'#9aa3b2',600,'right');
+      g.restore()}
+  }
   // реплика Артёма дословно
   const u=(t-sc.start)/sc.dur,qt=sc.quotes.find(q=>u>=q.u&&u<q.u+q.d/sc.dur);
   if(qt){const k=Math.min(1,(u-qt.u)*sc.dur/.4,(qt.u+qt.d/sc.dur-u)*sc.dur/.5);g.save();g.globalAlpha=clamp(k);

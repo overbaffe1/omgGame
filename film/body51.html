@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="«Вайбкодер из Мурманска» — процедурный вертикальный мультфильм по фактам стримов @body51: 12 глав, картинка и музыка из кода, реплики — дословно по субтитрам.">
+<meta name="description" content="«Вайбкодер из Мурманска» — вертикальный мультфильм с 3D: 12 глав, Мурманск, кот Гуччи, семь принтеров, «директор нейронок». Два голоса: рассказчик и цитаты со стримов.">
 <title>Вайбкодер из Мурманска — процедурный мультфильм о @body51</title>
 <style>
   html,body{margin:0;height:100%;background:#05060b;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;color:#eee;overflow:hidden}
@@ -24,18 +24,20 @@
   <canvas id="c" width="1080" height="1920"></canvas>
   <div id="intro">
     <h1>Вайбкодер из Мурманска</h1>
-    <div class="lead">Мультфильм по фактам стримов <b>@body51</b>. 12 глав, 5 минут.<br>Картинка и музыка — код, закадровый голос — рассказчик,<br>реплики Артёма — дословно по субтитрам.</div>
+    <div class="lead">Мультфильм по фактам стримов <b>@body51</b>. 12 глав, 5:52, объёмная графика.<br>Картинка и музыка — код; голос за кадром — рассказчик,<br>цитаты Артёма читает второй голос — дословно по субтитрам.<br><span style="color:#7d8798">Голос самого Артёма не синтезируется.</span></div>
     <button id="play">▶ Смотреть</button>
-    <small>Лучше со звуком. Наушники приветствуются.<br>Пробел — пауза, стрелки — ±5 секунд, N/P — главы, F — на весь экран.<br><a href="body51-video.html">Версия в MP4</a> · <a href="index.html">Галерея</a></small>
+    <small>Лучше со звуком. Наушники приветствуются.<br>3D-версия: полигоны, мягкий свет, туман и объёмные декорации.<br>Пробел — пауза, стрелки — ±5 секунд, N/P — главы, F — на весь экран.<br><a href="body51-video.html">Версия в MP4</a> · <a href="index.html">Галерея</a></small>
   </div>
 </div>
-<script src="fx.js"></script>
-<script src="player.js"></script>
-<script src="body51-timing.js?v=1"></script>
-<script src="body51-film.js?v=1"></script>
-<script src="body51-scenes.js?v=1"></script>
-<script src="body51-score.js?v=1"></script>
-<script src="body51-run.js?v=1"></script>
+<script src="fx.js?v=2"></script>
+<script src="player.js?v=2"></script>
+<script src="body51-timing.js?v=2"></script>
+<script src="body51-film.js?v=2"></script>
+<script src="body51-3d.js?v=2"></script>
+<script src="body51-3d-scenes.js?v=2"></script>
+<script src="body51-scenes.js?v=2"></script>
+<script src="body51-score.js?v=2"></script>
+<script src="body51-run.js?v=2"></script>
 <script>
   const ui=document.getElementById('intro'),plr=document.getElementById('play');
   plr.onclick=()=>{ui.style.display='none';document.getElementById('plbig')?.click()};

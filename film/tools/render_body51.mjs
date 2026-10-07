@@ -57,7 +57,20 @@ for (const v of script.voices) {
   durations[v.scene] = mp3Duration(mp3);
   narFiles[v.id] = mp3; texts[v.scene] = v.text;
 }
-const timing = computeTiming({ durations, texts });
+// блоки цитат — второй голос, отдельные файлы qNN.mp3
+const quotes = {}, quoteTexts = {}, quoteLines = {}, quoteWho = {}, qFiles = {};
+for (const q of (script.quotes || [])) {
+  const mp3 = path.join(film, 'body51-voices', q.id + '.mp3');
+  if (!fs.existsSync(mp3)) {
+    quotes[q.scene] = { id: q.id, dur: estimate(q.text) };
+    console.log('цитата без озвучки (оценка длительности):', q.id, quotes[q.scene].dur.toFixed(1) + 'с');
+  } else {
+    quotes[q.scene] = { id: q.id, dur: mp3Duration(mp3) };
+    qFiles[q.id] = mp3;
+  }
+  quoteTexts[q.scene] = q.text; quoteLines[q.scene] = q.lines; quoteWho[q.scene] = q.who;
+}
+const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho });
 fs.writeFileSync(path.join(film, 'body51-timing.js'), toJs(timing, 'длительности из mp3 озвучки (render_body51.mjs)'));
 const TOTAL = timing.total;
 console.log('хронометраж:', `${Math.floor(TOTAL / 60)}:${String(Math.round(TOTAL % 60)).padStart(2, '0')}`, '· глав:', timing.scenes.length);
@@ -113,7 +126,7 @@ const sandbox = {
 sandbox.window = sandbox; sandbox.globalThis = sandbox;
 sandbox.window.addEventListener = () => {};
 vm.createContext(sandbox);
-for (const f of ['body51-timing.js', 'body51-film.js', 'body51-scenes.js', 'body51-score.js', 'body51-run.js'])
+for (const f of ['body51-timing.js', 'body51-film.js', 'body51-3d.js', 'body51-3d-scenes.js', 'body51-scenes.js', 'body51-score.js', 'body51-run.js'])
   vm.runInContext(fs.readFileSync(path.join(film, f), 'utf8'), sandbox, { filename: f });
 const filmApi = sandbox.__body51;
 if (!filmApi) { console.error('фильм не инициализировался'); process.exit(1); }
@@ -159,13 +172,16 @@ function renderMusic() {
   for (let i = d; i < n; i++) R2[i] = R[i - d] * .5 + R[i] * .6;
   // подмешиваем закадровый голос и приглушаем музыку под репликами
   const duck = new Float32Array(n).fill(1);
-  for (const s of timing.scenes) {
-    if (!s.narr || !narFiles[s.narr]) continue;
-    const pcm = decodeMp3(narFiles[s.narr]);
-    const at = Math.floor((s.start + (s.narrAt || .6)) * SR);
-    for (let i = 0; i < pcm.length; i++) if (at + i < n) { L[at + i] += pcm[i] * 1.05; R2[at + i] += pcm[i] * 1.05; }
+  const addVoice = (file, atSec, gain) => {
+    const pcm = decodeMp3(file);
+    const at = Math.floor(atSec * SR);
+    for (let i = 0; i < pcm.length; i++) if (at + i < n) { L[at + i] += pcm[i] * gain; R2[at + i] += pcm[i] * gain; }
     const from = Math.max(0, at - Math.floor(.2 * SR)), to = Math.min(n, at + pcm.length + Math.floor(.18 * SR));
     for (let i = from; i < to; i++) duck[i] = .36;
+  };
+  for (const s of timing.scenes) {
+    if (s.narr && narFiles[s.narr]) addVoice(narFiles[s.narr], s.start + (s.narrAt || .6), 1.05);
+    if (s.quote && s.quote.id && qFiles[s.quote.id]) addVoice(qFiles[s.quote.id], s.start + s.quote.at, 1.0);
   }
   // сглаживание «приглушения»
   const smooth = new Float32Array(n);
