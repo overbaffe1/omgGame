@@ -46,7 +46,15 @@ function decodeMp3(file) {                        // → Float32Array, моно,
 }
 
 // ---------- хронометраж ----------
-const script = JSON.parse(fs.readFileSync(path.join(film, 'body51-voices', 'script.json'), 'utf8'));
+// нарезки: --cut minute → короткая мем-версия (свои текст, тайминг и файл)
+const CUTS = {
+  minute: { script: 'script-minute.json', timing: 'body51-timing-min.js', out: 'body51-min.mp4',
+            subset: ['polar', 'cat', 'limits', 'gag', 'release', 'finale'],
+            lead: 0.8, tail: 0.7, qgap: 0.4, minDur: 6 },
+};
+const CUT = arg('cut', null);
+const CFG = CUT ? (CUTS[CUT] || (() => { console.error('неизвестная нарезка:', CUT, '· есть:', Object.keys(CUTS).join(', ')); process.exit(1); })()) : null;
+const script = JSON.parse(fs.readFileSync(path.join(film, 'body51-voices', CFG ? CFG.script : 'script.json'), 'utf8'));
 const durations = {}, narFiles = {}, texts = {};
 for (const v of script.voices) {
   const mp3 = path.join(film, 'body51-voices', v.id + '.mp3');
@@ -71,10 +79,13 @@ for (const q of (script.quotes || [])) {
   }
   quoteTexts[q.scene] = q.text; quoteLines[q.scene] = q.lines; quoteWho[q.scene] = q.who;
 }
+// карта «глава → id озвучки» (в нарезках id свои: m01, m02, …)
+const narrIds = {};
+for (const v of script.voices) if (v.scene) narrIds[v.scene] = v.id;
 // замер речи: где в файле реально начинается/кончается голос и где паузы
 const narrSpecs = {}, quoteSpecs = {};
 for (const s of SCENES) {
-  const nar = narFiles[s.narr];
+  const nar = narFiles[narrIds[s.id] || s.narr];
   if (nar) {
     const sp = speechSpans(nar, { ffmpeg });
     narrSpecs[s.id] = Object.assign(sp, { seg: segmentsFor(sp, sentences(texts[s.id])) });
@@ -85,8 +96,12 @@ for (const s of SCENES) {
     quoteSpecs[s.id] = Object.assign(sp, { seg: segmentsFor(sp, q.lines && q.lines.length ? q.lines : [q.text]) });
   }
 }
-const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho, narrSpecs, quoteSpecs });
-fs.writeFileSync(path.join(film, 'body51-timing.js'), toJs(timing, 'длительности из mp3 озвучки (render_body51.mjs)'));
+const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho, narrSpecs, quoteSpecs,
+  narrIds,
+  subset: CFG ? CFG.subset : null, lead: CFG ? CFG.lead : undefined, tail: CFG ? CFG.tail : undefined,
+  qgap: CFG ? CFG.qgap : undefined, minDur: CFG ? CFG.minDur : undefined });
+const TIMING_FILE = CFG ? CFG.timing : 'body51-timing.js';
+fs.writeFileSync(path.join(film, TIMING_FILE), toJs(timing, 'длительности из mp3 озвучки (render_body51.mjs)'));
 const TOTAL = timing.total;
 console.log('хронометраж:', `${Math.floor(TOTAL / 60)}:${String(Math.round(TOTAL % 60)).padStart(2, '0')}`, '· глав:', timing.scenes.length);
 
@@ -141,7 +156,7 @@ const sandbox = {
 sandbox.window = sandbox; sandbox.globalThis = sandbox;
 sandbox.window.addEventListener = () => {};
 vm.createContext(sandbox);
-for (const f of ['body51-timing.js', 'body51-film.js', 'body51-3d.js', 'body51-3d-scenes.js', 'body51-scenes.js', 'body51-score.js', 'body51-run.js'])
+for (const f of [TIMING_FILE, 'body51-film.js', 'body51-3d.js', 'body51-3d-scenes.js', 'body51-scenes.js', 'body51-score.js', 'body51-run.js'])
   vm.runInContext(fs.readFileSync(path.join(film, f), 'utf8'), sandbox, { filename: f });
 const filmApi = sandbox.__body51;
 if (!filmApi) { console.error('фильм не инициализировался'); process.exit(1); }
@@ -229,7 +244,7 @@ const JOBS = Math.max(1, parseInt(arg('jobs', '1'), 10) || 1);
 const CHUNK = arg('chunk-out', null);            // служебное: имя куска для воркера
 const range = arg('range', null);
 const [t0, t1] = range ? range.split(':').map(Number) : [0, TOTAL];
-const outMp4 = CHUNK || process.env.BODY51_OUT || path.join(film, 'body51.mp4');
+const outMp4 = CHUNK || process.env.BODY51_OUT || path.join(film, CFG ? CFG.out : 'body51.mp4');
 // защита: кусок (--range) не должен затирать полный релизный ролик
 if (range && !CHUNK && !process.env.BODY51_OUT && fs.existsSync(outMp4)
     && t1 - t0 < TOTAL - 1 && !arg('force', null)) {

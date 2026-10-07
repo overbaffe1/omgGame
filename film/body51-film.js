@@ -56,6 +56,11 @@ for(const s of SC){const m=T&&T.scenes?T.scenes.find(x=>x.id===s.id):null;
   if(m.narrSeg)s.narrSeg=m.narrSeg;
   if(m.narrOn!=null){s.narrOn=m.narrOn;s.narrOff=m.narrOff;s.narrAt=m.narrAt}
   if(m.quote){s.quote=m.quote;s.quotes=[]}}
+// минутная нарезка: в тайминге только выбранные главы — берём их порядок и тайминги из тайминга
+if(T&&T.subset){const keep=[];
+  for(const m of T.scenes){const sc=SC.find(s=>s.id===m.id);if(!sc)continue;
+    sc.start=m.start;sc.dur=m.dur;keep.push(sc)}
+  SC.length=0;SC.push(...keep);}
 const TOTAL=SC[SC.length-1].start+SC[SC.length-1].dur;
 const sceneAt=t=>{for(const s of SC)if(t>=s.start&&t<s.start+s.dur)return s;return SC[SC.length-1]};
 

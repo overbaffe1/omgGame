@@ -1,9 +1,10 @@
 // body51-timing.js — собран автоматически (film/tools/build_body51_timing.mjs).
-// длительности из mp3 озвучки (render_body51.mjs)
+// длительности и паузы из mp3 озвучки
 window.BODY51_TIMING={
  "version": 3,
  "total": 235.47,
  "rate": 12.7,
+ "subset": null,
  "scenes": [
   {
    "id": "polar",

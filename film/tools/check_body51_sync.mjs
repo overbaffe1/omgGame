@@ -23,10 +23,15 @@ const arg = (n, d) => { const i = argv.indexOf('--' + n); return i < 0 ? d : arg
 const FF = process.env.FFMPEG_BIN || (() => { try { return require('@ffmpeg-installer/ffmpeg').path; } catch { return 'ffmpeg'; } })();
 const SR = 44100;
 
-const mp4 = arg('mp4', process.env.BODY51_OUT || path.join(film, 'body51.mp4'));
+const CUTS = { minute: { timing: 'body51-timing-min.js', mp4: 'body51-min.mp4' } };
+const CUT = arg('cut', null);
+if (CUT && !CUTS[CUT]) { console.error('неизвестная нарезка:', CUT); process.exit(1); }
+const mp4 = arg('mp4', process.env.BODY51_OUT
+  || path.join(film, CUT ? CUTS[CUT].mp4 : 'body51.mp4'));
 const tol = parseFloat(arg('tol', '0.30'));
 const OFF = parseFloat(arg('offset', '0'));            // сдвиг файла (для кусков --range)
-const timing = JSON.parse(fs.readFileSync(path.join(film, 'body51-timing.js'), 'utf8').replace(/^[^{]*/, '').replace(/;\s*$/, ''));
+const timingFile = arg('timing', CUT ? CUTS[CUT].timing : 'body51-timing.js');
+const timing = JSON.parse(fs.readFileSync(path.join(film, timingFile), 'utf8').replace(/^[^{]*/, '').replace(/;\s*$/, ''));
 
 function pcm(file, ss, dur) {
   const a = [];
@@ -64,7 +69,7 @@ const durOut = (() => {
 const checks = [];
 for (const s of timing.scenes) {
   // файл рассказчика ставится в start + narrAt, речь внутри него начинается с onset
-  if (s.narr) checks.push({ what: s.id + ' / рассказчик', file: path.join(film, 'body51-voices', s.narr + '.mp3'), at: s.start + s.narrAt });
+  if (s.narr) checks.push({ what: s.id + ' / рассказчик', file: path.join(film, 'body51-voices', (s.narrSpec || s.narr) + '.mp3'), at: s.start + s.narrAt });
   if (s.quote && s.quote.id) checks.push({ what: s.id + ' / цитата', file: path.join(film, 'body51-voices', s.quote.id + '.mp3'), at: s.start + s.quote.at });
 }
 

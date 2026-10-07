@@ -14,7 +14,14 @@ import { speechSpans, sentences, segmentsFor } from './body51_speech.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const film = path.resolve(here, '..');
-const script = JSON.parse(readFileSync(path.join(film, 'body51-voices', 'script.json'), 'utf8'));
+const argv = process.argv.slice(2);
+const arg = (n, d) => { const i = argv.indexOf('--' + n); return i < 0 ? d : argv[i + 1]; };
+// нарезки: --cut minute → короткая мем-версия
+const CUTS = { minute: { script: 'script-minute.json', timing: 'body51-timing-min.js',
+  subset: ['polar', 'cat', 'limits', 'gag', 'release', 'finale'], lead: 0.8, tail: 0.7, qgap: 0.4, minDur: 6 } };
+const CFG = arg('cut', null) ? (CUTS[arg('cut', null)] || null) : null;
+if (arg('cut', null) && !CFG) { console.error('неизвестная нарезка:', arg('cut', null)); process.exit(1); }
+const script = JSON.parse(readFileSync(path.join(film, 'body51-voices', CFG ? CFG.script : 'script.json'), 'utf8'));
 
 const require = createRequire(
   process.env.BODY51_DEPS ? path.join(process.env.BODY51_DEPS, 'noop.cjs') : import.meta.url);
@@ -47,8 +54,8 @@ for (const v of script.voices) {
 }
 // замер пауз в озвучке: окна фраз для титров и точка старта речи (та же логика, что в рендере)
 const narrSpecs = {}, quoteSpecs = {};
-const voices = {}, narr = {};
-for (const v of script.voices) { voices[v.id] = v; narr[v.scene] = v.id; }
+const voices = {}, narr = {}, narrIds = {};
+for (const v of script.voices) { voices[v.id] = v; narr[v.scene] = v.id; narrIds[v.scene] = v.id; }
 const quotesByScene = {};
 for (const q of script.quotes || []) quotesByScene[q.scene] = q;
 for (const sc of SCENES) {
@@ -72,8 +79,10 @@ for (const q of script.quotes || []) {
   if (!fs.existsSync(mp3)) console.log('цитата без озвучки (оценка):', q.id);
   quoteTexts[q.scene] = q.text; quoteLines[q.scene] = q.lines; quoteWho[q.scene] = q.who;
 }
-const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho, narrSpecs, quoteSpecs });
-fs.writeFileSync(path.join(film, 'body51-timing.js'), toJs(timing,
+const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho, narrSpecs, quoteSpecs,
+  narrIds, subset: CFG ? CFG.subset : null, lead: CFG ? CFG.lead : undefined, tail: CFG ? CFG.tail : undefined,
+  qgap: CFG ? CFG.qgap : undefined, minDur: CFG ? CFG.minDur : undefined });
+fs.writeFileSync(path.join(film, CFG ? CFG.timing : 'body51-timing.js'), toJs(timing,
   missing.length ? `оценка по тексту; нет озвучки: ${missing.join(', ')}` : 'длительности и паузы из mp3 озвучки'));
 const mm = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
 console.log('хронометраж:', mm(timing.total));

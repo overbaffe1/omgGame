@@ -88,6 +88,20 @@ python3 film/serve.py                                # http://localhost:8080/fil
    `--no-voice` (примерка кадров без озвучки — длительности считаются по скорости речи).
    Длительность видео и звука берётся из `body51-timing.js`, поэтому картинка и музыка всегда синхронны.
 
+## Минутная мем-версия
+
+Короткая нарезка самого смешного — 6 глав, 1:16 (свой текст, свой тайминг, тот же движок):
+
+```bash
+DEPS=$(bash film/tools/body51_deps.sh)
+BODY51_DEPS=$DEPS node film/tools/render_body51.mjs --cut minute --jobs 8
+```
+
+Текст лежит в `film/body51-voices/script-minute.json`, тайминг собирается в
+`film/body51-timing-min.js`, ролик — `film/body51-min.mp4`, страница — `film/body51-min.html`.
+Цитаты в нарезке — те же файлы `qNN.mp3`, что и в полной версии.
+Сверка синхрона: `node film/tools/check_body51_sync.mjs --cut minute`.
+
 ## Синхронизация озвучки
 
 После рендера полезно сверить, что каждая реплика звучит ровно там, где написано в тайминге:

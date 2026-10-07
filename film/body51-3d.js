@@ -197,13 +197,17 @@ class Scene{
       q=clipHalf(q,p=>ky*p.z-p.y);if(!q)return null;
       q=clipHalf(q,p=>p.y+ky*p.z);if(!q)return null;
       return q};
+    // ключ сортировки painter'а: берём дальнюю точку грани, а не центр, иначе крупный
+    // полигон (кран, монитор, полка) перекрывает мелкие детали, которые ближе к камере
+    const zsort=(poly,zc)=>{let f=0;for(const p of poly)if(p.z>f)f=p.z;return f+0.06*zc};
     // тени на полу (рисуем как тёмные эллипсы-полигоны на плоскостях y=const — упрощённо: на уровне 0)
-    const items=[],adds=[];
+    const items=[],adds=[],glass=[];
     for(const b of this.blobs){
       const pts=[];const N=14;
       for(let i=0;i<N;i++){const a=i/N*TAU;pts.push(toCam(v3(b.x+Math.cos(a)*b.rx,0.02,b.z+Math.sin(a)*b.rz)))}
       const cl=clipNear(pts);if(!cl)continue;
-      items.push({z:cl.reduce((s,p)=>s+p.z,0)/cl.length,pts:cl.map(project),col:[6,6,9],a:b.a,e:true,shadow:true});
+      const zs=cl.reduce((s,p)=>s+p.z,0)/cl.length;
+      items.push({z:zsort(cl,zs),pts:cl.map(project),col:[6,6,9],a:b.a,e:true,shadow:true});
     }
     for(const f of this.faces){
       const cams=f.p.map(toCam);
@@ -213,6 +217,7 @@ class Scene{
       else n=v3(0,1,0);
       let cw=v3(0,0,0);for(const p of f.p)cw=vadd(cw,p);cw=vmul(cw,1/f.p.length);
       const zc=cl.reduce((s,p)=>s+p.z,0)/cl.length;
+      const zk=zsort(cl,zc);
       const toEye=vnorm(vsub(eye,cw));
       let base=f.c;
       if(f.tint)base=[base[0]*f.tint[0],base[1]*f.tint[1],base[2]*f.tint[2]];
@@ -235,10 +240,12 @@ class Scene{
       // туман
       const ft=clamp((zc-this.fogNear)/(this.fogFar-this.fogNear));
       if(ft>0){col=[lerp(col[0],this.fogCol[0],ft),lerp(col[1],this.fogCol[1],ft),lerp(col[2],this.fogCol[2],ft)]}
-      if(f.add){adds.push({z:zc,pts:cl.map(project),col,a:f.alpha});continue}
-      items.push({z:zc,pts:cl.map(project),col,a:f.alpha==null?1:f.alpha,e:f.e,glow:f.glow});
+      if(f.add){adds.push({z:zk,pts:cl.map(project),col,a:f.alpha});continue}
+      const it={z:zk,pts:cl.map(project),col,a:f.alpha==null?1:f.alpha,e:f.e,glow:f.glow};
+      if(it.a<1)glass.push(it);else items.push(it);
     }
     items.sort((A,B)=>B.z-A.z);
+    glass.sort((A,B)=>B.z-A.z);      // стекло и вода — после всего непрозрачного, от дальних к ближним
     const paint=(it,composite)=>{
       const pts=it.pts;
       g.save();
@@ -253,7 +260,7 @@ class Scene{
       if(al>0.5)g.stroke();
       g.restore();
     };
-    for(const it of items){
+    for(const it of items.concat(glass)){
       const pts=it.pts;
       g.beginPath();g.moveTo(pts[0].x,pts[0].y);
       for(let i=1;i<pts.length;i++)g.lineTo(pts[i].x,pts[i].y);
