@@ -138,6 +138,21 @@ function creditsPanel(gg,w,h,i,src){
   src.forEach((l,idx)=>gg.fillText(l,22,96+idx*40));
 }
 
+// из точек свечения сцены делаем объём: пятна на полу, шахты света, пылинки
+function deriveLight(sc,pan,t){
+  sc.tick(t);
+  if(pan&&pan.glows)for(const gl of pan.glows){
+    const floorHit=Math.max(0,gl.p.y);
+    if(gl.pool===true||(gl.pool!==false&&(gl.a||0)>=0.32&&(gl.r||0)<=260&&floorHit<2.6)){
+      const r=(gl.r||180)/260*1.05;
+      sc.pool(gl.p.x,gl.p.z,Math.max(0.35,r),gl.col,(gl.a||0.4)*0.30);
+    }
+    if(gl.shaft)sc.shaft(gl.p.x,gl.p.y+ (gl.shaft.h||1.2)/2,gl.p.z,(gl.shaft.r0||0.5),(gl.shaft.r1||0.15),(gl.shaft.h||1.6),gl.col,(gl.a||0.4)*0.22);
+  }
+  const d=pan&&pan.dust;
+  if(d)sc.dust(t,d.n||18,d.c[0],d.c[1],d.c[2],d.w[0],d.w[1],d.w[2],d.col||'#e8dcc0',d.a==null?0.5:d.a);
+}
+
 // мягкое свечение вокруг ламп/экранов/окон — «с кайфом»
 function glowSprites(sc,pan,t){
   if(!pan||!pan.glows)return;
@@ -305,6 +320,7 @@ function frame(t){
     s3=new B3.Scene(g,W,H);
     sceneBg(scene.kind,t);
     panels=S3[scene.kind](s3,u,t)||{};
+    deriveLight(s3,panels,t);
     B3.draw(s3);
     drawPanels(scene.kind,s3,panels,u,t);
     glowSprites(s3,panels,t);

@@ -36,7 +36,7 @@ const QUOTES={
  caravan:[{u:.74,d:5.4,t:'Куча систем и ноль контента',s:'#473'}],
  limits:[{u:.13,d:4.6,t:'Я токеновый мультимиллионер',s:'#073'},{u:.46,d:5.6,t:'11 часов до сброса и 74% лимитов',s:'#008'},{u:.80,d:5.4,t:'Меняешь нейронку — будто девушке изменяешь',s:'стримы'}],
  gag:[{u:.30,d:5.4,t:'Ты где такой меч видел? Он ещё и деревянный, и квадратный',s:'#061'},{u:.63,d:4.6,t:'Кости молота мигрировали',s:'#468'},{u:.86,d:4.4,t:'Где руны? Я вижу… свисающее с колокола',s:'#468'}],
- burnout:[{u:.22,d:5.2,t:'Я устал, я выгорел',s:'#018'}],
+ burnout:[],
  release:[{u:.52,d:8.4,t:'Я не релизил 10 лет ни одной игры. Я лишился релизной девственности',s:'#065'}],
  wishlist:[{u:.80,d:8.0,t:'13 000 вишлистов и написали два издателя',s:'#012'}],
  finale:[{u:.10,d:5.0,t:'Если я перестану стримить — значит, я заработал свои миллионы',s:'#015'},{u:.42,d:6.0,t:'Главное — доделывать. Доводить до релиза',s:'#200'}],
@@ -52,7 +52,10 @@ const SC=[];{let t=0;for(const d of DEFS){
   t+=dur}}
 // если у главы есть озвученный блок цитат — титры-цитаты рисуем блоком (см. hud)
 for(const s of SC){const m=T&&T.scenes?T.scenes.find(x=>x.id===s.id):null;
-  if(m&&m.quote){s.quote=m.quote;s.quotes=[]}}
+  if(!m)continue;
+  if(m.narrSeg)s.narrSeg=m.narrSeg;
+  if(m.narrOn!=null){s.narrOn=m.narrOn;s.narrOff=m.narrOff;s.narrAt=m.narrAt}
+  if(m.quote){s.quote=m.quote;s.quotes=[]}}
 const TOTAL=SC[SC.length-1].start+SC[SC.length-1].dur;
 const sceneAt=t=>{for(const s of SC)if(t>=s.start&&t<s.start+s.dur)return s;return SC[SC.length-1]};
 
@@ -186,51 +189,56 @@ function hud(sc,t){
   // название главы + факты
   txt(sc.title,CX,168,40,'#f1e9dc',800,'center');
   panel(CX-190,196,380,54,27,.4);txt('факты: '+sc.fact,CX,224,26,'#ffd8a0',700,'center');
-  // блок озвученных цитат: второй голос читает, титры идут с ним синхронно
+  // блок озвученных цитат: каждая строка появляется ровно тогда, когда её читает второй голос
   if(sc.quote){
-    const qt=t-sc.start-sc.quote.at;
-    if(qt>=-0.4&&qt<=sc.quote.dur+1.0){
-      const k=Math.min(1,Math.max(0,(qt+0.4)/0.4),Math.max(0,Math.min(1,(sc.quote.dur+1.0-qt)/0.5)));
-      g.save();g.globalAlpha=clamp(k);
-      g.font='italic 700 44px Georgia,serif';
-      const l=[];for(const line of sc.quote.lines){
-        const words=line.split(' ');let cur='';
-        for(const w of words){const cand=cur?cur+' '+w:w;
-          if(g.measureText(cand).width>860&&cur){l.push(cur);cur=w}else cur=cand}
-        if(cur)l.push(cur);
-        l.push('␣');
-      }
-      if(l[l.length-1]==='␣')l.pop();
-      const hh=l.length*58+104,y0=Math.min(1420,1560-hh);
-      panel(CX-505,y0,1010,hh,28,.88);
-      g.fillStyle=AMBER;rr(CX-505+26,y0+22,8,hh-44,4);g.fill();
-      txt('ЦИТАТА СО СТРИМА · голос со стрима читает второй диктор',CX-455,y0+42,23,'#ffd8a0',700,'left','ui-monospace,monospace');
-      l.forEach((p,i)=>txt(p==='␣'?'':p,CX-404,y0+86+i*58,44,'#fff6e6',700,'left','Georgia,serif'));
-      txt(sc.quote.who,CX+478,y0+hh-24,23,'#9aa3b2',600,'right');
-      g.restore()}
-  }
-  // реплика Артёма дословно
-  const u=(t-sc.start)/sc.dur,qt=sc.quotes.find(q=>u>=q.u&&u<q.u+q.d/sc.dur);
-  if(qt){const k=Math.min(1,(u-qt.u)*sc.dur/.4,(qt.u+qt.d/sc.dur-u)*sc.dur/.5);g.save();g.globalAlpha=clamp(k);
-    g.font='italic 700 46px Georgia,serif';const l=[];{const w=qt.t.split(' ');let line='';for(const q of w){const n=line?line+' '+q:q;if(g.measureText(n).width>880&&line){l.push(line);line=q}else line=n}l.push(line)}
-    const hh=l.length*62+96;const y0=Math.min(1400,1620-hh)-hh>0?Math.min(1400,1620-hh):1400-hh;panel(CX-500,y0,1000,hh,30,.86);g.fillStyle=AMBER;rr(CX-500+26,y0+24,8,hh-48,4);g.fill();
-    txt('«',CX-452,y0+44,60,AMBER,800,'left','Georgia,serif');
-    l.forEach((p,i)=>txt(p,CX-404,y0+64+i*62,46,'#fff6e6',700,'left','Georgia,serif'));
-    txt(qt.s+' — дословно',CX+470,y0+hh-26,24,'#9aa3b2',600,'right');g.restore()}
-  // субтитры рассказчика: текущее предложение закадрового текста
-  if(sc.narrText){
-    const t0=sc.start+(sc.narrAt||.6),nd=sc.narrDur||(sc.dur-2.9),u2=(t-t0)/nd;
-    if(u2>=-.02&&u2<=1.02){
-      const parts=sc.narrText.match(/[^.!?…]+[.!?…]*/g)||[sc.narrText];
-      const tot=parts.reduce((a,x)=>a+x.length,0);let acc=0,cur=parts[0],from=0,to=1;
-      for(const p of parts){const w=p.length/tot;if(u2>=acc&&u2<acc+w){cur=p;from=acc;to=acc+w;break}acc+=w}
-      const a2=Math.min(1,seg(u2,from-.03,from+.03),1-seg(u2,to-.03,to+.01));
-      if(a2>0){g.save();g.globalAlpha=clamp(a2);
-        panel(64,1648,952,146,26,.74);
-        txt('ЗА КАДРОМ',96,1682,19,MINT,800,'left','ui-monospace,monospace');
-        lines(cur.trim(),CX,1730,824,42,33,'#eef2f8',600,'center','system-ui,sans-serif');
+    const q=sc.quote, segs=q.seg&&q.seg.length?q.seg:null;
+    const local=t-sc.start;
+    if(local>=q.on-0.45&&local<=q.off+1.1){
+      const shown=segs?segs.filter(g=>local>=g.t0-0.28&&local<=g.t1+0.42):[{text:q.lines.join(' · '),t0:q.on,t1:q.off}];
+      if(shown.length){
+        g.save();
+        g.font='italic 700 44px Georgia,serif';
+        const l=[];
+        shown.forEach((seg,idx)=>{
+          if(idx)g.fillText('',0,0);
+          const words=seg.text.split(' ');let cur='';
+          for(const w of words){const cand=cur?cur+' '+w:w;
+            if(g.measureText(cand).width>860&&cur){l.push(cur);cur=w}else cur=cand}
+          if(cur)l.push(cur);
+          if(idx<shown.length-1)l.push('␣');
+        });
+        while(l.length&&l[l.length-1]==='␣')l.pop();
+        const hh=l.length*58+104,y0=Math.min(1420,1560-hh);
+        // мягкое появление каждой строки
+        let k=1;
+        const first=shown[0],last=shown[shown.length-1];
+        k=Math.min(1,Math.max(0,(local-(first.t0-0.28))/0.28),Math.max(0,Math.min(1,(last.t1+0.42-local)/0.4)));
+        g.globalAlpha=clamp(k);
+        panel(CX-505,y0,1010,hh,28,.88);
+        g.fillStyle=AMBER;rr(CX-505+26,y0+22,8,hh-44,4);g.fill();
+        txt('ЦИТАТА СО СТРИМА · голос со стрима читает второй диктор',CX-455,y0+42,23,'#ffd8a0',700,'left','ui-monospace,monospace');
+        l.forEach((p,i)=>txt(p==='␣'?'':p,CX-404,y0+86+i*58,44,'#fff6e6',700,'left','Georgia,serif'));
+        txt(q.who,CX+478,y0+hh-24,23,'#9aa3b2',600,'right');
         g.restore()}
     }
+  }
+  // субтитры рассказчика: текущее предложение закадрового текста
+  if(sc.narrText){
+    const local=t-sc.start;
+    const segs=sc.narrSeg;
+    if(segs&&segs.length){
+      // точная синхронизация: у каждой фразы своё окно (замер пауз в озвучке)
+      const cur=segs.find(x=>local>=x.t0-0.25&&local<=x.t1+0.30);
+      if(cur){
+        const a=Math.min(1,(local-(cur.t0-0.25))/0.25,Math.max(0,(cur.t1+0.30-local)/0.30));
+        if(a>0){g.save();g.globalAlpha=clamp(a);
+          panel(64,1638,952,166,26,.76);
+          panel(88,1652,186,34,17,.5);
+          txt('ЗА КАДРОМ',181,1669,19,MINT,800,'center','ui-monospace,monospace');
+          lines(cur.text.trim(),CX-10,1740,796,38,40,'#eef2f8',600,'center','system-ui,sans-serif');
+          g.restore()}
+      }
+    }else if(sc.narrText){}
   }
   progressBar(t);
 }

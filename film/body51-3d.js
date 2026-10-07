@@ -103,8 +103,47 @@ function slab(w,d,cols,rows,col,opt={}){const m=mesh();
 class Scene{
   constructor(g,W,H){this.g=g;this.W=W;this.H=H;this.faces=[];this.blobs=[];
     this.vp={x:0,y:0,w:W,h:H};this.cam={eye:v3(0,1.6,6),target:v3(0,1.2,0),fov:42};this.light=vnorm(v3(-0.45,0.85,0.35));this.light2=vnorm(v3(0.7,0.25,-0.5));this.ambient=0.66;
-    this.sun=[1,.94,.86];this.fill=[.66,.74,1];this.sky=[.55,.65,.85];this.fogCol=[10,12,20];this.fogNear=7;this.fogFar=30;this.key=1;this.exposure=1.0;}
+    this.sun=[1,.94,.86];this.fill=[.66,.74,1];this.sky=[.55,.65,.85];this.fogCol=[10,12,20];this.fogNear=7;this.fogFar=30;this.key=1;this.exposure=1.0;this.drift=0.03;this._t=0;this.post=[];}
   viewport(vp){this.vp=vp;return this}
+  tick(t){this._t=t||0;return this}
+  // световое пятно на полу: три вложенных круга, складываются в «screen»
+  pool(x,z,r,col,a=0.3){
+    a=clamp(a,0,0.30);r=Math.min(r,1.05);
+    for(const [k,al] of [[1,a],[0.66,a*0.8],[0.36,a*0.7]]){
+      const m=mesh();const N=18;
+      for(let i=0;i<N;i++){
+        const a1=i/N*TAU,a2=(i+1)/N*TAU;
+        tri(m,v3(0,0,0),v3(Math.cos(a1)*r*k,0,Math.sin(a1)*r*k),v3(Math.cos(a2)*r*k,0,Math.sin(a2)*r*k),col,{emissive:true});
+      }
+      this.add(m,null,{additive:true,alpha:al,tint:[col[0],col[1],col[2]]});
+    }
+    return this;
+  }
+  // шахта света: открытый конус вниз («screen»)
+  shaft(x,y,z,r0,r1,h,col,a=0.10){
+    const m=mesh();const N=14;
+    for(let i=0;i<N;i++){
+      const a1=i/N*TAU,a2=(i+1)/N*TAU;
+      quad(m,
+        v3(Math.cos(a1)*r0,-h/2,Math.sin(a1)*r0),v3(Math.cos(a2)*r0,-h/2,Math.sin(a2)*r0),
+        v3(Math.cos(a2)*r1,h/2,Math.sin(a2)*r1),v3(Math.cos(a1)*r1,h/2,Math.sin(a1)*r1),col,{emissive:true});
+    }
+    this.add(m,mTrans(x,y,z),{additive:true,alpha:a});
+    return this;
+  }
+  // пылинки в воздухе
+  dust(t,n,cx,cy,cz,wx,wy,wz,col='#e8dcc0',alpha=0.5){
+    for(let i=0;i<n;i++){
+      const h1=Math.sin(i*12.9898)*43758.5453,h2=Math.sin(i*78.233)*43758.5453,h3=Math.sin(i*39.425)*43758.5453;
+      const f1=h1-Math.floor(h1),f2=h2-Math.floor(h2),f3=h3-Math.floor(h3);
+      const x=cx+(f1-0.5)*wx+Math.sin(t*0.3+f1*7)*0.12;
+      const y=cy+(f2-0.5)*wy+Math.sin(t*0.21+f2*9)*0.10;
+      const z=cz+(f3-0.5)*wz+Math.cos(t*0.26+f3*5)*0.12;
+      const r=0.008+f3*0.010;
+      this.add(sphere(3,4,r,col,{emissive:true,glow:0.12}),mTrans(x,y,z),{additive:true,alpha:alpha*0.5*(0.3+0.7*Math.abs(Math.sin(t*0.5+i)))});
+    }
+    return this;
+  }
   camera(eye,target,fov){this.cam={eye,target,fov:fov||this.cam.fov};return this}
   sunLight(dir,intensity){this.light=vnorm(dir);this.key=intensity==null?1:intensity;return this}
   fog(near,far,col){this.fogNear=near;this.fogFar=far;this.fogCol=colorOf(col||'#0a0c14');return this}
@@ -115,7 +154,8 @@ class Scene{
     const V=m.verts.map(v=>xform(mat||mIdent(),v));
     const off=this.faces.length;
     for(const f of m.faces){
-      this.faces.push({p:f.v.map(i=>V[i]),c:Array.isArray(f.c)?f.c:colorOf(f.c),e:f.e||opt.emissive,tint:opt.tint||null,double:f.double!==false,glow:f.glow||opt.glow||0});
+      this.faces.push({p:f.v.map(i=>V[i]),c:Array.isArray(f.c)?f.c:colorOf(f.c),e:f.e||opt.emissive,tint:opt.tint||null,double:f.double!==false,glow:f.glow||opt.glow||0,
+        add:!!opt.additive,alpha:opt.alpha==null?1:opt.alpha});
     }
     return off;
   }
@@ -123,10 +163,17 @@ class Scene{
   // рисование
   render(){
     const g=this.g,W=this.W,H=this.H,vp=this.vp;
-    const eye=this.cam.eye,tgt=this.cam.target;
+    let eye=this.cam.eye;const tgt=this.cam.target;
     const fwd=vnorm(vsub(tgt,eye));
     let up=v3(0,1,0);if(Math.abs(vdot(fwd,up))>0.995)up=v3(0,0,1);
-    const right=vnorm(vcross(fwd,up)),upv=vcross(right,fwd);
+    let right=vnorm(vcross(fwd,up)),upv=vcross(right,fwd);
+    // «живая» камера: лёгкое дыхание и крен
+    const t=this._t||0,amp=this.drift||0;
+    eye=vadd(eye,vadd(vmul(right,Math.sin(t*0.53)*amp),vadd(vmul(upv,Math.sin(t*0.71+1.3)*amp*0.6),vmul(fwd,Math.sin(t*0.41+0.7)*amp*0.5))));
+    const roll=Math.sin(t*0.37+1.2)*0.0055;
+    {const cs=Math.cos(roll),sn=Math.sin(roll);
+      const r2=vadd(vmul(right,cs),vmul(upv,sn)),u2=vadd(vmul(upv,cs),vmul(right,-sn));
+      right=r2;upv=u2}
     const focal=(vp.h/2)/Math.tan(rad(this.cam.fov)/2);
     const cx=vp.x+vp.w/2, cy=vp.y+vp.h/2;
     const toCam=p=>{const d=vsub(p,eye);return v3(vdot(d,right),vdot(d,upv),vdot(d,fwd))};
@@ -151,7 +198,7 @@ class Scene{
       q=clipHalf(q,p=>p.y+ky*p.z);if(!q)return null;
       return q};
     // тени на полу (рисуем как тёмные эллипсы-полигоны на плоскостях y=const — упрощённо: на уровне 0)
-    const items=[];
+    const items=[],adds=[];
     for(const b of this.blobs){
       const pts=[];const N=14;
       for(let i=0;i<N;i++){const a=i/N*TAU;pts.push(toCam(v3(b.x+Math.cos(a)*b.rx,0.02,b.z+Math.sin(a)*b.rz)))}
@@ -176,17 +223,36 @@ class Scene{
         const dl=Math.abs(vdot(n,this.light));
         const nb=Math.abs(vdot(n,v3(0,1,0)));
         const d2=Math.abs(vdot(n,this.light2));
-        const k=(this.ambient + dl*0.46 + nb*0.12 + d2*0.16)*this.exposure;
+        // мягкое «затемнение к полу» (псевдо-AO) + блик по полувектору
+        const ao=0.70+0.30*clamp(cw.y/1.25);
+        const hv=vnorm(vadd(this.light,toEye));
+        const spec=Math.pow(clamp(vdot(n,hv)),14)*0.30*clamp(1-cw.y/3);
+        const k=(this.ambient + dl*0.46 + nb*0.12 + d2*0.16)*this.exposure*ao;
         const rim=Math.pow(clamp(1-Math.abs(vdot(n,toEye))),4)*0.26;
         const tr=0.60*this.sun[0]+0.40*this.fill[0], tg=0.60*this.sun[1]+0.40*this.fill[1], tb=0.60*this.sun[2]+0.40*this.fill[2];
-        col=[base[0]*(k*tr+rim*1.05),base[1]*(k*tg+rim*1.08),base[2]*(k*tb+rim*1.18)];
+        col=[base[0]*(k*tr+rim*1.05)+spec*255*this.sun[0],base[1]*(k*tg+rim*1.08)+spec*250*this.sun[1],base[2]*(k*tb+rim*1.18)+spec*245*this.sun[2]];
       }
       // туман
       const ft=clamp((zc-this.fogNear)/(this.fogFar-this.fogNear));
       if(ft>0){col=[lerp(col[0],this.fogCol[0],ft),lerp(col[1],this.fogCol[1],ft),lerp(col[2],this.fogCol[2],ft)]}
-      items.push({z:zc,pts:cl.map(project),col,a:1,e:f.e,glow:f.glow});
+      if(f.add){adds.push({z:zc,pts:cl.map(project),col,a:f.alpha});continue}
+      items.push({z:zc,pts:cl.map(project),col,a:f.alpha==null?1:f.alpha,e:f.e,glow:f.glow});
     }
     items.sort((A,B)=>B.z-A.z);
+    const paint=(it,composite)=>{
+      const pts=it.pts;
+      g.save();
+      if(composite)g.globalCompositeOperation='screen';
+      if(it.a!=null&&it.a<1)g.globalAlpha=it.a;
+      g.beginPath();g.moveTo(pts[0].x,pts[0].y);
+      for(let i=1;i<pts.length;i++)g.lineTo(pts[i].x,pts[i].y);
+      g.closePath();
+      const al=it.a==null?1:it.a;
+      const c=rgb2css(it.col[0],it.col[1],it.col[2],al);
+      g.fillStyle=c;g.strokeStyle=c;g.lineWidth=1;g.fill();
+      if(al>0.5)g.stroke();
+      g.restore();
+    };
     for(const it of items){
       const pts=it.pts;
       g.beginPath();g.moveTo(pts[0].x,pts[0].y);
@@ -198,6 +264,8 @@ class Scene{
         g.beginPath();g.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)g.lineTo(pts[i].x,pts[i].y);g.closePath();
         g.fillStyle=rgb2css(it.col[0],it.col[1],it.col[2],1);g.fill();g.restore()}
     }
+    adds.sort((A,B)=>B.z-A.z);
+    for(const it of adds)paint(it,true);
     return{project:(p)=>project(toCam(p)),eye,right,upv,fwd,focal,cx,cy};
   }
   // 2D-содержимое на 3D-плоскости: 4 мировые точки, рисование в системе (0..wpx, 0..hpx)
@@ -336,5 +404,6 @@ function rigCat(o={}){
 // помощник: собрать из трансформов
 function mul(a,b){return mMul(a,b)}
 window.B3={TAU,clamp,lerp,rad,v3,vadd,vsub,vmul,vdot,vcross,vlen,vnorm,vlerp,mIdent,mMul,mTrans,mScale,mRotX,mRotY,mRotZ,xform,xformDir,
- mesh,addFace,addMesh,quad,tri,box,prism,cone,sphere,torus,planeQuad,wall,slab,Scene,draw,rigPerson,rigCat,colorOf,rgb2css};
+ mesh,addFace,addMesh,quad,tri,box,prism,cone,sphere,torus,planeQuad,wall,slab,Scene,draw,rigPerson,rigCat,colorOf,rgb2css,
+ poolsFromGlows:null,dustFromSpec:null};
 })();

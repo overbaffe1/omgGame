@@ -88,6 +88,28 @@ function mug(sc,x,y,z,col='#e8e2d6'){
 const S3={};
 S3.help={room,window3,desk,monitor,printerRig,shelf,plant,mug};
 
+
+// робо-рука, которая сама печатает релиз
+function roboArm(sc,o,t){
+  const base=mMul(mTrans(o.x,0,o.z),mScale(o.s||1,o.s||1,o.s||1));
+  sc.add(B3.prism(10,0.30,0.12,'#3f4a63',{top:'#525f7c'}),mMul(base,mTrans(0,0.06,0)));
+  sc.add(B3.prism(10,0.12,0.8,'#556180'),mMul(base,mTrans(0,0.5,0)));
+  const a1=Math.sin(t*1.5)*0.10-0.22;
+  const shoulder=mMul(base,mMul(mTrans(0,1.05,0),mRotX(a1)));
+  sc.add(B3.prism(10,0.088,0.72,'#657192'),mMul(shoulder,mTrans(0,0.36,0)));
+  const a2=0.92+Math.sin(t*2.0+0.6)*0.12;
+  const elbow=mMul(shoulder,mMul(mTrans(0,0.72,0),mRotX(a2)));
+  sc.add(B3.prism(10,0.075,0.6,'#7b87a8'),mMul(elbow,mTrans(0,0.3,0)));
+  const wrist=mMul(elbow,mTrans(0,0.6,0));
+  sc.add(B3.box(0.24,0.11,0.3,'#39415a',{top:'#485178'}),mMul(wrist,mTrans(0,0.05,0)));
+  for(const sd of [-1,1]){
+    const k=Math.max(0,Math.sin(t*6.5+sd*1.3))*0.05;
+    sc.add(B3.prism(6,0.032,0.24,'#cfe0f5'),mMul(wrist,mMul(mTrans(sd*0.075,-0.10-k,0.07),mRotX(0.25))));
+    sc.add(B3.torus(8,0.012,0.05,'#7fe0c0',{emissive:true,glow:.6}),mMul(wrist,mTrans(sd*0.075,0.02,0.07)));
+  }
+  sc.add(B3.sphere(5,7,0.05,'#7fe0c0',{emissive:true,glow:.8}),mMul(wrist,mTrans(0,0.0,0.16)));
+  return wrist;
+}
 // ================= 1. Мурманск =================
 S3.polar=(sc,u,t)=>{
   // снежная земля + двор
@@ -179,7 +201,7 @@ S3.cat=(sc,u,t)=>{
   const d=lerp(4.6,3.5,u);
   sc.camera(v3(0.25+Math.sin(0.35+u*0.35)*d*0.85,lerp(1.55,1.25,u),-0.7+Math.cos(0.35+u*0.35)*d*0.7),v3(-0.45,lerp(1.0,1.05,u),-1.45),lerp(52,47,u));
   sc.fog(4,26,'#241a30');
-  return{probe:{c:v3(-0.7,1.05,-1.5),up:v3(-0.7,2.05,-1.5)},glows:[
+  return{dust:{n:16,c:[-0.4,1.2,-1.4],w:[2.6,1.4,2.2],a:.42},probe:{c:v3(-0.7,1.05,-1.5),up:v3(-0.7,2.05,-1.5)},glows:[
     {p:v3(0.95,0.48,-0.37),r:110,col:'#7fe0c0',a:.5},
     {p:v3(-1.05,1.01,-1.5),r:110,col:'#8fd3ff',a:.4},
     {p:v3(-0.6,1.75,-1.8),r:90,col:'#bfe3ff',a:.3},
@@ -251,7 +273,7 @@ S3.workshop=(sc,u,t)=>{
   const a=lerp(-0.5,0.5,u),r=lerp(4.2,3.1,u);
   sc.camera(v3(Math.sin(a)*r+0.2,lerp(1.8,1.45,u),Math.cos(a)*r-1.4),v3(-0.2,lerp(1.3,1.2,u),-1.9),lerp(50,45,u));
   sc.fog(5,22,'#151b28');
-  return{probe:{c:v3(0.2,1.15,-1.9),up:v3(0.2,2.15,-1.9)},monitor:M2.quad,winQuad:win.quad,glows:[
+  return{dust:{n:22,c:[0.2,1.4,-2.0],w:[3.6,1.6,2.6],a:.45},probe:{c:v3(0.2,1.15,-1.9),up:v3(0.2,2.15,-1.9)},monitor:M2.quad,winQuad:win.quad,glows:[
     {p:v3(1.2,1.42,-2.4),r:260,col:'#78c8ff',a:.45},
     {p:v3(-2.2,1.35,-2.5),r:200,col:'#ffd08a',a:.4},
     {p:v3(-3.0,1.8,-5.9),r:240,col:'#9fd8ff',a:.25},
@@ -304,7 +326,7 @@ S3.stream=(sc,u,t)=>{
   const a=lerp(1.15,0.3,u),r=lerp(3.3,2.7,u);
   sc.camera(v3(Math.sin(a)*r,lerp(1.7,1.5,u),0.6+Math.cos(a)*r*0.6),v3(0.1,lerp(1.45,1.5,u),-1.5),lerp(52,46,u));
   sc.fog(5,20,'#191428');
-  return{probe:{c:v3(0.3,1.25,-1.4),up:v3(0.3,2.25,-1.4)},monitor:m1.quad,monitor2:m2.quad,winQuad:win.quad,glows:[
+  return{dust:{n:20,c:[0.2,1.4,-1.6],w:[3.2,1.5,2.4],a:.42},probe:{c:v3(0.3,1.25,-1.4),up:v3(0.3,2.25,-1.4)},monitor:m1.quad,monitor2:m2.quad,winQuad:win.quad,glows:[
     {p:v3(-0.7,1.42,-2.0),r:260,col:'#78c8ff',a:.45},
     {p:v3(1.35,1.36,-1.95),r:220,col:'#7fe0c0',a:.35},
     {p:v3(0.6,1.9,-3.35),r:340,col:'#fff0d0',a:.5},
@@ -317,7 +339,8 @@ S3.stream=(sc,u,t)=>{
 S3.caravan=(sc,u,t)=>{
   // дюны
   const m=B3.mesh();const N=20,SIZE=90;
-  const H=(x,z)=>Math.sin(x*0.09)*1.6+Math.cos(z*0.11)*1.4+Math.sin((x+z)*0.05)*2.2;
+  const nh=k=>{const q=Math.sin(k*127.1+311.7)*43758.5453;return q-Math.floor(q)};
+  const H=(x,z)=>Math.sin(x*0.09)*1.1+Math.cos(z*0.11)*0.9+Math.sin((x+z)*0.05)*1.5;
   const pts=[];
   for(let i=0;i<=N;i++){pts.push([]);for(let j=0;j<=N;j++){
     const x=(i/N-0.5)*SIZE,z=(j/N-0.5)*SIZE;
@@ -328,13 +351,13 @@ S3.caravan=(sc,u,t)=>{
   sc.add(m,null);
   // караван: телеги с тентом, ящиками, колёсами
   const cart=(x,z,s,rot)=>{
-    const M=mMul(mMul(mTrans(x,0.02,z),mRotY(rot)),mScale(s,s,s));
+    const M=mMul(mMul(mTrans(x,H(x,z),z),mRotY(rot)),mScale(s,s,s));
     sc.add(B3.box(1.7,0.12,1.1,'#5a4030',{top:'#6b4c38'}),mMul(M,mTrans(0,0.72,0)));
     for(const sx of [-0.8,0.8])sc.add(B3.box(0.1,0.5,1.1,'#4a3527'),mMul(M,mTrans(sx,0.45,0)));
     for(const sz of [-0.5,0.5])sc.add(B3.box(1.7,0.5,0.1,'#4a3527'),mMul(M,mTrans(0,0.45,sz)));
     // тент-полусфера
-    sc.add(B3.sphere(8,14,0.62,'#d8c49a',{top:'#e8d8b4'}),mMul(M,mScale(1.3,0.75,0.85)));
-    sc.add(B3.box(1.9,0.1,1.2,'#8a6a4a'),mMul(M,mTrans(0,1.02,0)));
+    sc.add(B3.sphere(8,14,0.62,'#d8c49a',{top:'#e8d8b4'}),mMul(M,mMul(mTrans(0,0.80,0),mScale(1.3,0.72,0.85))));
+    sc.add(B3.box(1.9,0.1,1.2,'#8a6a4a'),mMul(M,mTrans(0,1.06,0)));
     for(const wx of [-0.62,0.62]){
       sc.add(B3.torus(14,0.09,0.4,'#3a2a1e'),mMul(M,mTrans(wx,0.4,0.62),mRotY(Math.PI/2)));
       sc.add(B3.torus(14,0.09,0.4,'#3a2a1e'),mMul(M,mTrans(wx,0.4,-0.62),mRotY(Math.PI/2)));
@@ -346,12 +369,21 @@ S3.caravan=(sc,u,t)=>{
     sc.shadow(x,z,1.1,0.7,0.3);
     return M;
   };
-  cart(-1.4,0.8,1,0.15);cart(1.6,-0.4,0.92,-0.2);cart(3.9,-1.6,0.8,0.5);cart(-3.4,1.6,0.86,0.9);
+  cart(-3.6,2.4,1,0.15);cart(-1.5,0.9,0.94,-0.15);cart(0.6,-0.7,0.88,0.3);
+  cart(2.7,-2.3,0.8,0.55);cart(4.6,-3.9,0.72,-0.3);
+  // камни и сухие кусты по обочинам — чтобы дюны не выглядели пустой стеной
+  for(let i=0;i<14;i++){
+    const x=lerp(-9,9,nh(i*3.7)),z=lerp(-7,5,nh(i*1.9+0.4));const h=H(x,z);
+    const col=i%3?'#8a6a48':'#6a5a44';
+    sc.add(B3.prism(5,lerp(0.2,0.5,nh(i)),lerp(0.35,0.8,nh(i+2)),col),mMul(mTrans(x,h+0.16,z),mRotY(i*1.3)));
+    if(i%4===0)sc.add(prism7(0.05,lerp(0.9,1.6,nh(i+5)),'#6a6a44'),mMul(mTrans(x+0.5,h+0.8,z-0.4),mRotZ(0.06)));
+  }
   // караванщик в плаще с посохом
   const per=B3.rigPerson({shirt:'#8a6a44',arm:20,beard:true,hair:'#6b5033'});
-  sc.add(per.mesh,mMul(mMul(mTrans(-2.1,0.75,1.5),mRotY(1.1)),mIdent()));
-  sc.add(prism7(0.04,1.5,'#6a5236'),mMul(mTrans(-2.45,1.4,1.65),mRotZ(0.12)));
-  sc.shadow(-2.1,1.5,0.4,0.3,0.3);
+  const ph0=H(-1.5,0.6);
+  sc.add(per.mesh,mMul(mMul(mTrans(-2.9,ph0+0.02,2.0),mRotY(1.0)),mIdent()));
+  sc.add(prism7(0.04,1.5,'#6a5236'),mMul(mTrans(-3.25,ph0+0.72,2.15),mRotZ(0.12)));
+  sc.shadow(-2.9,2.0,0.4,0.3,0.3);
   // перекати-поле и ящерица-«вайб»
   sc.add(B3.sphere(6,10,0.34,'#7a6640'),mMul(mTrans(lerp(-9,9,(t*0.1)%1),0.3,3.2),mRotZ(t*2.4)));
   sc.add(B3.sphere(6,10,0.26,'#8a7648'),mMul(mTrans(lerp(8,-8,(t*0.07)%1),0.35,4.4),mRotZ(-t*2)));
@@ -359,9 +391,12 @@ S3.caravan=(sc,u,t)=>{
   for(let i=0;i<3;i++){const ph=(t*0.2+i*0.3)%1;const x=lerp(-8,8,ph),y=6+i*0.7;
     sc.add(B3.box(0.5,0.04,0.04,'#4a3a2a'),mMul(mTrans(x,y,-6-i),mRotZ(Math.sin(t*3+i)*0.4)));
     sc.add(B3.box(0.5,0.04,0.04,'#4a3a2a'),mMul(mTrans(x+0.5,y,-6-i),mRotZ(-Math.sin(t*3+i)*0.4)));}
-  const a=lerp(-0.35,0.85,u),r=lerp(5.6,3.9,u);
-  sc.camera(v3(Math.sin(a)*r,lerp(2.4,1.4,u),Math.cos(a)*r),v3(0,0.9,0),lerp(48,44,u));
-  sc.fog(12,60,'#c9924f');
+  // камера едет вдоль каравана и всегда выше рельефа — в дюну не залезает
+  const a=lerp(-0.10,0.62,u),r=lerp(7.2,4.9,u);
+  const cx=Math.sin(a)*r,cz=Math.cos(a)*r+1.2;
+  const cy=Math.max(lerp(3.5,2.3,u),H(cx,cz)+1.9);
+  sc.camera(v3(cx,cy,cz),v3(0.2,lerp(1.5,1.15,u),lerp(0.6,-0.5,u)),lerp(50,45,u));
+  sc.fog(14,70,'#d8a25e');
   return{probe:{c:v3(0,1.2,0.4),up:v3(0,2.2,0.4)},glows:[
     {p:v3(0.6,7.5,-40),r:520,col:'#ffd08a',a:.42},
     {p:v3(-1.3,1.55,0.8),r:150,col:'#ffbe6a',a:.4},
@@ -388,6 +423,16 @@ S3.limits=(sc,u,t)=>{
     sc.add(B3.box(0.12,0.12,0.04,on?'#ffc06a':'#28324a',{emissive:on,glow:on?.45:0}),mTrans(x-0.11,y+0.02,z+0.24));
     sc.add(B3.box(0.12,0.12,0.04,on?'#28324a':'#7fe0c0',{emissive:!on,glow:!on?.35:0}),mTrans(x+0.11,y+0.02,z+0.24));
   }
+  // башенные краны над городком — «стройка идёт»
+  for(const [cx,cz,sc0] of [[-1.75,-2.6,1],[-0.55,-2.85,0.8]]){
+    const M=mMul(mTrans(cx,0,cz),mScale(sc0,sc0,sc0));
+    sc.add(B3.box(0.12,3.1,0.12,'#2b3a5c'),mMul(M,mTrans(0,1.55,0)));
+    sc.add(B3.box(1.9,0.1,0.1,'#35476e'),mMul(M,mTrans(0.7,3.05,0)));
+    sc.add(B3.box(0.1,0.12,0.5,'#35476e'),mMul(M,mTrans(1.55,3.0,0)));
+    sc.add(B3.box(0.05,0.7,0.05,'#4a5a7f'),mMul(M,mTrans(1.55,2.6,0)));
+    sc.add(B3.box(0.3,0.24,0.3,'#3a4a6a',{top:'#46587c'}),mMul(M,mTrans(1.55,2.2,0)));
+    sc.add(B3.sphere(4,6,0.05,'#ffc06a',{emissive:true,glow:.6}),mMul(M,mTrans(0,3.2,0)));
+  }
   // труба с токенами: сверху вниз, вдоль кадра
   const pipe=[];for(let i=0;i<=14;i++){const p=i/14;
     pipe.push(v3(0.75+Math.sin(p*4.5)*0.22,3.0-p*2.2,-1.6+Math.sin(p*3)*0.12))}
@@ -406,10 +451,10 @@ S3.limits=(sc,u,t)=>{
   // стойки с логами по бокам (лампочки)
   for(const sx of [-3.0,3.0])for(let i=0;i<12;i++)
     sc.add(B3.box(0.16,0.04,0.03,((i+Math.floor(t*3))%4===0)?'#ffc06a':'#7fe0c0',{emissive:true,glow:.4}),mTrans(sx,0.5+i*0.24,-1.2));
-  const a=lerp(-0.18,0.35,u),r=lerp(3.7,3.1,u);
-  sc.camera(v3(Math.sin(a)*r,lerp(1.9,1.6,u),Math.cos(a)*r-0.6),v3(0,lerp(1.9,1.7,u),-1.9),lerp(52,48,u));
+  const a=lerp(-0.16,0.30,u),r=lerp(3.3,2.9,u);
+  sc.camera(v3(-0.25+Math.sin(a)*r,lerp(1.85,1.6,u),-0.35+Math.cos(a)*r),v3(-0.25,lerp(1.8,1.65,u),-2.0),lerp(54,50,u));
   sc.fog(6,30,'#0a1020');
-  return{screens:[{quad:m1.quad},{quad:lim},{quad:eye}],probe:{c:v3(0,1.9,-1.9),up:v3(0,2.9,-1.9)},glows:[
+  return{dust:{n:24,c:[0,2.0,-2.0],w:[4.0,2.2,2.6],a:.4},screens:[{quad:m1.quad},{quad:lim},{quad:eye}],probe:{c:v3(0,1.9,-1.9),up:v3(0,2.9,-1.9)},glows:[
     {p:v3(0,2.65,-2.2),r:340,col:'#78c8ff',a:.42},
     {p:v3(0,1.5,-1.9),r:300,col:'#7fe0c0',a:.4},
     {p:v3(1.7,1.65,-1.7),r:220,col:'#ffc06a',a:.35},
@@ -434,6 +479,13 @@ S3.release=(sc,u,t)=>{
   sc.add(B3.box(1.3,0.78,0.12,'#1a2030',{top:'#232a3e'}),mTrans(-0.35,0.7,-0.9));
   sc.add(B3.box(1.2,0.7,0.05,'#7fe0c0',{emissive:true,glow:.3}),mTrans(-0.35,0.7,-0.83));
   sc.add(B3.prism(8,0.5,0.5,'#232c40'),mTrans(-0.35,0.45,-0.9));
+  // робо-рука печатает релиз; от пальцев — искры
+  const wrist=roboArm(sc,{x:0.95,z:-0.55,s:0.8},t);
+  for(let i=0;i<7;i++){
+    const k=(t*1.7+i*0.14)%1;if(k>0.6)continue;
+    const p=B3.xform(wrist,v3(Math.sin(i*2.1)*0.1,-0.12-k*0.12,0.12+Math.cos(i*1.7)*0.06));
+    sc.add(B3.box(0.05,0.05,0.02,['#7fe0c0','#ffd8a0','#9fd8ff'][i%3],{emissive:true,glow:.6}),mMul(mTrans(p.x,p.y,p.z),mRotZ(k*9+i)));
+  }
   // серверы-стойки по краям и гирлянда лампочек над сценой
   for(const sx of [-2.6,2.6])for(let i=0;i<14;i++)
     sc.add(B3.box(0.18,0.05,0.03,((i+Math.floor(t*4))%5===0)?'#ffc06a':'#7fe0c0',{emissive:true,glow:.45}),mTrans(sx,0.5+i*0.22,-1.4));
@@ -443,7 +495,8 @@ S3.release=(sc,u,t)=>{
   const gl=[{p:v3(0,2.25,-2.6),r:360,col:'#7fe0c0',a:.35},
             {p:v3(0,1.15,-1.5),r:300,col:pressed?'#7fe0c0':'#3a5a48',a:pressed?.55:.2},
             {p:v3(-0.35,0.7,-0.83),r:240,col:'#7fe0c0',a:.4},
-            {p:v3(0,3.3,-1.9),r:300,col:'#ffd8a0',a:.25}];
+            {p:v3(0,3.3,-1.9),r:300,col:'#ffd8a0',a:.25},
+            {p:v3(0.95,1.15,-0.5),r:200,col:'#7fe0c0',a:.4}];
   if(u>0.28)for(let i=0;i<44;i++){
     const p=((t*0.42+i*0.023)%1);
     const ang=i*1.7;
@@ -455,7 +508,7 @@ S3.release=(sc,u,t)=>{
   const a=lerp(-0.22,0.5,u),r=lerp(3.5,2.9,u);
   sc.camera(v3(Math.sin(a)*r,lerp(2.0,1.75,u),Math.cos(a)*r),v3(0,lerp(1.7,1.6,u),-1.4),lerp(52,48,u));
   sc.fog(6,26,'#0a1020');
-  return{win,probe:{c:v3(0,1.8,-1.6),up:v3(0,2.8,-1.6)},glows:gl};
+  return{dust:{n:22,c:[0,1.8,-1.6],w:[4.0,2.0,2.6],a:.45},win,probe:{c:v3(0,1.8,-1.6),up:v3(0,2.8,-1.6)},glows:gl};
 };
 S3.wishlist=(sc,u,t)=>{
   const R=room(sc,{w:14,d:13,h:3.2,wall:'#332a46',floor:'#3b2e4c',ceil:'#241c30',ledCol:'#ffc06a'});
@@ -475,6 +528,11 @@ S3.wishlist=(sc,u,t)=>{
     sc.add(B3.box(0.34,hh,0.3,col,{emissive:i>7,glow:i>7?.35:0}),mTrans(-1.35+ (i%2)*0.16,hh/2,-2.4-((i%3)*0.2)));
   }
   sc.add(B3.box(0.5,2.6,0.4,'#241c30'),mTrans(-1.75,1.3,-2.4));
+  // купол-витрина над рюкзаком
+  sc.add(B3.sphere(9,16,1.15,'#9fd8ff',{top:'#bfe6ff'}),mMul(mTrans(0.1,1.05,-0.5),mScale(1,0.85,1)),{alpha:0.16});
+  sc.add(B3.torus(18,0.028,1.05,'#c8d8f0'),mMul(mTrans(0.1,1.05,-0.5),mRotX(Math.PI/2)));
+  sc.add(B3.torus(18,0.022,0.7,'#c8d8f0'),mMul(mTrans(0.1,1.5,-0.5),mRotX(Math.PI/2)));
+  sc.add(B3.prism(8,0.16,0.34,'#2b3244'),mTrans(0.1,0.17,-0.5));
   // вылетающие предметы
   const items=['#c8b0ff','#ffb0b0','#a8ebc2','#ffd8a0','#9fd8ff','#e0c060'];
   for(let i=0;i<9;i++){
@@ -506,7 +564,7 @@ S3.wishlist=(sc,u,t)=>{
             {p:v3(0.1,1.6,-0.5),r:220,col:'#c8b0ff',a:.3},
             {p:v3(2.2,2.22,0.6),r:170,col:'#ff8a5c',a:.3}];
   if(u>0.55)for(let i=0;i<2;i++)gl.push({p:v3(0.9+i*0.2,1.4,-0.8+i*0.3),r:160,col:'#e06565',a:.35});
-  return{probe:{c:v3(0.1,1.6,-0.9),up:v3(0.1,2.6,-0.9)},glows:gl};
+  return{dust:{n:16,c:[0.1,1.6,-0.9],w:[3.0,1.6,2.4],a:.4},probe:{c:v3(0.1,1.6,-0.9),up:v3(0.1,2.6,-0.9)},glows:gl};
 };
 S3.credits=(sc,u,t)=>{
   const R=room(sc,{w:18,d:16,h:4.2,wall:'#1b2230',floor:'#212935',ceil:'#141a24',ledCol:'#ffc06a'});
@@ -514,18 +572,33 @@ S3.credits=(sc,u,t)=>{
   const cards=[];
   for(let i=0;i<6;i++){
     const cx=-0.82+(i%2)*1.64,cy=2.55-Math.floor(i/2)*1.05,cz=-3.0;
-    sc.add(B3.box(1.5,0.94,0.08,'#242c42',{top:'#2e3854'}),mTrans(cx,cy,cz));
-    sc.add(B3.box(1.42,0.86,0.02,'#141a2a',{emissive:true,glow:.12}),mTrans(cx,cy,cz+0.06));
+    sc.add(B3.box(1.5,0.94,0.08,'#242c42',{top:'#3a4664'}),mTrans(cx,cy,cz));
+    sc.add(B3.box(1.42,0.86,0.02,'#1b2338',{emissive:true,glow:.24}),mTrans(cx,cy,cz+0.06));
     const M=mMul(mTrans(cx,cy,cz+0.07),mRotX(-0.06*(3-i)));
     cards.push([[-0.67,0.4,0],[0.67,0.4,0],[0.67,-0.4,0],[-0.67,-0.4,0]].map(q=>xform(M,v3(q[0],q[1],q[2]))));
+  }
+  // бегущая лента титров: плитки уходят вверх, часть — «источники»
+  for(let i=0;i<14;i++){
+    const ph=((t*0.10+i*0.072)%1);
+    const y=lerp(-0.3,3.9,ph),x=-1.55+((i%2)*0.30);
+    const on=(i%3!==1);
+    sc.add(B3.box(0.3,0.2,0.16,on?'#2b3448':'#1b2230',{top:'#37425c'}),mMul(mTrans(x,y,-1.25),mRotY(0.25*Math.sin(i))));
+    sc.add(B3.box(0.22,0.03,0.02,on?'#7fe0c0':'#46536e',{emissive:on,glow:on?.35:0}),mMul(mTrans(x,y,-1.16),mRotY(0.25*Math.sin(i))));
   }
   // «витрина итогов»: три стойки снизу + частицы вверх
   for(let i=0;i<3;i++){
     sc.add(B3.box(0.5,0.8,0.5,'#1a2130',{top:'#232c40'}),mTrans(-1.0+i*1.0,0.4,-1.5));
     sc.add(B3.sphere(6,9,0.2,['#ffd8a0','#7fe0c0','#b0a0ff'][i],{emissive:true,glow:.4}),mTrans(-1.0+i*1.0,0.92,-1.5));
   }
-  for(let i=0;i<40;i++){const p=((t*0.16+i*0.025)%1);
-    sc.add(B3.sphere(4,6,0.028,'#ffd8a0',{emissive:true,glow:.45}),mMul(mTrans(-1.6+(i%10)*0.35,0.4+p*2.6,-1.5+Math.floor(i/10)*0.3),mScale(1,1,1)));}
+  for(let i=0;i<56;i++){const p=((t*0.16+i*0.021)%1);
+    const col=i%5===0?'#7fe0c0':(i%7===0?'#b0a0ff':'#ffd8a0');
+    sc.add(B3.sphere(4,6,0.026+i%3*0.008,col,{emissive:true,glow:.45}),mMul(mTrans(-1.6+(i%10)*0.35,0.4+p*2.9,-1.5+Math.floor(i/10)*0.3),mScale(1,1,1)));}
+  // герой-кристалл по центру: медленно вращается, вокруг — два светящихся кольца
+  // небольшой кристалл над средним пьедесталом (камера проходит рядом — держим его компактным)
+  const HY=1.24;
+  const oct=mMul(mMul(mTrans(0,HY,-1.5),mRotY(t*0.55)),mRotX(0.42+Math.sin(t*0.3)*0.12));
+  sc.add(B3.prism(6,0.075,0.14,'#ffd8a0',{emissive:true,glow:.45}),oct);
+  sc.add(B3.prism(6,0.04,0.08,'#fff0d0',{emissive:true,glow:.5}),mMul(oct,mTrans(0,0.11,0)));
   // рамки-полки по бокам
   for(const sx of [-2.6,2.6])sc.add(B3.wall(0.5,4.0,1,6,'#2b3448'),mMul(mTrans(sx,2.0,-3.0),mRotY(Math.PI/2)));
   const a=lerp(-0.3,0.55,u),r=lerp(3.9,3.2,u);
@@ -534,9 +607,11 @@ S3.credits=(sc,u,t)=>{
   const gl=[];
   for(let i=0;i<6;i++)gl.push({p:v3(-0.82+(i%2)*1.64,2.55-Math.floor(i/2)*1.05,-2.9),r:240,col:['#ffc06a','#7fe0c0','#b0a0ff','#9fd8ff','#ff8fb0','#ffd8a0'][i],a:.26});
   for(let i=0;i<3;i++)gl.push({p:v3(-1.0+i*1.0,0.92,-1.5),r:200,col:['#ffd8a0','#7fe0c0','#b0a0ff'][i],a:.4});
+  gl.push({p:v3(0,1.24,-1.5),r:150,col:'#ffe0b0',a:.34,pool:false});   // свет от кристалла — без пятна на полу
+  gl.push({p:v3(0,3.5,-2.2),r:240,col:'#ffc06a',a:.2});
   gl.push({p:v3(-2.6,2.0,-3.0),r:240,col:'#ffc06a',a:.22});
   gl.push({p:v3(2.6,2.0,-3.0),r:240,col:'#ffc06a',a:.22});
-  return{cards,probe:{c:v3(0,2.0,-2.4),up:v3(0,3.0,-2.4)},glows:gl};
+  return{dust:{n:26,c:[0,2.0,-2.4],w:[4.2,2.4,2.6],a:.4},cards,probe:{c:v3(0,2.0,-2.4),up:v3(0,3.0,-2.4)},glows:gl};
 };
 
 // ================= 7. Нейронка творит =================
@@ -625,7 +700,7 @@ S3.burnout=(sc,u,t)=>{
   const d=lerp(3.2,2.4,u);
   sc.camera(v3(0.5+Math.sin(u*0.4)*0.4,lerp(1.7,1.5,u),0.3+d*0.8),v3(0.2,lerp(1.4,1.3,u),-1.7),lerp(52,48,u));
   sc.fog(5,20,'#0a0e16');
-  return{probe:{c:v3(0.5,1.15,-1.6),up:v3(0.5,2.15,-1.6)},monitor:m1.quad,monitor2:m2.quad,monitor3:m3.quad,winQuad:win.quad,alive,glows:[
+  return{dust:{n:18,c:[0.4,1.4,-1.7],w:[3.2,1.5,2.4],a:.4},probe:{c:v3(0.5,1.15,-1.6),up:v3(0.5,2.15,-1.6)},monitor:m1.quad,monitor2:m2.quad,monitor3:m3.quad,winQuad:win.quad,alive,glows:[
     {p:v3(0.5,1.45,-2.1),r:260,col:alive>0?'#7fe0c0':'#7f9fd0',a:.4},
     {p:v3(2.1,1.32,-1.9),r:180,col:'#78c8ff',a:.25},
     {p:v3(-2.0,0.7,-2.6),r:230,col:'#7fe0c0',a:.3+alive*0.3},
@@ -665,7 +740,7 @@ S3.finale=(sc,u,t)=>{
   const a=lerp(-0.5,0.8,u),r=lerp(4.2,3.1,u);
   sc.camera(v3(Math.sin(a)*r,lerp(2.0,1.5,u),1.2+Math.cos(a)*r*0.6),v3(0.2,lerp(1.35,1.25,u),-1.8),lerp(50,46,u));
   sc.fog(5,20,'#0d0b16');
-  return{probe:{c:v3(0.2,1.4,-1.6),up:v3(0.2,2.4,-1.6)},monitor:m1.quad,winQuad:win.quad,glows:[
+  return{dust:{n:18,c:[0.2,1.5,-1.8],w:[3.4,1.6,2.4],a:.42},probe:{c:v3(0.2,1.4,-1.6),up:v3(0.2,2.4,-1.6)},monitor:m1.quad,winQuad:win.quad,glows:[
     {p:v3(-2.6,1.9,-5.9),r:380,col:'#9fd8ff',a:.4},
     {p:v3(1.0,1.4,-2.9),r:230,col:'#ffd8a0',a:.32},
     {p:v3(-0.6,1.72,-3.8),r:130,col:'#ffd8a0',a:.3},

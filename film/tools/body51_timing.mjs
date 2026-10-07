@@ -28,34 +28,47 @@ export function estimate(text) {
   return text.length / RATE + pauses;
 }
 
-export function computeTiming({ durations = {}, texts = {}, quotes = {}, quoteTexts = {}, quoteLines = {}, quoteWho = {} } = {}) {
+export function computeTiming({ durations = {}, texts = {}, quotes = {}, quoteTexts = {}, quoteLines = {}, quoteWho = {},
+                               narrSpecs = {}, quoteSpecs = {} } = {}) {
   let t = 0;
   const scenes = SCENES.map(d => {
-    const nar = d.narr ? durations[d.id] : null;
+    const nsp = d.narr ? (narrSpecs[d.id] || null) : null;                       // замер речи рассказчика
+    const narrSpeech = nsp ? nsp.speech : (d.narr ? (durations[d.id] || d.nom) : 0);
+    const narrOnset  = nsp ? nsp.onset : 0;                                      // тишина в начале файла
+    const narrAt = +(LEAD - narrOnset).toFixed(3);                               // где ставить файл, чтобы речь началась ровно в LEAD
     const qv = quotes[d.id];
-    const q = qv == null ? null : (typeof qv === 'number' ? qv : qv.dur);   // длительность блока цитат
-    const body = (nar || durations[d.id] || d.nom) + (q ? QGAP + q : 0);
+    const hasQuote = qv != null;
+    const qsp = quoteSpecs[d.id] || null;
+    const quoteSpeech = qsp ? qsp.speech : (hasQuote ? (typeof qv === 'number' ? qv : qv.dur) : 0);
+    const body = narrSpeech + (hasQuote ? QGAP + quoteSpeech : 0);                // без тишины в файлах
     const dur = d.fixed ? d.nom : Math.max(MIN_DUR, LEAD + body + TAIL);
+    const shift = (seg, off) => (seg || []).map(g => ({ t0: +(off + g.t0).toFixed(2), t1: +(off + g.t1).toFixed(2), text: g.text }));
     const o = {
       id: d.id, start: +t.toFixed(2), dur: +dur.toFixed(2),
-      narr: d.narr, narrDur: d.narr ? +((nar || 0)).toFixed(2) : 0, narrAt: NARR_AT,
+      narr: d.narr, narrAt, narrDur: nsp ? +nsp.dur.toFixed(2) : (d.narr ? +(durations[d.id] || 0).toFixed(2) : 0),
       narrText: d.narr ? (texts[d.id] || '') : '',
+      narrOn: +(LEAD).toFixed(2),                                                 // речь рассказчика стартует здесь
+      narrOff: +(LEAD + narrSpeech).toFixed(2),
+      narrSeg: nsp ? shift(nsp.seg, narrAt) : null,
       quote: null,
     };
-    if (d.narr && nar) o.narrDur = +nar.toFixed(2);
-    if (q) {
-      const at = LEAD + (nar || 0) + QGAP + QAT;
+    if (hasQuote) {
+      const quoteAt = +(LEAD + narrSpeech + QGAP - (qsp ? qsp.onset : 0)).toFixed(3);
       o.quote = {
         id: (typeof qv === 'object' && qv.id) || null,
-        at: +at.toFixed(2), dur: +q.toFixed(2),
+        at: quoteAt,
+        on: +(LEAD + narrSpeech + QGAP).toFixed(2),
+        off: +(LEAD + narrSpeech + QGAP + quoteSpeech).toFixed(2),
+        dur: qsp ? +qsp.dur.toFixed(2) : (typeof qv === 'number' ? qv : qv.dur),
         text: quoteTexts[d.id] || '', lines: quoteLines[d.id] || [], who: quoteWho[d.id] || '',
+        seg: qsp ? shift(qsp.seg, quoteAt) : null,
         voiced: true,
       };
     }
     t += dur;
     return o;
   });
-  return { version: 2, total: +t.toFixed(2), rate: RATE, scenes };
+  return { version: 3, total: +t.toFixed(2), rate: RATE, scenes };
 }
 
 export function toJs(timing, note = '') {

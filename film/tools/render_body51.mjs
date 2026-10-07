@@ -15,7 +15,8 @@ import vm from 'node:vm';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { computeTiming, toJs, estimate } from './body51_timing.mjs';
+import { computeTiming, toJs, estimate, SCENES } from './body51_timing.mjs';
+import { speechSpans, sentences, segmentsFor } from './body51_speech.mjs';
 
 // зависимости можно держать вне репозитория: BODY51_DEPS=/путь/к/node_modules
 // (ставится скриптом film/tools/body51_deps.sh)
@@ -70,7 +71,21 @@ for (const q of (script.quotes || [])) {
   }
   quoteTexts[q.scene] = q.text; quoteLines[q.scene] = q.lines; quoteWho[q.scene] = q.who;
 }
-const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho });
+// замер речи: где в файле реально начинается/кончается голос и где паузы
+const narrSpecs = {}, quoteSpecs = {};
+for (const s of SCENES) {
+  const nar = narFiles[s.narr];
+  if (nar) {
+    const sp = speechSpans(nar, { ffmpeg });
+    narrSpecs[s.id] = Object.assign(sp, { seg: segmentsFor(sp, sentences(texts[s.id])) });
+  }
+  const q = (script.quotes || []).find(x => x.scene === s.id);
+  if (q && qFiles[q.id]) {
+    const sp = speechSpans(qFiles[q.id], { ffmpeg });
+    quoteSpecs[s.id] = Object.assign(sp, { seg: segmentsFor(sp, q.lines && q.lines.length ? q.lines : [q.text]) });
+  }
+}
+const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho, narrSpecs, quoteSpecs });
 fs.writeFileSync(path.join(film, 'body51-timing.js'), toJs(timing, 'длительности из mp3 озвучки (render_body51.mjs)'));
 const TOTAL = timing.total;
 console.log('хронометраж:', `${Math.floor(TOTAL / 60)}:${String(Math.round(TOTAL % 60)).padStart(2, '0')}`, '· глав:', timing.scenes.length);
@@ -180,7 +195,7 @@ function renderMusic() {
     for (let i = from; i < to; i++) duck[i] = .36;
   };
   for (const s of timing.scenes) {
-    if (s.narr && narFiles[s.narr]) addVoice(narFiles[s.narr], s.start + (s.narrAt || .6), 1.05);
+    if (s.narr && narFiles[s.narr]) addVoice(narFiles[s.narr], s.start + s.narrAt, 1.05);
     if (s.quote && s.quote.id && qFiles[s.quote.id]) addVoice(qFiles[s.quote.id], s.start + s.quote.at, 1.0);
   }
   // сглаживание «приглушения»
@@ -213,10 +228,50 @@ function renderMusic() {
 const audioPath = process.env.BODY51_AUDIO || renderMusic();
 
 // ---------- видео ----------
+// ---------- параллельный рендер (для локальной машины) ----------
+// node film/tools/render_body51.mjs --jobs 8            → рендерит кусками по всем ядрам
+// node film/tools/render_body51.mjs --jobs 8 --range 0:60
+const JOBS = Math.max(1, parseInt(arg('jobs', '1'), 10) || 1);
+const CHUNK = arg('chunk-out', null);            // служебное: имя куска для воркера
 const range = arg('range', null);
 const [t0, t1] = range ? range.split(':').map(Number) : [0, TOTAL];
-const outMp4 = process.env.BODY51_OUT || path.join(film, 'body51.mp4');
+const outMp4 = CHUNK || process.env.BODY51_OUT || path.join(film, 'body51.mp4');
+if (JOBS > 1 && !CHUNK) {
+  // ведомый режим: разбить [t0,t1) на JOBS кусков, отрендерить параллельно, склеить
+  const tmp = fs.mkdtempSync(path.join(process.env.TMPDIR || '/tmp', 'body51-jobs-'));
+  const n = JOBS, step = (t1 - t0) / n;
+  console.log(`параллельный рендер: ${n} процессов · кусок ~${(step).toFixed(1)} с · кадров всего ${Math.round((t1 - t0) * FPS)}`);
+  const parts = [];
+  const procs = [];
+  const snap = x => Math.round(x * FPS) / FPS;      // границы кусков — по кадрам, чтобы не было дрожания на стыках
+  for (let i = 0; i < n; i++) {
+    const a = snap(t0 + i * step), b = (i === n - 1) ? t1 : snap(t0 + (i + 1) * step);
+    if (b - a < 0.05) continue;
+    const out = path.join(tmp, `part${String(i).padStart(2, '0')}.mp4`);
+    parts.push(out);
+    const argsW = process.execArgv.concat([fileURLToPath(import.meta.url),
+      '--chunk-out', out, '--range', `${a}:${b}`, '--crf', CRF, '--jobs', '1']);
+    if (FAST) argsW.push('--fast');
+    procs.push(new Promise((res, rej) => {
+      const p = spawn(process.execPath, argsW, { stdio: ['ignore', 'inherit', 'inherit'],
+        env: Object.assign({}, process.env, { BODY51_AUDIO: audioPath }) });
+      p.on('close', c => c === 0 ? res(out) : rej(new Error('кусок упал: ' + out)));
+    }));
+  }
+  await Promise.all(procs);
+  const list = path.join(tmp, 'list.txt');
+  fs.writeFileSync(list, parts.map(p => `file '${p.replace(/'/g, "'\\''")}'`).join('\n'));
+  const { status } = spawnSync(ffmpeg, ['-y', '-hide_banner', '-loglevel', 'error',
+    '-f', 'concat', '-safe', '0', '-i', list,
+    '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-t', String(TOTAL),
+    '-c:v', 'copy', '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', outMp4], { stdio: ['ignore', 'inherit', 'inherit'] });
+  if (status !== 0) { console.error('склейка не удалась — можно повторить с --jobs 1'); process.exit(1); }
+  console.log('готово (параллельно):', outMp4, (fs.statSync(outMp4).size / 1048576).toFixed(1) + ' МБ');
+  process.exit(0);
+}
 const usePng = argv.includes('--png');           // PNG медленнее, но устойчивее к разным сборкам canvas
+const chunkMode = !!CHUNK;
+const audioIn = chunkMode ? ['-an'] : [];
 const args = usePng
   ? ['-y', '-hide_banner', '-loglevel', 'error',
      '-framerate', String(FPS), '-f', 'image2pipe', '-vcodec', 'png', '-i', 'pipe:0',
@@ -228,6 +283,7 @@ const args = usePng
      '-ss', String(t0), '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-t', String(t1 - t0),
      '-c:v', 'libx264', '-preset', 'veryfast', '-crf', CRF, '-pix_fmt', 'yuv420p', '-r', String(FPS),
      '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', outMp4];
+if (chunkMode) { const i = args.lastIndexOf('-c:a'); if (i >= 0) args.splice(i, 4, '-an'); }
 const proc = spawn(ffmpeg, args, { stdio: ['pipe', 'ignore', 'inherit'] });
 const frames = Math.floor((t1 - t0) * FPS);
 let i = 0;
