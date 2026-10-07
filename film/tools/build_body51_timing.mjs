@@ -8,12 +8,16 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
-import { computeTiming, estimate, toJs } from './body51_timing.mjs';
+import { createRequire } from 'node:module';
+import { computeTiming, estimate, toJs, SCENES } from './body51_timing.mjs';
+import { speechSpans, sentences, segmentsFor } from './body51_speech.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const film = path.resolve(here, '..');
 const script = JSON.parse(readFileSync(path.join(film, 'body51-voices', 'script.json'), 'utf8'));
 
+const require = createRequire(
+  process.env.BODY51_DEPS ? path.join(process.env.BODY51_DEPS, 'noop.cjs') : import.meta.url);
 function ffmpegBin() {
   if (process.env.FFMPEG_BIN) return process.env.FFMPEG_BIN;
   try { return require('@ffmpeg-installer/ffmpeg').path; } catch {}
@@ -21,7 +25,7 @@ function ffmpegBin() {
 }
 function mp3Duration(file) {
   try {
-    const out = execFileSync(ffmpegBin(), ['-i', file], { stdio: ['ignore', 'ignore', 'pipe'] }).toString();
+    execFileSync(ffmpegBin(), ['-i', file], { stdio: ['ignore', 'ignore', 'pipe'] });
     return null;
   } catch (e) {
     const m = /Duration: (\d+):(\d+):([\d.]+)/.exec(e.stderr?.toString() || '');
@@ -41,9 +45,36 @@ for (const v of script.voices) {
   }
   texts[v.scene] = v.text;
 }
-const timing = computeTiming({ durations, texts });
+// замер пауз в озвучке: окна фраз для титров и точка старта речи (та же логика, что в рендере)
+const narrSpecs = {}, quoteSpecs = {};
+const voices = {}, narr = {};
+for (const v of script.voices) { voices[v.id] = v; narr[v.scene] = v.id; }
+const quotesByScene = {};
+for (const q of script.quotes || []) quotesByScene[q.scene] = q;
+for (const sc of SCENES) {
+  const v = narr[sc.id] ? voices[narr[sc.id]] : null;
+  const nf = v ? path.join(film, 'body51-voices', v.id + '.mp3') : null;
+  if (v && fs.existsSync(nf)) {
+    const sp = speechSpans(nf, { ffmpeg: ffmpegBin() });
+    narrSpecs[sc.id] = Object.assign(sp, { seg: segmentsFor(sp, sentences(v.text)) });
+  }
+  const q = quotesByScene[sc.id];
+  const qf = q ? path.join(film, 'body51-voices', q.id + '.mp3') : null;
+  if (q && fs.existsSync(qf)) {
+    const sp = speechSpans(qf, { ffmpeg: ffmpegBin() });
+    quoteSpecs[sc.id] = Object.assign(sp, { seg: segmentsFor(sp, q.lines && q.lines.length ? q.lines : [q.text]) });
+  }
+}
+const quotes = {}, quoteTexts = {}, quoteLines = {}, quoteWho = {};
+for (const q of script.quotes || []) {
+  const mp3 = path.join(film, 'body51-voices', q.id + '.mp3');
+  quotes[q.scene] = { id: q.id, dur: fs.existsSync(mp3) ? mp3Duration(mp3) : +estimate(q.text).toFixed(2) };
+  if (!fs.existsSync(mp3)) console.log('цитата без озвучки (оценка):', q.id);
+  quoteTexts[q.scene] = q.text; quoteLines[q.scene] = q.lines; quoteWho[q.scene] = q.who;
+}
+const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho, narrSpecs, quoteSpecs });
 fs.writeFileSync(path.join(film, 'body51-timing.js'), toJs(timing,
-  missing.length ? `оценка по тексту; нет озвучки: ${missing.join(', ')}` : 'длительности из mp3 озвучки'));
+  missing.length ? `оценка по тексту; нет озвучки: ${missing.join(', ')}` : 'длительности и паузы из mp3 озвучки'));
 const mm = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
 console.log('хронометраж:', mm(timing.total));
 for (const s of timing.scenes) console.log(` ${s.id.padEnd(9)} ${mm(s.start)} +${s.dur.toFixed(1)}с ${s.narr || '—'}`);

@@ -225,17 +225,25 @@ function renderMusic() {
   console.log('звук:', out, (wav.length / 1048576).toFixed(1) + ' МБ');
   return out;
 }
+const JOBS = Math.max(1, parseInt(arg('jobs', '1'), 10) || 1);
+const CHUNK = arg('chunk-out', null);            // служебное: имя куска для воркера
+const range = arg('range', null);
+const [t0, t1] = range ? range.split(':').map(Number) : [0, TOTAL];
+const outMp4 = CHUNK || process.env.BODY51_OUT || path.join(film, 'body51.mp4');
+// защита: кусок (--range) не должен затирать полный релизный ролик
+if (range && !CHUNK && !process.env.BODY51_OUT && fs.existsSync(outMp4)
+    && t1 - t0 < TOTAL - 1 && !arg('force', null)) {
+  console.log(`отказ: --range ${t0}:${t1} короче ролика (${TOTAL.toFixed(0)} с) — не затираю ${path.relative(process.cwd(), outMp4)}.`);
+  console.log('  рендерь в отдельный файл: BODY51_OUT=/tmp/кусок.mp4 … либо добавь --force, если так и надо.');
+  process.exit(0);
+}
 const audioPath = process.env.BODY51_AUDIO || renderMusic();
 
 // ---------- видео ----------
 // ---------- параллельный рендер (для локальной машины) ----------
 // node film/tools/render_body51.mjs --jobs 8            → рендерит кусками по всем ядрам
 // node film/tools/render_body51.mjs --jobs 8 --range 0:60
-const JOBS = Math.max(1, parseInt(arg('jobs', '1'), 10) || 1);
-const CHUNK = arg('chunk-out', null);            // служебное: имя куска для воркера
-const range = arg('range', null);
-const [t0, t1] = range ? range.split(':').map(Number) : [0, TOTAL];
-const outMp4 = CHUNK || process.env.BODY51_OUT || path.join(film, 'body51.mp4');
+
 if (JOBS > 1 && !CHUNK) {
   // ведомый режим: разбить [t0,t1) на JOBS кусков, отрендерить параллельно, склеить
   const tmp = fs.mkdtempSync(path.join(process.env.TMPDIR || '/tmp', 'body51-jobs-'));

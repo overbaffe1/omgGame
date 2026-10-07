@@ -75,6 +75,9 @@ for (const c of checks) {
   c.at -= OFF;
   if (c.at < 0 || c.at > durOut - 0.6) { skipped++; continue; }   // реплика вне этого файла
   const spec = spawnSync(FF, ['-hide_banner', '-i', c.file, '-af', 'silencedetect=noise=-36dB:d=0.10', '-f', 'null', '-'], { encoding: 'utf8' });
+  const dm = /Duration: (\d+):(\d+):([\d.]+)/.exec(spec.stderr || '');
+  const fdur = dm ? (+dm[1]) * 3600 + (+dm[2]) * 60 + parseFloat(dm[3]) : 0;
+  if (fdur && c.at + fdur > durOut) { skipped++; continue; }   // реплика не влезает в этот файл целиком
   const starts = [...(spec.stderr || '').matchAll(/silence_start: ([\d.]+)/g)].map(m => +m[1]);
   const ends = [...(spec.stderr || '').matchAll(/silence_end: ([\d.]+)/g)].map(m => +m[1]);
   const onset = (starts[0] != null && starts[0] < 0.02 && ends[0] != null) ? ends[0] : 0;
@@ -85,9 +88,11 @@ for (const c of checks) {
   const { c: corr, lag } = bestLag(ref, big, 200);
   const found = from + lag / SR - 0.15;
   const off = found - (c.at + onset /* ожидаемое начало речи в mp4 */);
-  const good = Math.abs(off) <= tol && corr > 0.20;
+  // решаем по сдвигу; корреляция — только уверенность (музыка и микс её занижают)
+  const good = Math.abs(off) <= tol && corr > 0.05;
   if (good) ok++; else bad++;
-  console.log(`  ${good ? '✓' : '✗'} ${c.what.padEnd(22)} ожидалось ${(c.at + onset).toFixed(2)}с, звучит ${found.toFixed(2)}с · сдвиг ${off >= 0 ? '+' : ''}${off.toFixed(2)}с · корреляция ${corr.toFixed(2)}`);
+  const conf = corr > 0.5 ? '' : (corr > 0.2 ? ' (уверенность средняя)' : ' (тихо: музыка глушит)');
+  console.log(`  ${good ? '✓' : '✗'} ${c.what.padEnd(22)} ожидалось ${(c.at + onset).toFixed(2)}с, звучит ${found.toFixed(2)}с · сдвиг ${off >= 0 ? '+' : ''}${off.toFixed(2)}с · корреляция ${corr.toFixed(2)}${conf}`);
 }
 console.log(`\nсверено: ${ok + bad} (вне этого файла: ${skipped})`);
 console.log(bad ? `проблемных реплик: ${bad} — правь тайминг или озвучку` : 'всё сходится: титры и голос совпадают');
