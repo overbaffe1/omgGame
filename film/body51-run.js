@@ -320,6 +320,10 @@ function frame(t){
     s3=new B3.Scene(g,W,H);
     sceneBg(scene.kind,t);
     panels=S3[scene.kind](s3,u,t)||{};
+    // мем-склейка: на реплике цитаты камера чуть наезжает и плавно отпускает
+    if(window.BODY51_CUT&&scene.quote){const q=scene.quote,local=t-scene.start,dd=local-q.on;
+      const k=dd>=0?Math.max(0,1-dd/1.4):0;
+      if(k>0)s3.cam.fov*=1-0.13*k;}
     deriveLight(s3,panels,t);
     B3.draw(s3);
     drawPanels(scene.kind,s3,panels,u,t);

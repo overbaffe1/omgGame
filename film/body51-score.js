@@ -22,6 +22,19 @@ window.BODY51_SCORE=function(SC,TOTAL){
     if(b%4===1)bell(ch[2]+24,t0+bar*.5,.014);
     if(b%8===7)bell(ch[0]+19,t0+bar*.3,.012,3.4);
   }
+  // — мем-нарезка: ровный бит, хэт и короткий «стаб» на каждой реплике
+  const isCut=TOTAL<130;
+  if(isCut){
+    for(let t0=0;t0<TOTAL-0.4;t0+=0.5)add({at:t0,dur:.15,f:hz(33),vol:.062,type:'sine',attack:.004});
+    for(let t0=0.25;t0<TOTAL-0.4;t0+=0.5)add({at:t0,dur:.05,f:hz(88),vol:.012,type:'square',attack:.002});
+    for(const s of SC){
+      if(s.quote){const q=s.quote;
+        add({at:s.start+q.on-0.02,dur:.30,f:hz(64),vol:.048,type:'sawtooth',attack:.006});
+        add({at:s.start+q.on+0.11,dur:.40,f:hz(67),vol:.042,type:'sawtooth',attack:.006})}
+      if(s.start>0.5)for(let k=0;k<5;k++)
+        add({at:s.start-0.44+k*0.075,dur:.15,f:hz(74-k*3),vol:.018,type:'triangle',attack:.006});
+    }
+  }
   const at=id=>{const s=SC.find(x=>x.id===id);return s?s.start:0};
   const scene=(id)=>SC.find(x=>x.id===id);
   // — заставка: северное сияние, стеклянные пинг-понги

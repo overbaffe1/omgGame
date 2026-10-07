@@ -3,6 +3,7 @@
    плоское затенение (ambient + key + rim), туман, тени-блики, экраны с 2D-содержимым.
    Работает и в браузере, и в офлайн-рендере (@napi-rs/canvas). */
 (function(){
+// punch — короткий наезд камеры на реплике (включается для мем-нарезки)
 const TAU=Math.PI*2;
 const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const lerp=(a,b,t)=>a+(b-a)*t;

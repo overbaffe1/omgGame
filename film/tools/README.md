@@ -99,6 +99,9 @@ BODY51_DEPS=$DEPS node film/tools/render_body51.mjs --cut minute --jobs 8
 
 Текст лежит в `film/body51-voices/script-minute.json`, тайминг собирается в
 `film/body51-timing-min.js`, ролик — `film/body51-min.mp4`, страница — `film/body51-min.html`.
+В нарезке включаются мем-приёмы: короткий наезд камеры на каждой реплике цитаты,
+бит с хэтом в музыке, плашка «МИНУТНАЯ МЕМ-ВЕРСИЯ» в начале и «ПОЛНАЯ ВЕРСИЯ — 12 ГЛАВ»
+в конце. В полной версии они выключены (`window.BODY51_CUT`).
 Цитаты в нарезке — те же файлы `qNN.mp3`, что и в полной версии.
 Сверка синхрона: `node film/tools/check_body51_sync.mjs --cut minute`.
 

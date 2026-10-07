@@ -57,7 +57,7 @@ for(const s of SC){const m=T&&T.scenes?T.scenes.find(x=>x.id===s.id):null;
   if(m.narrOn!=null){s.narrOn=m.narrOn;s.narrOff=m.narrOff;s.narrAt=m.narrAt}
   if(m.quote){s.quote=m.quote;s.quotes=[]}}
 // минутная нарезка: в тайминге только выбранные главы — берём их порядок и тайминги из тайминга
-if(T&&T.subset){const keep=[];
+if(T&&T.subset){window.BODY51_CUT=true;const keep=[];
   for(const m of T.scenes){const sc=SC.find(s=>s.id===m.id);if(!sc)continue;
     sc.start=m.start;sc.dur=m.dur;keep.push(sc)}
   SC.length=0;SC.push(...keep);}
@@ -244,6 +244,24 @@ function hud(sc,t){
           g.restore()}
       }
     }else if(sc.narrText){}
+  }
+  // — минутная мем-версия: крючок в начале и плашка в конце
+  if(window.BODY51_CUT){
+    if(t<2.6){const a=Math.min(1,(2.6-t)/0.55)||0;
+      if(a>0){g.save();g.globalAlpha=clamp(a);
+        const w=860,x=CX-w/2,y=1180;
+        fill('rgba(10,12,20,.86)',x,y,w,132,30);
+        g.strokeStyle='#ffc06a55';g.lineWidth=3;rr(x,y,w,132,30);g.stroke();
+        txt('⚡ МИНУТНАЯ МЕМ-ВЕРСИЯ',CX,y+52,42,AMBER,900,'center','system-ui,sans-serif');
+        txt('6 глав · только самое смешное',CX,y+100,27,'#cfd6e2',600,'center');
+        g.restore()}}
+    if(t>TOTAL-3.2){const a=Math.min(1,(t-(TOTAL-3.2))/0.5);
+      g.save();g.globalAlpha=clamp(a);
+      const w=900,x=CX-w/2,y=1150;
+      fill('rgba(10,12,20,.86)',x,y,w,120,30);
+      g.strokeStyle='#a8ebc255';g.lineWidth=3;rr(x,y,w,120,30);g.stroke();
+      txt('ПОЛНАЯ ВЕРСИЯ — 12 ГЛАВ, 3:55',CX,y+62,32,MINT,800,'center','system-ui,sans-serif');
+      g.restore()}
   }
   progressBar(t);
 }
