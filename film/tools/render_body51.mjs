@@ -160,6 +160,9 @@ for (const f of [TIMING_FILE, 'body51-film.js', 'body51-3d.js', 'body51-3d-scene
   vm.runInContext(fs.readFileSync(path.join(film, f), 'utf8'), sandbox, { filename: f });
 const filmApi = sandbox.__body51;
 if (!filmApi) { console.error('фильм не инициализировался'); process.exit(1); }
+const framesChapters = vm.runInContext('window.B.SC.length', sandbox);
+console.log('глав в кадре:', framesChapters, '· глав в звуке:', timing.scenes.length,
+  framesChapters === timing.scenes.length ? '' : '← РАСХОЖДЕНИЕ (визуал и звук разъехались!)');
 
 // ---------- раскадровка для проверки ----------
 const shots = arg('shots', null);
@@ -275,6 +278,7 @@ if (JOBS > 1 && !CHUNK) {
     const argsW = process.execArgv.concat([fileURLToPath(import.meta.url),
       '--chunk-out', out, '--range', `${a}:${b}`, '--crf', CRF, '--jobs', '1']);
     if (FAST) argsW.push('--fast');
+    if (CUT) argsW.push('--cut', CUT);        // воркеры обязаны рендерить ту же нарезку, иначе визуал и звук разъедутся
     procs.push(new Promise((res, rej) => {
       const p = spawn(process.execPath, argsW, { stdio: ['ignore', 'inherit', 'inherit'],
         env: Object.assign({}, process.env, { BODY51_AUDIO: audioPath }) });
