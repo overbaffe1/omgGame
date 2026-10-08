@@ -245,22 +245,43 @@ function hud(sc,t){
       }
     }else if(sc.narrText){}
   }
-  // — минутная мем-версия: крючок в начале и плашка в конце
+  // — минутная мем-версия: крючок в начале и карточка-итог в конце
   if(window.BODY51_CUT){
     if(t<2.6){const a=Math.min(1,(2.6-t)/0.55)||0;
       if(a>0){g.save();g.globalAlpha=clamp(a);
-        const w=860,x=CX-w/2,y=1180;
-        fill('rgba(10,12,20,.86)',x,y,w,132,30);
-        g.strokeStyle='#ffc06a55';g.lineWidth=3;rr(x,y,w,132,30);g.stroke();
-        txt('⚡ МИНУТНАЯ МЕМ-ВЕРСИЯ',CX,y+52,42,AMBER,900,'center','system-ui,sans-serif');
-        txt('6 глав · только самое смешное',CX,y+100,27,'#cfd6e2',600,'center');
+        const w=920,x=CX-w/2,y=1146,h=180;
+        fill('rgba(10,12,20,.88)',x,y,w,h,30);
+        g.strokeStyle='#ffc06a55';g.lineWidth=3;rr(x,y,w,h,30);g.stroke();
+        txt('⚡ МИНУТНАЯ МЕМ-ВЕРСИЯ',CX,y+48,42,AMBER,900,'center','system-ui,sans-serif');
+        txt('Мурманск · 10 лет геймдева · 0 релизов',CX,y+104,28,'#f1e9dc',700,'center');
+        txt('6 глав · только самое смешное',CX,y+148,25,'#cfd6e2',600,'center');
         g.restore()}}
-    if(t>TOTAL-3.2){const a=Math.min(1,(t-(TOTAL-3.2))/0.5);
+    if(t>TOTAL-3.6){const a=Math.min(1,(t-(TOTAL-3.6))/0.4);
       g.save();g.globalAlpha=clamp(a);
-      const w=900,x=CX-w/2,y=1150;
-      fill('rgba(10,12,20,.86)',x,y,w,120,30);
-      g.strokeStyle='#a8ebc255';g.lineWidth=3;rr(x,y,w,120,30);g.stroke();
-      txt('ПОЛНАЯ ВЕРСИЯ — 12 ГЛАВ, 3:55',CX,y+62,32,MINT,800,'center','system-ui,sans-serif');
+      fill('rgba(4,5,9,'+(0.78*clamp(a)).toFixed(3)+')',0,0,W,H);   // затемнение под карточку
+      const w=940,x=CX-w/2,y0=560,h=780;
+      fill('rgba(10,12,20,.94)',x,y0,w,h,34);
+      g.strokeStyle='#ffc06a44';g.lineWidth=3;rr(x,y0,w,h,34);g.stroke();
+      txt('ИТОГО',CX,y0+84,30,'#9aa3b2',800,'center','ui-monospace,monospace');
+      const rows=[['10 лет делает игры','0 релизов'],
+                  ['2 месяца вайбкода','1 релиз'],
+                  ['релизная девственность','ПОТЕРЯНА']];
+      rows.forEach((r,i)=>{
+        const la=clamp((t-(TOTAL-3.35+i*0.5))/0.3);
+        if(la>0){g.globalAlpha=clamp(la);
+          const yy=y0+210+i*116;
+          txt(r[0],CX-44,yy,34,'#cfd6e2',600,'right','system-ui,sans-serif');
+          txt(r[1],CX+44,yy,40,i===2?MINT:AMBER,900,'left','system-ui,sans-serif');
+          if(i===2){const gx=CX+44+g.measureText(r[1]).width+20;   // галочка «потеряна»
+            g.strokeStyle=MINT;g.lineWidth=6;g.lineCap='round';
+            g.beginPath();g.moveTo(gx,yy-4);g.lineTo(gx+16,yy+12);g.lineTo(gx+46,yy-24);g.stroke();}
+        }
+      });
+      g.globalAlpha=clamp((t-(TOTAL-1.3))/0.3);
+      g.strokeStyle='#ffffff1c';g.lineWidth=2;
+      g.beginPath();g.moveTo(x+60,y0+600);g.lineTo(x+w-60,y0+600);g.stroke();
+      txt('@body51 · стримы каждый будний вечер',CX,y0+664,28,'#cfd6e2',600,'center');
+      txt('полная версия — 12 глав, 3:55',CX,y0+716,30,MINT,800,'center','system-ui,sans-serif');
       g.restore()}
   }
   progressBar(t);

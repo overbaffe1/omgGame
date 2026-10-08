@@ -28,7 +28,7 @@ python3 -m http.server 8080
 Отдельная вещь: [`film/body51.html`](film/body51.html) — «Вайбкодер из Мурманска», процедурный мультфильм
 по фактам стримов: 12 глав, 3:55, вертикальный мастер 9:16. Картинка и музыка — код, закадровый голос — рассказчик,
 реплики Артёма — дословно по субтитрам. Готовый MP4 — `film/body51.mp4`, разбор источников — [`body51/multik.md`](body51/multik.md).
-Есть и минутная мем-версия — 6 глав, 1:16: [`film/body51-min.html`](film/body51-min.html), ролик — `film/body51-min.mp4`.
+Есть и минутная мем-версия — 6 глав, 1:11: [`film/body51-min.html`](film/body51-min.html), ролик — `film/body51-min.mp4`.
 
 ## Шортсы
 
@@ -63,7 +63,7 @@ python3 -m http.server 8080
 Голос за кадром — рассказчик; реплики Артёма звучат только титрами, дословно по субтитрам стримов.
 
 - Смотреть: [`film/body51.html`](film/body51.html) (в галерее: [`film/index.html`](film/index.html))
-- Минутная мем-версия (6 глав, 1:16): [`film/body51-min.html`](film/body51-min.html)
+- Минутная мем-версия (6 глав, 1:11): [`film/body51-min.html`](film/body51-min.html)
 - Готовый MP4: [`film/body51.mp4`](film/body51.mp4) и [`film/body51-min.mp4`](film/body51-min.mp4)
 - Как собрано и как пересобрать: [`film/tools/README.md`](film/tools/README.md)
 - Материал: [`body51/facts.md`](body51/facts.md), [`body51/best_moments.md`](body51/best_moments.md), `body51/hl/`

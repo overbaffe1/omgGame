@@ -315,7 +315,12 @@ async function preload(){
 function frame(t){
   g.setTransform(1,0,0,1,0,0);
   const scene=B.sceneAt(t),u=clamp((t-scene.start)/scene.dur);
-  let panels=null,s3=null;
+  let panels=null,s3=null,flash=0;
+  // мем-тряска на смене глав (только в минутной нарезке)
+  if(window.BODY51_CUT){const ls=t-scene.start;
+    if(ls>=0&&ls<0.30){const k=1-ls/0.30,a=k*k*16;
+      const n1=B.hp(Math.floor(t*24)*3.1+1.7),n2=B.hp(Math.floor(t*24)*5.7+2.9);
+      g.translate((n1*2-1)*a,(n2*2-1)*a);}}
   if(B3&&S3&&S3[scene.kind]){
     s3=new B3.Scene(g,W,H);
     sceneBg(scene.kind,t);
@@ -324,7 +329,11 @@ function frame(t){
     if(window.BODY51_CUT&&scene.quote){const q=scene.quote,local=t-scene.start,dd=local-q.on;
       if(dd>=0){const atk=Math.min(1,dd/0.18),rel=Math.max(0,1-Math.max(0,dd-0.55)/1.15);
         const k=atk*atk*(3-2*atk)*rel;   // smoothstep на заезде — без рывка на стыке кадров
-        if(k>0)s3.cam.fov*=1-0.13*k;}}
+        if(k>0)s3.cam.fov*=1-0.13*k;}
+      // панчлайн: когда последняя цитата (релиз) заканчивается — микро-наезд и вспышка
+      if(scene.id==='release'){const d2=local-q.off;
+        if(d2>=-0.06&&d2<0.32){const kk=Math.max(0,1-d2/0.32);
+          s3.cam.fov*=1-0.10*kk;flash=0.3*kk;}}}
     deriveLight(s3,panels,t);
     B3.draw(s3);
     drawPanels(scene.kind,s3,panels,u,t);
@@ -338,7 +347,10 @@ function frame(t){
   const d=Math.max(1-seg(t-scene.start,0,.35),seg(t,scene.start+scene.dur-.35,scene.start+scene.dur));
   if(d>0){g.fillStyle=`rgba(4,5,9,${d})`;g.fillRect(0,0,W,H)}
   if(window.FX)FX.post(g,t,{bloom:.2,grain:.045,vignette:.46,leak:.04,ca:.4});
-  const fade=Math.max(1-seg(t,0,.9),seg(t,TOTAL-1.5,TOTAL));
+  if(flash>0){g.fillStyle=`rgba(255,244,214,${(flash*0.9).toFixed(3)})`;g.fillRect(0,0,W,H)}
+  // в минутной нарезке финальное затемнение короче — карточка-итог должна читаться
+  const fadeEnd=window.BODY51_CUT?0.5:1.5;
+  const fade=Math.max(1-seg(t,0,.9),seg(t,TOTAL-fadeEnd,TOTAL));
   if(fade>0){g.fillStyle=`rgba(4,5,9,${fade})`;g.fillRect(0,0,W,H)}
 }
 

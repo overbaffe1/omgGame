@@ -49,8 +49,8 @@ function decodeMp3(file) {                        // → Float32Array, моно,
 // нарезки: --cut minute → короткая мем-версия (свои текст, тайминг и файл)
 const CUTS = {
   minute: { script: 'script-minute.json', timing: 'body51-timing-min.js', out: 'body51-min.mp4',
-            subset: ['polar', 'cat', 'limits', 'gag', 'release', 'finale'],
-            lead: 0.8, tail: 0.7, qgap: 0.4, minDur: 6 },
+            subset: ['cat', 'workshop', 'limits', 'gag', 'wishlist', 'release'],
+            lead: 0.5, tail: 0.4, qgap: 0.25, minDur: 6, padEnd: 4.6 },
 };
 const CUT = arg('cut', null);
 const CFG = CUT ? (CUTS[CUT] || (() => { console.error('неизвестная нарезка:', CUT, '· есть:', Object.keys(CUTS).join(', ')); process.exit(1); })()) : null;
@@ -99,7 +99,7 @@ for (const s of SCENES) {
 const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho, narrSpecs, quoteSpecs,
   narrIds,
   subset: CFG ? CFG.subset : null, lead: CFG ? CFG.lead : undefined, tail: CFG ? CFG.tail : undefined,
-  qgap: CFG ? CFG.qgap : undefined, minDur: CFG ? CFG.minDur : undefined });
+  qgap: CFG ? CFG.qgap : undefined, minDur: CFG ? CFG.minDur : undefined, padEnd: CFG ? CFG.padEnd : undefined });
 const TIMING_FILE = CFG ? CFG.timing : 'body51-timing.js';
 fs.writeFileSync(path.join(film, TIMING_FILE), toJs(timing, 'длительности из mp3 озвучки (render_body51.mjs)', TIMING_FILE));
 const TOTAL = timing.total;

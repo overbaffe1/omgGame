@@ -34,6 +34,10 @@ window.BODY51_SCORE=function(SC,TOTAL){
       if(s.start>0.5)for(let k=0;k<5;k++)
         add({at:s.start-0.44+k*0.075,dur:.15,f:hz(74-k*3),vol:.018,type:'triangle',attack:.006});
     }
+    // бубум под панчлайн: последняя цитата (релиз) заканчивается — низкий удар
+    {const s=SC.find(x=>x.id==='release');if(s&&s.quote){const t1=s.start+s.quote.off;
+      add({at:t1-0.02,dur:.55,f:hz(30),vol:.11,type:'sine',attack:.004});
+      add({at:t1-0.02,dur:.30,f:hz(52),vol:.05,type:'sine',attack:.003});}}
   }
   const at=id=>{const s=SC.find(x=>x.id===id);return s?s.start:0};
   const scene=(id)=>SC.find(x=>x.id===id);

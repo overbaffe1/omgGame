@@ -32,9 +32,12 @@ export function computeTiming({ durations = {}, texts = {}, quotes = {}, quoteTe
                                narrSpecs = {}, quoteSpecs = {},
                                narrIds = null,       // карта «глава → id озвучки» (для нарезок)
                                subset = null,        // список глав (для минутной нарезки)
-                               lead = LEAD, tail = TAIL, qgap = QGAP, minDur = MIN_DUR } = {}) {
+                               lead = LEAD, tail = TAIL, qgap = QGAP, minDur = MIN_DUR,
+                               padEnd = 0            // доп. хвост к последней главе (финальная карточка в нарезке)
+                             } = {}) {
   let t = 0;
-  const list = subset ? SCENES.filter(d => subset.includes(d.id)) : SCENES;
+  // порядок глав в нарезке — по порядку в subset, а не по общему списку
+  const list = subset ? subset.map(id => SCENES.find(d => d.id === id)).filter(Boolean) : SCENES;
   const scenes = list.map(d => {
     const nsp = d.narr ? (narrSpecs[d.id] || null) : null;                       // замер речи рассказчика
     const narrSpeech = nsp ? nsp.speech : (d.narr ? (durations[d.id] || d.nom) : 0);
@@ -72,6 +75,8 @@ export function computeTiming({ durations = {}, texts = {}, quotes = {}, quoteTe
     t += dur;
     return o;
   });
+  if (padEnd && scenes.length) { const last = scenes[scenes.length - 1];
+    last.dur = +(last.dur + padEnd).toFixed(2); t += padEnd; }
   return { version: 3, total: +t.toFixed(2), rate: RATE, subset: subset || null, scenes };
 }
 

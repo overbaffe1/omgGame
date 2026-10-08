@@ -18,7 +18,8 @@ const argv = process.argv.slice(2);
 const arg = (n, d) => { const i = argv.indexOf('--' + n); return i < 0 ? d : argv[i + 1]; };
 // нарезки: --cut minute → короткая мем-версия
 const CUTS = { minute: { script: 'script-minute.json', timing: 'body51-timing-min.js',
-  subset: ['polar', 'cat', 'limits', 'gag', 'release', 'finale'], lead: 0.8, tail: 0.7, qgap: 0.4, minDur: 6 } };
+  subset: ['cat', 'workshop', 'limits', 'gag', 'wishlist', 'release'],
+  lead: 0.5, tail: 0.4, qgap: 0.25, minDur: 6, padEnd: 4.6 } };
 const CFG = arg('cut', null) ? (CUTS[arg('cut', null)] || null) : null;
 if (arg('cut', null) && !CFG) { console.error('неизвестная нарезка:', arg('cut', null)); process.exit(1); }
 const script = JSON.parse(readFileSync(path.join(film, 'body51-voices', CFG ? CFG.script : 'script.json'), 'utf8'));
@@ -81,7 +82,7 @@ for (const q of script.quotes || []) {
 }
 const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines, quoteWho, narrSpecs, quoteSpecs,
   narrIds, subset: CFG ? CFG.subset : null, lead: CFG ? CFG.lead : undefined, tail: CFG ? CFG.tail : undefined,
-  qgap: CFG ? CFG.qgap : undefined, minDur: CFG ? CFG.minDur : undefined });
+  qgap: CFG ? CFG.qgap : undefined, minDur: CFG ? CFG.minDur : undefined, padEnd: CFG ? CFG.padEnd : undefined });
 fs.writeFileSync(path.join(film, CFG ? CFG.timing : 'body51-timing.js'), toJs(timing,
   missing.length ? `оценка по тексту; нет озвучки: ${missing.join(', ')}` : 'длительности и паузы из mp3 озвучки',
   CFG ? CFG.timing : 'body51-timing.js'));
