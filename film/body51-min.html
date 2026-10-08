@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="«Вайбкодер из Мурманска» — минутная мем-версия: 6 глав самого смешного, быстрый закадр и дословные цитаты со стримов.">
-<title>Вайбкодер из Мурманска — минутная мем-версия</title>
+<meta name="description" content="Один день из жизни @body51: кот Гуччи, автокормушка Валера, семь принтеров, турник, помидорки и релиз. Новая 2D-анимация по фактам стримов.">
+<title>Один день из жизни @body51 — процедурный мультфильм</title>
 <style>
   html,body{margin:0;height:100%;background:#05060b;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;color:#eee;overflow:hidden}
   #wrap{position:relative;height:96vh;aspect-ratio:9/16;max-width:96vw}
@@ -23,21 +23,20 @@
 <div id="wrap">
   <canvas id="c" width="1080" height="1920"></canvas>
   <div id="intro">
-    <h1>Вайбкодер из Мурманска</h1>
-    <div class="lead">Минутная мем-версия по фактам стримов <b>@body51</b>: 6 глав, 1:11 — только самое смешное.<br>Картинка и музыка — код; голос за кадром — рассказчик,<br>цитаты Артёма читает второй голос — дословно по субтитрам.<br>Титры синхронизированы по паузам в озвучке.<br><span style="color:#7d8798">Голос самого Артёма не синтезируется.</span></div>
+    <h1>Один день из жизни @body51</h1>
+    <div class="lead">Гуччи и Валера, семь принтеров, перерыв на турнике,<br>помидорки, нейронки и первый релиз — одна цельная история.<br>Новая плоская 2D-анимация по фактам стримов; цитаты — дословно.<br><span style="color:#7d8798">Никаких перспективных 3D-экранов: всё остаётся в кадре.</span></div>
     <button id="play">▶ Смотреть</button>
-    <small>Лучше со звуком. Наушники приветствуются.<br>3D-версия: полигоны, мягкий свет, туман и объёмные декорации.<br>Пробел — пауза, стрелки — ±5 секунд, N/P — главы, F — на весь экран.<br><a href="body51-min.mp4" download>Скачать MP4 (1:11)</a> · <a href="body51.html">Полная версия (12 глав)</a> · <a href="index.html">Галерея</a></small>
+    <small>Лучше со звуком. Цитаты и рассказчик синхронизированы с анимацией.<br>6 эпизодов · ~1:14 · 9:16 · короткая история рабочего дня.<br>Пробел — пауза, стрелки — ±5 секунд, N/P — главы, F — на весь экран.<br><a href="body51-min.mp4" download>Скачать MP4</a> · <a href="body51.html">Полная версия (12 глав)</a> · <a href="index.html">Галерея</a></small>
   </div>
 </div>
-<script src="fx.js?v=6"></script>
-<script src="player.js?v=6"></script>
-<script src="body51-timing-min.js?v=6"></script>
-<script src="body51-film.js?v=6"></script>
-<script src="body51-3d.js?v=6"></script>
-<script src="body51-3d-scenes.js?v=6"></script>
-<script src="body51-scenes.js?v=6"></script>
-<script src="body51-score.js?v=6"></script>
-<script src="body51-run.js?v=6"></script>
+<script src="fx.js?v=7"></script>
+<script src="player.js?v=7"></script>
+<script src="body51-timing-min.js?v=8"></script>
+<script src="body51-film.js?v=7"></script>
+<script src="body51-score.js?v=7"></script>
+<script src="body51-day.js?v=2"></script>
+<script>window.BODY51_DAY=true;</script>
+<script src="body51-run.js?v=8"></script>
 <script>
   const ui=document.getElementById('intro'),plr=document.getElementById('play');
   plr.onclick=()=>{ui.style.display='none';document.getElementById('plbig')?.click()};

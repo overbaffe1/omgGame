@@ -49,7 +49,7 @@ function decodeMp3(file) {                        // → Float32Array, моно,
 // нарезки: --cut minute → короткая мем-версия (свои текст, тайминг и файл)
 const CUTS = {
   minute: { script: 'script-minute.json', timing: 'body51-timing-min.js', out: 'body51-min.mp4',
-            subset: ['cat', 'workshop', 'limits', 'gag', 'wishlist', 'release'],
+            subset: ['cat', 'workshop', 'stream', 'limits', 'gag', 'release'], dayMode: true,
             lead: 0.5, tail: 0.4, qgap: 0.25, minDur: 6, padEnd: 4.6 },
 };
 const CUT = arg('cut', null);
@@ -154,9 +154,10 @@ const sandbox = {
   console, Math, Date,
 };
 sandbox.window = sandbox; sandbox.globalThis = sandbox;
+sandbox.BODY51_DAY = Boolean(CFG && CFG.dayMode);
 sandbox.window.addEventListener = () => {};
 vm.createContext(sandbox);
-for (const f of [TIMING_FILE, 'body51-film.js', 'body51-3d.js', 'body51-3d-scenes.js', 'body51-scenes.js', 'body51-score.js', 'body51-run.js'])
+for (const f of [TIMING_FILE, 'body51-film.js', 'body51-3d.js', 'body51-3d-scenes.js', 'body51-scenes.js', 'body51-score.js', 'body51-day.js', 'body51-run.js'])
   vm.runInContext(fs.readFileSync(path.join(film, f), 'utf8'), sandbox, { filename: f });
 const filmApi = sandbox.__body51;
 if (!filmApi) { console.error('фильм не инициализировался'); process.exit(1); }

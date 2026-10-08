@@ -318,10 +318,12 @@ function frame(t){
   let panels=null,s3=null,flash=0;
   // мем-тряска на смене глав (только в минутной нарезке)
   if(window.BODY51_CUT){const ls=t-scene.start;
-    if(ls>=0&&ls<0.30){const k=1-ls/0.30,a=k*k*16;
+    if(ls>=0&&ls<0.30){const k=1-ls/0.30,amp=window.BODY51_DAY?5:16,a=k*k*amp;
       const n1=B.hp(Math.floor(t*24)*3.1+1.7),n2=B.hp(Math.floor(t*24)*5.7+2.9);
       g.translate((n1*2-1)*a,(n2*2-1)*a);}}
-  if(B3&&S3&&S3[scene.kind]){
+  if(window.BODY51_DAY&&typeof window.BODY51_DAY_FRAME==='function'){
+    window.BODY51_DAY_FRAME(scene,t);
+  }else if(B3&&S3&&S3[scene.kind]){
     s3=new B3.Scene(g,W,H);
     sceneBg(scene.kind,t);
     panels=S3[scene.kind](s3,u,t)||{};
@@ -343,10 +345,10 @@ function frame(t){
     const draw=B.SCENES[scene.kind]||B.SCENES.polar;
     draw(u,t,scene);
   }
-  B.hud(scene,t);
+  if(!(window.BODY51_DAY&&typeof window.BODY51_DAY_FRAME==='function'))B.hud(scene,t);
   const d=Math.max(1-seg(t-scene.start,0,.35),seg(t,scene.start+scene.dur-.35,scene.start+scene.dur));
   if(d>0){g.fillStyle=`rgba(4,5,9,${d})`;g.fillRect(0,0,W,H)}
-  if(window.FX)FX.post(g,t,{bloom:.2,grain:.045,vignette:.46,leak:.04,ca:.4});
+  if(window.FX&&!window.BODY51_DAY)FX.post(g,t,{bloom:.2,grain:.045,vignette:.46,leak:.04,ca:.4});
   if(flash>0){g.fillStyle=`rgba(255,244,214,${(flash*0.9).toFixed(3)})`;g.fillRect(0,0,W,H)}
   // в минутной нарезке финальное затемнение короче — карточка-итог должна читаться
   const fadeEnd=window.BODY51_CUT?0.5:1.5;
