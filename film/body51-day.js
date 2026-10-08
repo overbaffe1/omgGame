@@ -1,6 +1,6 @@
-/* body51-day.js — самостоятельная 2D-версия «Один день из жизни».
-   Все рисунки — вектор на одном canvas, внутри явно ограниченной рамки сцены.
-   Никакой 3D-проекции экранов или текстур, которые могут уехать за край кадра. */
+/* body51-day.js — короткий отдельный монтаж «Три проекта, один разработчик».
+   Иллюстрации основаны на фото; титры и инфографика рисуются на canvas и остаются
+   внутри безопасного поля 9:16. Без 3D-проекции и объектов, вылезающих за кадр. */
 (function(){
 'use strict';
 const cv=document.getElementById('c');
@@ -13,13 +13,14 @@ const C={
   blue:'#8ac8ef',violet:'#b99af5',wood:'#a97742',wood2:'#d5a665'
 };
 const META={
-  cat:{title:'СНАЧАЛА — ГУЧЧИ И ВАЛЕРА',source:'#440 · #457 · #462',accent:C.amber,bg:['#25223a','#101725']},
-  workshop:{title:'СЕМЬ ПРИНТЕРОВ. НОЛЬ ПЕЧАТАЕТ.',source:'#018 · #186 · #069',accent:C.mint,bg:['#202b3b','#111723']},
-  stream:{title:'25 МИНУТ КОДА — 5 МИНУТ ПЕРЕРЫВА',source:'#022 · #057 · #174',accent:C.blue,bg:['#292443','#111321']},
-  limits:{title:'ОСТАЛИСЬ ЛИМИТЫ? КУДА ИХ ДЕТЬ?',source:'#008 · #073',accent:C.amber,bg:['#172c42','#101724']},
-  gag:{title:'НЕЙРОНКА СДЕЛАЛА МЕЧ. ПОЧТИ.',source:'#061 · #468',accent:C.violet,bg:['#30213d','#151421']},
-  release:{title:'ФИНАЛ СМЕНЫ: ПЕРВЫЙ РЕЛИЗ',source:'#004 · #065',accent:C.mint,bg:['#183a3b','#101a25']}
+  cat:{title:'ДОМАШНИЙ ОТДЕЛ КОНТРОЛЯ',source:'#440 · #457 · #462',accent:C.amber,bg:['#25223a','#101725']},
+  workshop:{title:'DESKTOP HELLFARMER: ПЕРВЫЙ РЕЛИЗ',source:'#002 · #065',accent:C.amber,bg:['#202b3b','#111723']},
+  stream:{title:'BACKPACK INSPECTOR: ФЭНТЕЗИ-ТАМОЖНЯ',source:'#014 · #176 · #012',accent:C.blue,bg:['#292443','#111321']},
+  limits:{title:'WHITE MERIDIAN — ПРОЕКТ МЕЧТЫ',source:'#008 · #035',accent:C.mint,bg:['#172c42','#101724']},
+  gag:{title:'ПЕРЕРЫВ: ПРОСТО ВИСИМ',source:'#186',accent:C.violet,bg:['#30213d','#151421']},
+  release:{title:'ТРИ ПРОЕКТА. ОДИН РАЗРАБОТЧИК.',source:'#002 · #004 · #065',accent:C.mint,bg:['#183a3b','#101a25']}
 };
+const ART_KEY={cat:'gucci-valera',workshop:'desktop-hellfarmer',stream:'backpack-inspector',limits:'white-meridian'};
 const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const smooth=x=>{x=clamp(x);return x*x*(3-2*x)};
 const mix=(a,b,k)=>a+(b-a)*k;
@@ -64,29 +65,49 @@ function alpha(a,fn){g.save();g.globalAlpha*=clamp(a);fn();g.restore()}
 function clipRound(x,y,w,h,r,fn){
   g.save();g.beginPath();g.roundRect(x,y,w,h,r);g.clip();fn();g.restore();
 }
+function art(key){return window.BODY51_ART&&window.BODY51_ART[key]||null;}
+function drawCover(img,x,y,w,h,zoom=1,panX=0,panY=0){
+  if(!img||!img.width||!img.height)return false;
+  const s=Math.max(w/img.width,h/img.height)*zoom,dw=img.width*s,dh=img.height*s;
+  g.drawImage(img,x+(w-dw)/2+panX,y+(h-dh)/2+panY,dw,dh);return true;
+}
+function drawArtworkScene(scene,t,key){
+  const img=art(key);if(!img)return false;
+  const local=clamp((t-scene.start)/Math.max(.1,scene.dur));
+  g.save();g.beginPath();g.rect(0,0,W,H);g.clip();
+  drawCover(img,0,0,W,H,1.015+.025*local,Math.sin(local*Math.PI)*7,-local*7);
+  const top=g.createLinearGradient(0,0,0,430);top.addColorStop(0,'rgba(8,11,18,.78)');top.addColorStop(1,'rgba(8,11,18,0)');
+  g.fillStyle=top;g.fillRect(0,0,W,430);
+  const bottom=g.createLinearGradient(0,980,0,H);bottom.addColorStop(0,'rgba(8,11,18,0)');bottom.addColorStop(.42,'rgba(8,11,18,.30)');bottom.addColorStop(1,'rgba(8,11,18,.90)');
+  g.fillStyle=bottom;g.fillRect(0,980,W,H-980);g.restore();
+  // Full-bleed art is clipped to the 9:16 canvas; all captions stay inside this safe frame.
+  g.strokeStyle='rgba(255,255,255,.22)';g.lineWidth=2;rr(22,20,1036,1880,28);g.stroke();
+  const badges={
+    cat:[['ГУЧЧИ · ВОДА ИЗ КРАНА',75,1100,390,C.amber],['ВАЛЕРА · КОРМ ПО ЧАСАМ',615,1100,390,C.mint]],
+    workshop:[['ДВА МЕСЯЦА ДО РЕЛИЗА',76,1100,390,C.amber],['ПЕРВЫЕ КОПИИ · ЯПОНИЯ',614,1100,390,C.mint]],
+    stream:[['ФЭНТЕЗИ-ТАМОЖНЯ',76,1100,350,C.blue],['13 000 ВИШЛИСТОВ · 2 ИЗДАТЕЛЯ',510,1100,495,C.amber]],
+    limits:[['ПРОЕКТ МЕЧТЫ · ОТ ПЕРВОГО ЛИЦА',76,1100,510,C.mint],['ПЕКАРЬ · ХЛЕБ · СВИДЕТЕЛИ',618,1100,387,C.amber]]
+  }[scene.id]||[];
+  badges.forEach(([label,x,y,w,col])=>pill(label,x,y,w,48,'rgba(8,12,20,.78)',col,'rgba(255,255,255,.18)',16));
+  return true;
+}
 function stageBackdrop(scene,t){
+  if(ART_KEY[scene.id]&&drawArtworkScene(scene,t,ART_KEY[scene.id]))return;
   const m=META[scene.id]||META.cat;
   const grad=g.createLinearGradient(0,0,0,H);
   grad.addColorStop(0,m.bg[0]);grad.addColorStop(.62,'#151927');grad.addColorStop(1,m.bg[1]);
   g.fillStyle=grad;g.fillRect(0,0,W,H);
-  // Flat background only: no projected textures, oversized ornaments or edge bleed.
-  // Stage window: every animated object is clipped to this rounded safe area.
   box(42,278,996,1024,'rgba(8,12,20,.42)',38,'rgba(255,255,255,.18)',2);
   clipRound(44,280,992,1020,36,()=>{
     const s=g.createLinearGradient(0,280,0,1300);
     s.addColorStop(0,'rgba(255,255,255,.055)');s.addColorStop(1,'rgba(0,0,0,.10)');
     g.fillStyle=s;g.fillRect(44,280,992,1020);
     switch(scene.id){
-      case 'cat':drawCatStage(scene,t);break;
-      case 'workshop':drawWorkshopStage(scene,t);break;
-      case 'stream':drawStreamStage(scene,t);break;
-      case 'limits':drawLimitsStage(scene,t);break;
-      case 'gag':drawGagStage(scene,t);break;
-      case 'release':drawReleaseStage(scene,t);break;
+      case 'gag':drawBreakStage(scene,t);break;
+      case 'release':drawProjectFinale(scene,t);break;
       default:drawCatStage(scene,t);
     }
   });
-  // Clean border keeps the 9:16 illustration visually contained.
   g.strokeStyle='rgba(255,255,255,.20)';g.lineWidth=2;rr(44,280,992,1020,36);g.stroke();
 }
 function drawHeader(scene){
@@ -241,6 +262,23 @@ function drawHangingDev(cx,barY,local){
   g.strokeStyle='#283146';g.lineWidth=23;g.beginPath();
   g.moveTo(cx-26,barY+188);g.lineTo(cx-35+swing,barY+310);g.moveTo(cx+26,barY+188);g.lineTo(cx+37+swing,barY+305);g.stroke();
   g.strokeStyle='#d8c0a3';g.lineWidth=17;g.beginPath();g.moveTo(cx-35+swing,barY+310);g.lineTo(cx-75+swing,barY+325);g.moveTo(cx+37+swing,barY+305);g.lineTo(cx+82+swing,barY+321);g.stroke();
+}
+function drawBreakStage(scene,t){
+  const local=t-scene.start;
+  const bg=g.createLinearGradient(0,280,0,1300);bg.addColorStop(0,'#252b3b');bg.addColorStop(1,'#151925');g.fillStyle=bg;g.fillRect(44,280,992,1020);
+  // A deliberately static hang: the legs sway a little, but there is no pull-up motion.
+  g.fillStyle='rgba(255,255,255,.035)';
+  for(let y=342;y<1060;y+=118)g.fillRect(74,y,920,2);
+  box(102,388,450,476,'rgba(12,17,27,.82)',28,'rgba(255,255,255,.16)',3);
+  text('ПЕРЕРЫВ',327,466,37,C.mint,900,'center','ui-monospace,monospace');
+  text('5 МИНУТ',327,541,28,C.amber,900,'center','ui-monospace,monospace');
+  line(165,594,489,594,'rgba(255,255,255,.16)',3);
+  text('ЧЕЛОВЕК: В РЕЖИМЕ SLEEP',327,658,19,C.muted,800,'center','ui-monospace,monospace');
+  text('ПОВТОРЕНИЙ: 0',327,744,28,C.red,900,'center','ui-monospace,monospace');
+  pill('ЭРГОНОМИКА: СОМНИТЕЛЬНАЯ',132,796,390,43,'rgba(255,255,255,.06)',C.muted,'rgba(255,255,255,.12)',16);
+  drawHangingDev(830,430,local*.18);
+  box(78,1125,924,88,'rgba(10,14,23,.88)',22,'rgba(255,255,255,.14)',2);
+  pill('НА ПЕРЕРЫВЕ · ВИСИТ, НЕ ПОДТЯГИВАЕТСЯ',106,1142,868,54,'rgba(127,224,192,.10)',C.mint,'rgba(127,224,192,.28)',20);
 }
 function drawWorkshopStage(scene,t){
   const local=t-scene.start;
@@ -525,6 +563,38 @@ function drawReleaseStage(scene,t){
       text('10 лет — ни одного. Два месяца — релиз.',CX,1083,22,C.muted,700,'center');
     });
   }
+}
+function drawProjectFinale(scene,t){
+  const local=t-scene.start,p=clamp(local/Math.max(1,scene.dur));
+  const bg=g.createLinearGradient(0,280,0,1300);bg.addColorStop(0,'#1d4845');bg.addColorStop(1,'#131d29');g.fillStyle=bg;g.fillRect(44,280,992,1020);
+  const cards=[
+    {key:'desktop-hellfarmer',title:'DESKTOP HELLFARMER',tag:'РЕЛИЗ · ЯПОНИЯ',col:C.amber},
+    {key:'backpack-inspector',title:'BACKPACK INSPECTOR',tag:'ФЭНТЕЗИ-ТАМОЖНЯ',col:C.blue},
+    {key:'white-meridian',title:'WHITE MERIDIAN',tag:'ПРОЕКТ МЕЧТЫ',col:C.mint}
+  ];
+  cards.forEach((item,i)=>{
+    const x=70+i*314,y=365,w=296,h=518;
+    box(x,y,w,h,'#101723',24,'rgba(255,255,255,.22)',3);
+    clipRound(x+6,y+6,w-12,h-12,20,()=>{
+      drawCover(art(item.key),x+6,y+6,w-12,h-12,1.015+p*.018,(i-1)*2,0);
+      const shade=g.createLinearGradient(0,y+300,0,y+h);shade.addColorStop(0,'rgba(8,12,20,0)');shade.addColorStop(.52,'rgba(8,12,20,.52)');shade.addColorStop(1,'rgba(8,12,20,.97)');g.fillStyle=shade;g.fillRect(x+6,y+300,w-12,h-306);
+    });
+    pill(item.tag,x+16,y+18,w-32,38,'rgba(8,12,20,.78)',item.col,'rgba(255,255,255,.16)',14);
+    fitText(item.title,x+w/2,y+h-92,w-28,20,C.paper,800,'center','ui-monospace,monospace');
+    g.fillStyle=item.col;g.beginPath();g.arc(x+w/2,y+h-50,5,0,TAU);g.fill();
+  });
+  box(72,928,936,278,'rgba(10,16,23,.86)',26,'rgba(127,224,192,.42)',3);
+  text('ПРОДЮСЕР ГОДА',540,985,21,C.muted,800,'center','ui-monospace,monospace');
+  text('ВАЛЕРА',540,1040,38,C.mint,900,'center');
+  text('автокормушка · расписание выполняет',540,1092,22,C.paper,700,'center');
+  // Tiny feeder clock: the only project manager who never misses a deadline.
+  box(825,965,104,157,'#344054',18,'#7d8da1',3);
+  box(841,982,72,46,'#101a28',11,'rgba(255,255,255,.12)',2);
+  g.fillStyle=C.amber;g.beginPath();g.moveTo(854,994);g.lineTo(900,994);g.lineTo(877,1017);g.closePath();g.fill();
+  g.fillStyle=C.mint;g.beginPath();g.arc(877,1060,6,0,TAU);g.fill();
+  for(let i=0;i<3;i++){g.fillStyle=C.amber;g.beginPath();g.arc(864+i*13,1090+(i%2)*8,4,0,TAU);g.fill()}
+  line(92,1161,740,1161,'rgba(255,255,255,.16)',2);
+  text('Гуччи — контроль крана. Валера — контроль сроков.',416,1180,18,C.muted,700,'center');
 }
 function drawQuoteCaption(scene,t){
   const q=scene.quote;if(!q)return;

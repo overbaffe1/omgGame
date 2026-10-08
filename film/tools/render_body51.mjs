@@ -24,7 +24,7 @@ const require = createRequire(
   process.env.BODY51_DEPS ? path.join(process.env.BODY51_DEPS, 'noop.cjs') : import.meta.url);
 const here = path.dirname(fileURLToPath(import.meta.url));
 const film = path.resolve(here, '..');
-const { createCanvas } = require('@napi-rs/canvas');
+const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const ffmpeg = process.env.FFMPEG_BIN || (() => { try { return require('@ffmpeg-installer/ffmpeg').path; } catch { return 'ffmpeg'; } })();
 
 const argv = process.argv.slice(2);
@@ -50,7 +50,7 @@ function decodeMp3(file) {                        // → Float32Array, моно,
 const CUTS = {
   minute: { script: 'script-minute.json', timing: 'body51-timing-min.js', out: 'body51-min.mp4',
             subset: ['cat', 'workshop', 'stream', 'limits', 'gag', 'release'], dayMode: true,
-            lead: 0.5, tail: 0.4, qgap: 0.25, minDur: 6, padEnd: 4.6 },
+            lead: 0.4, tail: 0.25, qgap: 0.16, minDur: 5.6, padEnd: 2.0 },
 };
 const CUT = arg('cut', null);
 const CFG = CUT ? (CUTS[CUT] || (() => { console.error('неизвестная нарезка:', CUT, '· есть:', Object.keys(CUTS).join(', ')); process.exit(1); })()) : null;
@@ -155,6 +155,16 @@ const sandbox = {
 };
 sandbox.window = sandbox; sandbox.globalThis = sandbox;
 sandbox.BODY51_DAY = Boolean(CFG && CFG.dayMode);
+if (CFG && CFG.dayMode) {
+  const artFiles = {
+    'gucci-valera': 'gucci-valera.png',
+    'desktop-hellfarmer': 'desktop-hellfarmer.png',
+    'backpack-inspector': 'backpack-inspector.png',
+    'white-meridian': 'white-meridian.png',
+  };
+  sandbox.BODY51_ART = Object.fromEntries(await Promise.all(Object.entries(artFiles).map(async ([key, name]) =>
+    [key, await loadImage(path.join(film, 'body51-assets', name))])));
+}
 sandbox.window.addEventListener = () => {};
 vm.createContext(sandbox);
 for (const f of [TIMING_FILE, 'body51-film.js', 'body51-3d.js', 'body51-3d-scenes.js', 'body51-scenes.js', 'body51-score.js', 'body51-day.js', 'body51-run.js'])

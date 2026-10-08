@@ -39,8 +39,10 @@ export function computeTiming({ durations = {}, texts = {}, quotes = {}, quoteTe
   // порядок глав в нарезке — по порядку в subset, а не по общему списку
   const list = subset ? subset.map(id => SCENES.find(d => d.id === id)).filter(Boolean) : SCENES;
   const scenes = list.map(d => {
-    const nsp = d.narr ? (narrSpecs[d.id] || null) : null;                       // замер речи рассказчика
-    const narrSpeech = nsp ? nsp.speech : (d.narr ? (durations[d.id] || d.nom) : 0);
+    // Нарезка может добавить рассказчика в главу, которая в полном фильме немая (например, gag).
+    const narrId = narrIds && Object.prototype.hasOwnProperty.call(narrIds, d.id) ? narrIds[d.id] : d.narr;
+    const nsp = narrId ? (narrSpecs[d.id] || null) : null;                       // замер речи рассказчика
+    const narrSpeech = nsp ? nsp.speech : (narrId ? (durations[d.id] || d.nom) : 0);
     const narrOnset  = nsp ? nsp.onset : 0;                                      // тишина в начале файла
     const narrAt = +(lead - narrOnset).toFixed(3);                               // где ставить файл, чтобы речь началась ровно в lead
     const qv = quotes[d.id];
@@ -52,8 +54,8 @@ export function computeTiming({ durations = {}, texts = {}, quotes = {}, quoteTe
     const shift = (seg, off) => (seg || []).map(g => ({ t0: +(off + g.t0).toFixed(2), t1: +(off + g.t1).toFixed(2), text: g.text }));
     const o = {
       id: d.id, start: +t.toFixed(2), dur: +dur.toFixed(2),
-      narr: (narrIds && d.narr) ? (narrIds[d.id] || d.narr) : d.narr, narrAt, narrDur: nsp ? +nsp.dur.toFixed(2) : (d.narr ? +(durations[d.id] || 0).toFixed(2) : 0),
-      narrText: d.narr ? (texts[d.id] || '') : '',
+      narr: narrId, narrAt, narrDur: nsp ? +nsp.dur.toFixed(2) : (narrId ? +(durations[d.id] || 0).toFixed(2) : 0),
+      narrText: narrId ? (texts[d.id] || '') : '',
       narrOn: +(lead).toFixed(2),                                                 // речь рассказчика стартует здесь
       narrOff: +(lead + narrSpeech).toFixed(2),
       narrSeg: nsp ? shift(nsp.seg, narrAt) : null,
