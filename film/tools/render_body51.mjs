@@ -24,7 +24,7 @@ const require = createRequire(
   process.env.BODY51_DEPS ? path.join(process.env.BODY51_DEPS, 'noop.cjs') : import.meta.url);
 const here = path.dirname(fileURLToPath(import.meta.url));
 const film = path.resolve(here, '..');
-const { createCanvas, loadImage } = require('@napi-rs/canvas');
+const { createCanvas } = require('@napi-rs/canvas');
 const ffmpeg = process.env.FFMPEG_BIN || (() => { try { return require('@ffmpeg-installer/ffmpeg').path; } catch { return 'ffmpeg'; } })();
 
 const argv = process.argv.slice(2);
@@ -155,16 +155,6 @@ const sandbox = {
 };
 sandbox.window = sandbox; sandbox.globalThis = sandbox;
 sandbox.BODY51_DAY = Boolean(CFG && CFG.dayMode);
-if (CFG && CFG.dayMode) {
-  const artFiles = {
-    'gucci-valera': 'gucci-valera.png',
-    'desktop-hellfarmer': 'desktop-hellfarmer.png',
-    'backpack-inspector': 'backpack-inspector.png',
-    'white-meridian': 'white-meridian.png',
-  };
-  sandbox.BODY51_ART = Object.fromEntries(await Promise.all(Object.entries(artFiles).map(async ([key, name]) =>
-    [key, await loadImage(path.join(film, 'body51-assets', name))])));
-}
 sandbox.window.addEventListener = () => {};
 vm.createContext(sandbox);
 for (const f of [TIMING_FILE, 'body51-film.js', 'body51-3d.js', 'body51-3d-scenes.js', 'body51-scenes.js', 'body51-score.js', 'body51-day.js', 'body51-run.js'])

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="Короткая история из жизни @body51: кот Гуччи, автокормушка Валера, Desktop Hellfarmer, Backpack Inspector и White Meridian. Факты по стримам, иллюстрации с использованием фото.">
+<meta name="description" content="Короткая история из жизни @body51: Гуччи, Валера и три игры. Авторская 2D-анимация Canvas по фото-референсу, факты со стримов.">
 <title>Три проекта, один разработчик — @body51</title>
 <style>
   html,body{margin:0;height:100%;background:#05060b;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;color:#eee;overflow:hidden}
@@ -24,7 +24,7 @@
   <canvas id="c" width="1080" height="1920"></canvas>
   <div id="intro">
     <h1>Три проекта. Один разработчик.</h1>
-    <div class="lead">Гуччи и Валера, Desktop Hellfarmer, Backpack Inspector<br>и White Meridian — плюс перерыв на турнике.<br>Новая история по фактам стримов, с иллюстрациями на основе фото.<br><span style="color:#7d8798">Текстуры, плашки и герои не вылезают за границы кадра.</span></div>
+    <div class="lead">Гуччи и Валера, Desktop Hellfarmer, Backpack Inspector<br>и White Meridian — плюс перерыв на турнике.<br>Новая история по фактам стримов: все сцены нарисованы и анимированы на Canvas; стример — стилизованный персонаж по фото-референсу.<br><span style="color:#7d8798">Без сгенерированных иллюстраций. Текстуры, плашки и герои остаются внутри кадра.</span></div>
     <button id="play">▶ Смотреть</button>
     <small>Лучше со звуком. Цитаты и рассказчик синхронизированы с анимацией.<br>6 эпизодов · ~1:01 · 9:16 · короткая история рабочего дня.<br>Пробел — пауза, стрелки — ±5 секунд, N/P — главы, F — на весь экран.<br><a href="body51-min.mp4" download>Скачать MP4</a> · <a href="body51.html">Полная версия (12 глав)</a> · <a href="index.html">Галерея</a></small>
   </div>
@@ -34,20 +34,7 @@
 <script src="body51-timing-min.js?v=9"></script>
 <script src="body51-film.js?v=7"></script>
 <script src="body51-score.js?v=7"></script>
-<script src="body51-day.js?v=3"></script>
-<script>
-  window.BODY51_ART=Object.create(null);
-  window.BODY51_ART_READY=Promise.all([
-    ['gucci-valera','body51-assets/gucci-valera.png'],
-    ['desktop-hellfarmer','body51-assets/desktop-hellfarmer.png'],
-    ['backpack-inspector','body51-assets/backpack-inspector.png'],
-    ['white-meridian','body51-assets/white-meridian.png']
-  ].map(([key,url])=>new Promise(resolve=>{
-    const img=new Image();img.onload=()=>{window.BODY51_ART[key]=img;resolve()};
-    img.onerror=()=>{console.warn('Не удалось загрузить иллюстрацию:',url);window.BODY51_ART[key]=null;resolve()};
-    img.src=url;
-  })));
-</script>
+<script src="body51-day.js?v=4"></script>
 <script>window.BODY51_DAY=true;</script>
 <script src="body51-run.js?v=8"></script>
 <script>
