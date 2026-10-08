@@ -83,7 +83,8 @@ const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines,
   narrIds, subset: CFG ? CFG.subset : null, lead: CFG ? CFG.lead : undefined, tail: CFG ? CFG.tail : undefined,
   qgap: CFG ? CFG.qgap : undefined, minDur: CFG ? CFG.minDur : undefined });
 fs.writeFileSync(path.join(film, CFG ? CFG.timing : 'body51-timing.js'), toJs(timing,
-  missing.length ? `оценка по тексту; нет озвучки: ${missing.join(', ')}` : 'длительности и паузы из mp3 озвучки'));
+  missing.length ? `оценка по тексту; нет озвучки: ${missing.join(', ')}` : 'длительности и паузы из mp3 озвучки',
+  CFG ? CFG.timing : 'body51-timing.js'));
 const mm = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
 console.log('хронометраж:', mm(timing.total));
 for (const s of timing.scenes) console.log(` ${s.id.padEnd(9)} ${mm(s.start)} +${s.dur.toFixed(1)}с ${s.narr || '—'}`);

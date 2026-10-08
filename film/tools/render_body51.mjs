@@ -101,7 +101,7 @@ const timing = computeTiming({ durations, texts, quotes, quoteTexts, quoteLines,
   subset: CFG ? CFG.subset : null, lead: CFG ? CFG.lead : undefined, tail: CFG ? CFG.tail : undefined,
   qgap: CFG ? CFG.qgap : undefined, minDur: CFG ? CFG.minDur : undefined });
 const TIMING_FILE = CFG ? CFG.timing : 'body51-timing.js';
-fs.writeFileSync(path.join(film, TIMING_FILE), toJs(timing, 'длительности из mp3 озвучки (render_body51.mjs)'));
+fs.writeFileSync(path.join(film, TIMING_FILE), toJs(timing, 'длительности из mp3 озвучки (render_body51.mjs)', TIMING_FILE));
 const TOTAL = timing.total;
 console.log('хронометраж:', `${Math.floor(TOTAL / 60)}:${String(Math.round(TOTAL % 60)).padStart(2, '0')}`, '· глав:', timing.scenes.length);
 
@@ -274,6 +274,7 @@ if (JOBS > 1 && !CHUNK) {
     parts.push(out);
     const argsW = process.execArgv.concat([fileURLToPath(import.meta.url),
       '--chunk-out', out, '--range', `${a}:${b}`, '--crf', CRF, '--jobs', '1']);
+    if (CUT) argsW.push('--cut', CUT);   // воркеры должны рендерить ту же нарезку, что и родитель (иначе видео от полной версии с чужим звуком)
     if (FAST) argsW.push('--fast');
     procs.push(new Promise((res, rej) => {
       const p = spawn(process.execPath, argsW, { stdio: ['ignore', 'inherit', 'inherit'],

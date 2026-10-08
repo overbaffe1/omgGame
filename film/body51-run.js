@@ -320,10 +320,11 @@ function frame(t){
     s3=new B3.Scene(g,W,H);
     sceneBg(scene.kind,t);
     panels=S3[scene.kind](s3,u,t)||{};
-    // мем-склейка: на реплике цитаты камера чуть наезжает и плавно отпускает
+    // мем-склейка: на реплике цитаты камера наезжает — плавный заезд, короткая пауза, плавный отъезд
     if(window.BODY51_CUT&&scene.quote){const q=scene.quote,local=t-scene.start,dd=local-q.on;
-      const k=dd>=0?Math.max(0,1-dd/1.4):0;
-      if(k>0)s3.cam.fov*=1-0.13*k;}
+      if(dd>=0){const atk=Math.min(1,dd/0.18),rel=Math.max(0,1-Math.max(0,dd-0.55)/1.15);
+        const k=atk*atk*(3-2*atk)*rel;   // smoothstep на заезде — без рывка на стыке кадров
+        if(k>0)s3.cam.fov*=1-0.13*k;}}
     deriveLight(s3,panels,t);
     B3.draw(s3);
     drawPanels(scene.kind,s3,panels,u,t);

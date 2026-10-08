@@ -75,8 +75,8 @@ export function computeTiming({ durations = {}, texts = {}, quotes = {}, quoteTe
   return { version: 3, total: +t.toFixed(2), rate: RATE, subset: subset || null, scenes };
 }
 
-export function toJs(timing, note = '') {
-  const head = `// body51-timing.js — собран автоматически (film/tools/build_body51_timing.mjs).\n` +
+export function toJs(timing, note = '', file = 'body51-timing.js') {
+  const head = `// ${file} — собран автоматически (film/tools/build_body51_timing.mjs).\n` +
     `${note ? '// ' + note + '\n' : ''}`;
   return head + 'window.BODY51_TIMING=' + JSON.stringify(timing, null, 1) + ';\n';
 }
