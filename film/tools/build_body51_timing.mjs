@@ -12,6 +12,12 @@ import { createRequire } from 'node:module';
 import { computeTiming, estimate, toJs, SCENES } from './body51_timing.mjs';
 import { speechSpans, sentences, segmentsFor } from './body51_speech.mjs';
 
+// New minute timeline is isolated from the original full-length film.
+if (process.argv.includes('--cut') && process.argv[process.argv.indexOf('--cut') + 1] === 'minute') {
+  await import('./build_body51_day.mjs');
+  process.exit(0);
+}
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const film = path.resolve(here, '..');
 const argv = process.argv.slice(2);

@@ -1,0 +1,17 @@
+{
+  "targetLUFS": -16,
+  "truePeakCeiling": -1.5,
+  "input": {
+    "input_i": "-17.47",
+    "input_tp": "-2.04",
+    "input_lra": "2.70",
+    "input_thresh": "-28.01",
+    "output_i": "-16.12",
+    "output_tp": "-1.50",
+    "output_lra": "2.60",
+    "output_thresh": "-26.61",
+    "normalization_type": "dynamic",
+    "target_offset": "0.12"
+  },
+  "note": "Narration and procedural music/foley mixed separately; ducking affects the bed only."
+}

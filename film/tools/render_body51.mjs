@@ -18,6 +18,16 @@ import { createRequire } from 'node:module';
 import { computeTiming, toJs, estimate, SCENES } from './body51_timing.mjs';
 import { speechSpans, sentences, segmentsFor } from './body51_speech.mjs';
 
+// The minute film is a new standalone 2D production. Keep the familiar CLI,
+// but never let the archived 3D cut overwrite its MP4 or use its old voices.
+if (process.argv[process.argv.indexOf('--cut') + 1] === 'minute' && process.argv.includes('--cut')) {
+  const forwarded = process.argv.slice(2);
+  forwarded.splice(forwarded.indexOf('--cut'), 2);
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('./render_body51_day.mjs', import.meta.url)), ...forwarded], {stdio: 'inherit'});
+  if (result.error) console.error(result.error.message);
+  process.exit(result.status ?? 1);
+}
+
 // зависимости можно держать вне репозитория: BODY51_DEPS=/путь/к/node_modules
 // (ставится скриптом film/tools/body51_deps.sh)
 const require = createRequire(

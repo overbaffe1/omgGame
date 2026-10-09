@@ -15,6 +15,19 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
+// Preserve the existing command, validate the new minute film and its eight
+// newly recorded narration clips rather than the archived q/m clips.
+if (process.argv.includes('--cut') && process.argv[process.argv.indexOf('--cut') + 1] === 'minute') {
+  const i = process.argv.indexOf('--mp4');
+  const file = i >= 0 ? process.argv[i + 1] : (process.env.BODY51_OUT || fileURLToPath(new URL('../body51-min.mp4', import.meta.url)));
+  if (process.argv.includes('--offset') && Number(process.argv[process.argv.indexOf('--offset') + 1]) !== 0) {
+    throw new Error('The new minute check expects the full MP4; range offsets are not supported.');
+  }
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('./check_body51_day.mjs', import.meta.url)), '--mp4', file], {stdio: 'inherit'});
+  if (result.error) console.error(result.error.message);
+  process.exit(result.status ?? 1);
+}
+
 const require = createRequire(process.env.BODY51_DEPS ? path.join(process.env.BODY51_DEPS, 'noop.cjs') : import.meta.url);
 const here = path.dirname(fileURLToPath(import.meta.url));
 const film = path.resolve(here, '..');
