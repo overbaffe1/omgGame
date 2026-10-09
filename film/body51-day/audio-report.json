@@ -2,16 +2,94 @@
   "targetLUFS": -16,
   "truePeakCeiling": -1.5,
   "input": {
-    "input_i": "-17.47",
-    "input_tp": "-2.04",
-    "input_lra": "2.70",
-    "input_thresh": "-28.01",
-    "output_i": "-16.12",
+    "input_i": "-17.30",
+    "input_tp": "-2.17",
+    "input_lra": "3.10",
+    "input_thresh": "-28.18",
+    "output_i": "-16.10",
     "output_tp": "-1.50",
-    "output_lra": "2.60",
-    "output_thresh": "-26.61",
+    "output_lra": "2.90",
+    "output_thresh": "-26.90",
     "normalization_type": "dynamic",
-    "target_offset": "0.12"
+    "target_offset": "0.10"
   },
-  "note": "Narration and procedural music/foley mixed separately; ducking affects the bed only."
+  "version": "day-3",
+  "events": [
+    {
+      "scene": "wake",
+      "id": "plan",
+      "at": 2.3652
+    },
+    {
+      "scene": "wake",
+      "id": "veto",
+      "at": 4.73566
+    },
+    {
+      "scene": "service",
+      "id": "demand",
+      "at": 12.63222
+    },
+    {
+      "scene": "stream",
+      "id": "mute",
+      "at": 21.01319
+    },
+    {
+      "scene": "stream",
+      "id": "comment",
+      "at": 22.57912
+    },
+    {
+      "scene": "break",
+      "id": "freeze",
+      "at": 29.5908
+    },
+    {
+      "scene": "printers",
+      "id": "idle",
+      "at": 34.0413
+    },
+    {
+      "scene": "printers",
+      "id": "parallel",
+      "at": 36.12169
+    },
+    {
+      "scene": "sword",
+      "id": "throne",
+      "at": 45.25041
+    },
+    {
+      "scene": "hellfarmer",
+      "id": "camera",
+      "at": 52.97776
+    },
+    {
+      "scene": "inspector",
+      "id": "cool",
+      "at": 63.89865
+    },
+    {
+      "scene": "meridian",
+      "id": "boss",
+      "at": 73.31447
+    },
+    {
+      "scene": "night",
+      "id": "deadline",
+      "at": 80.35252
+    },
+    {
+      "scene": "finale",
+      "id": "request",
+      "at": 87.32254
+    },
+    {
+      "scene": "finale",
+      "id": "veto",
+      "at": 89.58614
+    }
+  ],
+  "note": "Narration, music and Foley are separate. Comic music rests preserve speech and impact sounds. Ducking never affects narration."
 }

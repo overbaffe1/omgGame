@@ -7,12 +7,15 @@ import {spawnSync} from 'node:child_process';
 import {dayDir, filmDir, timeline, drawing, requireDeps, ffmpeg, decode, SR} from './body51_day_common.mjs';
 
 const data = timeline();
-assert.equal(data.scenes.length, data.version === 'day-2' ? 11 : 8);
+const script = JSON.parse(fs.readFileSync(path.join(dayDir, 'script.json'), 'utf8'));
+assert.equal(data.version, script.version, 'Rebuild the timeline after a script change');
+assert.equal(data.scenes.length, script.scenes.length);
+assert.deepEqual(data.scenes.map(s => s.voice), script.scenes.map(s => s.voice));
 const [minDuration, maxDuration] = data.durationRange || [40, 80];
 assert(data.total >= minDuration && data.total <= maxDuration, 'Requested duration range');
-if (data.version === 'day-2') {
+if (data.version !== 'day-1') {
   for (const id of ['hellfarmer', 'inspector', 'meridian']) assert(data.scenes.some(s => s.id === id), `Missing game ${id}`);
-  assert.equal(data.scenes.at(-1).voice, 'd08b', 'The old finale take must not return');
+  assert.equal(data.scenes.at(-1).voice, script.scenes.at(-1).voice, 'The current finale take must be used');
   assert(!data.scenes.some(s => s.voice === 'd08'));
   assert.equal(data.format.fps, 60);
 }
@@ -28,6 +31,11 @@ for (const s of data.scenes) {
   });
   assert(s.trimOut > s.trimIn);
   assert(s.lead + s.speech < s.duration, `${s.id}: clipped narration`);
+  if (s.startFrame !== undefined) {
+    assert.equal(s.endFrame - s.startFrame, s.frames);
+    assert.equal(Math.round(s.start * data.format.fps), s.startFrame);
+    for (const [name, at] of Object.entries(s.events || {})) assert(at >= 0 && at < s.duration, `${s.id}: bad event ${name}`);
+  }
   cursor += s.duration;
 }
 assert(Math.abs(cursor - data.total) < .0001);
@@ -47,8 +55,14 @@ for (let frame = 0; frame < frames; frame++) {
     texts++;
   }
 }
+for (const s of data.scenes) {
+  if (s.startFrame !== undefined) {
+    assert.equal(movie.draw(s.startFrame / data.format.fps).scene, s.id, `Late scene cut: ${s.id}`);
+    assert.equal(movie.draw((s.endFrame - 1) / data.format.fps).scene, s.id, `Early scene cut: ${s.id}`);
+  }
+}
 const digest = t => { movie.draw(t); return createHash('sha256').update(canvas.toBuffer('image/png')).digest('hex'); };
-for (const t of [2, 14, 20, 30, 35, 43, 54, 66]) {
+for (const t of data.scenes.map(s => s.start + s.duration * .7)) {
   const a = digest(t); digest(t + .7); digest(data.total - t);
   assert.equal(a, digest(t), `Non-deterministic seek at ${t}`);
 }

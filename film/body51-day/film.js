@@ -106,7 +106,7 @@
     // This remains an illustration, not a face texture pasted onto a character.
     function artemFace(t, options = {}) {
       const sleepy = options.sleepy, puzzled = options.puzzled;
-      const look = options.pose === 'type' ? 4 : options.pose === 'point' ? 5 : Math.sin(t * .8) * 1.6;
+      const look = options.pose === 'type' ? 4 : options.pose === 'point' || puzzled ? 5 : Math.sin(t * .8) * 1.6;
       g.save(); g.translate(0, -385 + Math.sin(t * 1.7) * 1.4);
       g.rotate(Math.sin(t * .9) * (puzzled ? .035 : .012)); g.translate(0, 385);
       for (const d of [-1, 1]) {
@@ -164,6 +164,7 @@
       shape(p => { p.moveTo(60, -377); p.quadraticCurveTo(72, -329, 39, -298); p.quadraticCurveTo(52, -344, 38, -368); }, '#737b68', null);
       shape(p => { p.moveTo(-25, -373); p.quadraticCurveTo(5, -388, 32, -372); p.quadraticCurveTo(36, -353, 7, -348); p.quadraticCurveTo(-23, -350, -25, -373); }, C.skin, null);
       if (sleepy) oval(4, -362, 11, 14, '#845c4c', C.ink, 2.5);
+      else if (options.talk) oval(5, -361, 10, 3 + Math.abs(Math.sin(t * 13)) * 8, '#805b4e', '#624f43', 2);
       else shape(p => { p.moveTo(-15, -363); p.quadraticCurveTo(6, puzzled ? -362 : -352, 26, -365); }, null, '#624f43', 3);
       // Moustache is drawn last so the mouth can emote without changing identity.
       shape(p => { p.moveTo(3, -384); p.quadraticCurveTo(-18, -390, -34, -372); p.quadraticCurveTo(-19, -365, 4, -378); p.quadraticCurveTo(21, -366, 38, -372); p.quadraticCurveTo(28, -388, 3, -384); }, '#625e48', null);
@@ -222,7 +223,7 @@
         line([[-54, -245], [54, -245], [54, -198], [-54, -198], [-54, -245]], '#aeb9a9', 1.7);
         label('51', 0, -210, 36, '#dce2d3', 800, 'center', 85);
         line([[-61, -253], [-18, -263], [21, -257], [59, -266]], '#c4cdba', 2.3);
-        artemFace(t, {sleepy, pose, puzzled: options.puzzled});
+        artemFace(t, {sleepy, pose, puzzled: options.puzzled, talk: options.talk});
       });
     }
 
@@ -324,7 +325,40 @@
       });
     }
     const cue = (s, i, shift = 0) => (s.captions[i]?.start || 0) + shift;
-    const gameScenes = root.Body51DayGames({g, C, box, oval, shape, line, poly, label, local, asset, tag, sparkle, shadow, floor, person, cue, ease, seg, lerp, clamp});
+    const beat = (s, name, fallback = 0) => s.events?.[name] ?? fallback;
+    const gameScenes = root.Body51DayGames({g, C, box, oval, shape, line, poly, label, local, asset, tag, sparkle, shadow, floor, person, cat, cue, beat, ease, seg, lerp, clamp});
+
+    function pawPrint(x, y, s, col = C.coral) {
+      local(x, y, s, () => {
+        oval(0, 13, 21, 16, col);
+        for (const [px, py, ang] of [[-28, -5, -.5], [-11, -21, -.14], [11, -21, .14], [28, -5, .5]]) oval(px, py, 9, 13, col, null, 0, ang);
+      });
+    }
+    function veto(x, y, w, t, at) {
+      if (t < at) return;
+      // Fast stamp down, a single impact, then a readable hold. It does not
+      // shake the camera or flash the whole frame, and never hides subtitles.
+      const u = t - at, k = 1 + .27 * (1 - ease(seg(u, 0, .15)));
+      const bounce = u > .15 ? Math.sin((u - .15) * 32) * Math.exp(-(u - .15) * 16) * 3 : 0;
+      asset('Отказ Гуччи', x, y + bounce, k, [-w/2-8, -50, w/2+8, 50], () => {
+        box(-w/2, -41, w, 82, 10, '#fff2e7', '#bb543e', 6);
+        box(-w/2+9, -32, w-18, 64, 6, null, '#bb543e', 2);
+        label('НЕ СОГЛАСОВАНО', 0, 12, 33, '#b64d3b', 800, 'center', w-29);
+      }, -.065);
+    }
+    function request(x, y, w, title, body, t, at) {
+      if (t < at) return;
+      const p = ease(seg(t, at, at + .25));
+      local(x, y + (1-p)*16, 1, () => {
+        g.globalAlpha *= p;
+        box(-w/2+7, -81, w, 182, 14, '#293b3c13', null);
+        box(-w/2, -88, w, 182, 14, C.white, '#9cae9c', 3);
+        label(title, -w/2 + 21, -49, 22, '#7c9485', 800, 'left', w-89);
+        line([[-w/2+21, -32], [w/2-22, -32]], '#ced5c1', 2);
+        label(body, 0, 12, 31, C.ink, 800, 'center', w-34);
+        pawPrint(w/2-34, -57, .41, '#9baf99');
+      });
+    }
 
     function wake(s, t) {
       floor(1370);
@@ -341,16 +375,18 @@
       const up = ease(seg(t, cue(s, 1) - .1, cue(s, 1) + .65));
       box(120, 945, 647, 350, 35, '#b48b69', C.ink, 6);
       g.save(); g.beginPath(); g.rect(120, 730, 652, 572); g.clip();
-      person(368, 1385 - 66 * up, 1.02, t, {sleepy: up < .7, pose: t > cue(s, 2) ? 'point' : 'stand'});
+      person(368, 1385 - 66 * up, 1.02, t, {sleepy: up < .7, pose: t > cue(s, 1) ? 'point' : 'stand', puzzled: t > beat(s, 'veto', cue(s, 2))});
       g.restore();
       box(159, 1096, 591, 209, 31, C.white, C.ink, 5);
       box(424, 1068, 340, 248, 24, '#97b9a4', C.ink, 6);
       for (let i = 0; i < 7; i++) line([[444 + i * 43, 1082], [444 + i * 43, 1302]], '#c3d1b2', 5);
       box(113, 1298, 654, 41, 11, C.wood, C.ink, 5);
       line([[145, 1337], [136, 1400]], C.ink, 16); line([[734, 1337], [743, 1400]], C.ink, 16);
-      const boss = seg(t, cue(s, 2), cue(s, 2) + .65);
-      cat(655, 1078 - Math.sin(Math.min(1, boss) * Math.PI) * 14, 1.04, t, {boss: true});
-      if (t > cue(s, 2)) { tag('ГУЧЧИ / НАЧАЛЬНИК', 737, 663, 372, C.yellow, 27, -.035); line([[738, 709], [717, 752], [694, 778]], C.ink, 3); }
+      const decision = beat(s, 'veto', cue(s, 2) + .55);
+      const boss = seg(t, decision - .3, decision + .25);
+      cat(655, 1078 - Math.sin(boss * Math.PI) * 15, 1.04, t, {boss: true, paw: Math.sin(boss * Math.PI) * .8});
+      request(735, 603, 438, 'ПЛАН НА ДЕНЬ', 'РАБОТАТЬ НА СЕБЯ', t, beat(s, 'plan', cue(s, 1)));
+      veto(735, 670, 386, t, decision);
       if (up < .8) label('z', 537, 822 - t * 8, 36, '#718d8b', 800);
       plant(921, 1397, .57);
     }
@@ -379,10 +415,19 @@
       // A tiny hop between two valid poses; the cat never crosses a frame edge.
       const hop = ease(seg(t, cue(s, 2) - .5, cue(s, 2) + .5));
       const cx = lerp(486, 727, hop), cy = lerp(1310, 1154, hop) - Math.sin(hop * Math.PI) * 87;
-      cat(cx, cy, lerp(.92, .93, hop), t);
+      cat(cx, cy, lerp(.92, .93, hop), t, {boss: true, paw: t > beat(s, 'demand', cue(s, 3)) ? .38 : 0});
       if (hop > .99 && Math.sin(t * 10) > -.2) {
         shape(p => { p.moveTo(750, 1040); p.quadraticCurveTo(765, 1050, 779, 1044); }, null, '#8d5760', 7);
         shape(p => { p.moveTo(750, 1040); p.quadraticCurveTo(765, 1050, 779, 1044); }, null, '#e0a3a2', 4);
+      }
+      const summoned = ease(seg(t, beat(s, 'demand', cue(s, 3)), beat(s, 'demand', cue(s, 3)) + .35));
+      if (summoned > 0) {
+        g.save(); g.globalAlpha = summoned;
+        person(466, 1395, .46, t, {pose: 'point', puzzled: true});
+        // The napkin hangs over his raised arm like a waiter's serving cloth.
+        poly([[533, 1248], [577, 1248], [581, 1310], [538, 1305]], C.white, C.ink, 3);
+        line([[544, 1253], [548, 1294]], '#c9d3bc', 2);
+        g.restore();
       }
       if (t > cue(s, 3)) { tag('ПЯТЬ ЗВЁЗД', 440, 575, 304, C.yellow, 28, -.025); for (let i = 0; i < 5; i++) sparkle(330 + i * 56, 649, 15, '#b59347', .1); }
       plant(133, 1391, .5);
@@ -394,14 +439,21 @@
       box(274, 974, 163, 318, 57, '#a1bcb0', C.ink, 6);
       line([[357, 1287], [357, 1393]], C.ink, 13); line([[278, 1395], [436, 1395]], C.ink, 12);
       monitor(521, 666, 402, 303, t);
-      person(357, 1395, 1.07, t, {pose: 'type'});
+      const contact = beat(s, 'mute', cue(s, 2) + .65);
+      const speechBubble = t < cue(s, 1) ? 0 : 1 - ease(seg(t, contact, contact + .22));
+      if (speechBubble > .01) local(304, 785, 1, () => {
+        g.scale(1, speechBubble);
+        box(-148, -65, 296, 80, 23, C.white, '#8a9e8c', 3);
+        poly([[42, 12], [68, 37], [76, 12]], C.white, '#8a9e8c', 3);
+        for (let i = 0; i < 3; i++) line([[-113 + i*3, -42 + i*18], [91 - i*18 + Math.sin(t*8+i)*9, -42 + i*18]], '#698877', 4);
+      });
+      person(357, 1395, 1.07, t, {pose: 'type', talk: t > cue(s, 1) && t < cue(s, 3), puzzled: t > cue(s, 3)});
       box(151, 1118, 795, 39, 12, C.wood, C.ink, 6);
       line([[191, 1157], [176, 1396]], C.ink, 14); line([[907, 1157], [929, 1396]], C.ink, 14);
       keyboard(501, 1084, 185);
-      const contact = cue(s, 2) + .65;
       const paw = ease(seg(t, contact - .5, contact)) * (1 - ease(seg(t, contact + 1.1, contact + 1.5)));
       const muted = t >= contact;
-      cat(768, 1116, .77, t, {paw});
+      cat(768, 1116, .77, t, {paw, boss: true});
       mic(872, 1105, muted);
       const rx = 551, ry = 542;
       box(rx - 9, ry - 34, 336, 66, 32, muted ? '#edcbb7' : '#d5dfc8', C.ink, 3);
@@ -409,7 +461,7 @@
       label(muted ? 'КОТ НАЖАЛ MUTE' : 'СТРИМ ИДЁТ', rx + 57, ry + 9, 25, C.ink, 800, 'left', 252);
       if (!muted) for (let i = 0; i < 17; i++) line([[596 + i * 15, 627], [596 + i * 15, 627 - 8 - Math.abs(Math.sin(t * 8 + i * 1.3)) * 33]], C.teal, 7);
       else line([[596, 615], [836, 615]], '#9eaaa0', 4);
-      if (t > cue(s, 3)) tag('РЕВЬЮ ПРИНЯТО', 602, 1292, 342, C.yellow, 27, -.025);
+      if (t > cue(s, 3)) tag('/* АРТЁМ */', 602, 1292, 342, C.mint, 33, -.025);
       plant(141, 1086, .53);
     }
 
@@ -424,7 +476,8 @@
       const barY = 1320 - 545 * size;
       box(300, barY - 8, 490, 19, 9, '#517b76', C.ink, 5);
       for (const xx of [302, 784]) box(xx - 13, barY - 19, 27, 43, 7, '#96aea1', C.ink, 4);
-      person(547, feetY, size, t, {hang: lift});
+      const frozen = !ending && t > beat(s, 'freeze', cue(s, 2) + .55);
+      person(547, feetY, size, frozen ? beat(s, 'freeze', cue(s, 2) + .55) : t, {hang: lift, puzzled: ending && t > beat(s, 'veto', cue(s, 3))});
       // Fingers wrap over the bar; rendered after the character.
       if (lift > .88) for (const d of [-1, 1]) {
         const xx = 547 + d * 128 * size;
@@ -445,16 +498,20 @@
         line([[862, 1264], [877, 1279], [912, 1248]], C.teal, 7);
         box(791, 1322, 195, 15, 6, '#bac4b5', C.ink, 4);
         label('UNITY', 886, 1188, 24, C.ink, 800, 'center', 158);
-        if (t > cue(s, 2)) tag('РУЧНОЙ РЕЖИМ', 546, 616, 335, C.yellow, 26, -.025);
+        if (t > cue(s, 2)) tag('АРТЁМ НЕ ОТВЕЧАЕТ', 546, 616, 370, C.yellow, 27, -.025);
+        if (frozen) local(715, 1139, 1, () => {
+          for (let j = 0; j < 8; j++) oval(Math.cos(j*TAU/8)*24, Math.sin(j*TAU/8)*24, 4.5, 4.5, (Math.floor(t*8)%8) === j ? C.teal : '#adbeac');
+        });
       } else {
         if (t >= cue(s, 0)) { robot(865, 1091, .85, t); tag('КОД', 862, 881, 133, C.mint, 25, .025); }
         if (t >= cue(s, 1)) { feeder(181, 1277, .85, t, 1); tag('ОБЕД', 181, 962, 159, C.mint, 25, -.025); }
-        cat(845, 1398, .85, t, {sleepy: t > cue(s, 4)});
-        if (t > cue(s, 3)) tag('ВИСИТ ВРУЧНУЮ', 546, 616, 344, C.yellow, 28, -.025);
-        if (t > cue(s, 4)) {
-          const a = seg(t, cue(s, 4), cue(s, 4) + .35);
-          g.save(); g.globalAlpha = a; sparkle(382, 861, 23, C.coral, -.2); sparkle(700, 877, 19, C.teal, .2); g.restore();
-        }
+        const denied = beat(s, 'veto', cue(s, 3) + .6);
+        const motion = ease(seg(t, denied - .3, denied));
+        cat(845, 1398, .85, t, {boss: true, paw: motion * .9});
+        request(546, 622, 358, 'ЗАЯВКА ОТ АРТЁМА', 'ВЫХОДНОЙ', t, beat(s, 'request', cue(s, 2)));
+        veto(546, 660, 368, t, denied);
+        // The same paw-stamp as in the morning is the final payoff, not a
+        // surprise cut of a spoken word or an automatic player restart.
       }
     }
 
@@ -489,7 +546,7 @@
       line([[540, 465], [540, 500]], C.ink, 5);
       shape(p => { p.moveTo(474, 540); p.quadraticCurveTo(478, 490, 540, 488); p.quadraticCurveTo(600, 490, 606, 540); p.closePath(); }, C.yellow, C.ink, 5);
       line([[470, 546], [610, 546]], C.ink, 5);
-      const asleep = t > cue(s, 2);
+      const asleep = t > beat(s, 'idle', cue(s, 1));
       for (let i = 0; i < 3; i++) printer(260 + i * 280, 972, .91, i + 1, t, asleep);
       box(115, 985, 850, 22, 5, C.wood, C.ink, 4);
       for (let i = 0; i < 4; i++) printer(192 + i * 232, 1292, .79, i + 4, t, asleep);
@@ -498,9 +555,11 @@
         for (let i = 0; i < 7; i++) {
           const xx = i < 3 ? 245 + i * 280 : 172 + (i - 3) * 232;
           const yy = (i < 3 ? 688 : 1049) - Math.sin(t * 1.1 + i) * 6;
-          label('z', xx, yy, 29, '#6f9288', 800, 'center', 45);
+          const parallel = t > beat(s, 'parallel', cue(s, 2));
+          const zzz = 'z'.repeat(parallel ? 1 + Math.floor((t * 2 + i * .7) % 3) : 1);
+          label(zzz, xx, yy, 29, '#6f9288', 800, 'center', 91);
         }
-        tag('НИ ОДИН НЕ ПЕЧАТАЕТ', 540, 599, 452, C.mint, 29, -.018);
+        tag(t > cue(s, 2) ? '0 РЕЗУЛЬТАТОВ / 7 ПОТОКОВ' : 'НИ ОДИН НЕ ПЕЧАТАЕТ', 540, 599, 519, C.mint, 28, -.018);
       }
       plant(945, 1399, .42);
     }
@@ -549,13 +608,18 @@
           box(-150, -268, 300, 54, 12, '#cfaa78', C.ink, 5);
           line([[-131, -244], [130, -244]], '#e4c18d', 4);
         });
-        tag('МЕБЕЛЬ +1', 610, 741, 285, C.yellow, 30, -.025);
+        tag('ТРОН +1', 610, 640, 285, C.yellow, 30, -.025);
         g.restore();
+      }
+      const claimed = ease(seg(t, beat(s, 'throne', cue(s, 3) + .9), beat(s, 'throne', cue(s, 3) + .9) + .57));
+      if (t > beat(s, 'throne', cue(s, 3) + .9)) {
+        const cx = lerp(826, 615, claimed), cy = lerp(1188, 887, claimed) - Math.sin(claimed*Math.PI)*75;
+        cat(cx, cy, .67, t, {boss: true});
       }
       g.restore();
       person(259, 1410, .72, t, {puzzled: true, pose: 'point'});
       if (t < cue(s, 2)) { sparkle(821, 758, 19, '#b99d55', .13); sparkle(795, 1087, 12, '#b99d55', -.2); }
-      if (t > cue(s, 3) + .5) label('ЗАТО СТОИТ.', 735, 1367, 35, C.ink, 800, 'center', 350);
+      if (t > cue(s, 3) + .5) label('УЖЕ ЗАНЯТО.', 735, 1367, 35, C.ink, 800, 'center', 350);
     }
 
     function night(s, t) {
@@ -590,7 +654,7 @@
         g.save(); g.globalAlpha = pop;
         local(742, yy + (1 - pop) * 18, 1, () => {
           box(-182, -33, 364, 69, 14, i === 2 ? '#dcb979' : '#536d72', '#9cad99', 3);
-          label(i === 2 ? 'ТОЧНО ПОСЛЕДНИЙ' : '+1 ПРОМПТИК', 0, 10, 26, i === 2 ? C.ink : '#f0e7cf', 800, 'center', 336);
+          label(['ПОСЛЕДНИЙ', 'ПОСЛЕДНИЙ_ФИНАЛ', 'ПОСЛЕДНИЙ_ФИНАЛ_2'][i], 0, 10, 25, i === 2 ? C.ink : '#f0e7cf', 800, 'center', 336);
         }, (i - 1) * .018);
         g.restore();
       }
@@ -608,15 +672,16 @@
       label(s.phase, 116, 200, 24, dark ? '#afc4b9' : '#658278', 800, 'left', 757);
       label(String(s.index + 1).padStart(2, '0') + ' / ' + String(data.scenes.length).padStart(2, '0'), 998, 200, 21, dark ? '#afc4b9' : '#658278', 700, 'right', 115);
       let titles = s.title;
-      if (s.id === 'wake' && t < cue(s, 2)) titles = ['Один день', 'Артёма.'];
-      if (s.id === 'stream' && t < cue(s, 2) + .65) titles = ['Начался стрим.', 'Всё по плану.'];
+      if (s.id === 'wake' && t < cue(s, 1)) titles = ['Один день', 'Артёма.'];
+      if (s.id === 'wake' && t > beat(s, 'veto', cue(s, 2))) titles = ['Кот', 'не согласовал.'];
+      if (s.id === 'stream' && t < beat(s, 'mute', cue(s, 2) + .65)) titles = ['Начался стрим.', 'Всё по плану.'];
       if (s.id === 'break' && t > cue(s, 2) + .7) titles = ['Завис.', 'Не Unity.'];
       if (s.id === 'printers' && t < cue(s, 2)) titles = ['Семь', '3D-принтеров.'];
       if (s.id === 'sword' && t < cue(s, 3)) titles = ['Нейронка', 'сделала меч.'];
       if (s.id === 'inspector') titles = t < cue(s, 2) ? ['Не перенёс', 'дату релиза.'] : ['Календарь —', 'маркетолог.'];
-      if (s.id === 'meridian' && t > cue(s, 3)) titles = ['Эпическая', 'битва за батон.'];
-      if (s.id === 'night' && t > cue(s, 3)) titles = ['Три часа спустя.', 'Ещё один.'];
-      if (s.id === 'finale' && t > cue(s, 3)) titles = ['Кроме', 'турничка.'];
+      if (s.id === 'meridian' && t < beat(s, 'boss', cue(s, 3))) titles = ['Мир мечты.', 'Спёр батон.'];
+      if (s.id === 'night' && t > cue(s, 3)) titles = ['Три часа спустя.', 'Финальный_2.'];
+      if (s.id === 'finale' && t > beat(s, 'veto', cue(s, 3))) titles = ['Выходной?', 'Не согласован.'];
       if (s.id === 'finale' && t > cue(s, 4)) titles = ['Такие', 'пирожочки.'];
       label(titles[0], 77, 299, 87, ink, 800, 'left', 925);
       label(titles[1], 77, 393, 87, dark ? C.yellow : s.accent, 800, 'left', 925);
@@ -652,8 +717,9 @@
     }
     function draw(time, debug = false) {
       now = clamp(time, 0, data.total - 1 / data.format.fps);
-      current = data.scenes.find(s => now >= s.start && now < s.start + s.duration) || data.scenes.at(-1);
-      const t = now - current.start, dark = current.id === 'night';
+      const frame = Math.floor(now * data.format.fps + .000001);
+      current = data.scenes.find(s => frame >= (s.startFrame ?? Math.round(s.start * data.format.fps)) && frame < (s.endFrame ?? Math.round((s.start+s.duration) * data.format.fps))) || data.scenes.at(-1);
+      const t = Math.max(0, now - current.start), dark = current.id === 'night';
       bounds = []; textBoxes = [];
       g.save(); g.setTransform(scale, 0, 0, scale, 0, 0);
       g.lineJoin = 'round'; g.lineCap = 'round'; g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';

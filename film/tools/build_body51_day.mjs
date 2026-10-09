@@ -42,7 +42,7 @@ function align(spec, lines, onset, offset, reviewedPauses) {
 }
 
 const script = JSON.parse(fs.readFileSync(path.join(dayDir, 'script.json'), 'utf8'));
-let cursor = 0;
+let cursorFrames = 0;
 const scenes = script.scenes.map((scene, i) => {
   const file = path.join(dayDir, 'voices', scene.voice + '.mp3');
   const pcm = decode(file);
@@ -55,17 +55,26 @@ const scenes = script.scenes.map((scene, i) => {
   const ending = spec.pauses.find(([a, b]) => a > actual - .7 && b >= actual - .055);
   if (ending) offset = ending[0];
   const lead = i === 0 ? .28 : .22;
-  const tail = i === script.scenes.length - 1 ? 1.35 : .27;
+  const tail = scene.tail ?? (i === script.scenes.length - 1 ? 1.35 : .27);
+  if (!Number.isFinite(tail) || tail < 0 || tail > 4) throw new Error(`${scene.id}: invalid punchline hold`);
   const speech = offset - onset;
-  const dur = Math.ceil((lead + speech + tail) * script.format.fps) / script.format.fps;
+  const frames = Math.ceil((lead + speech + tail) * script.format.fps);
+  const dur = frames / script.format.fps;
   const captions = align(spec, scene.lines, onset, offset, scene.sentencePauses).map(c => ({...c, start: round(c.start + lead), end: round(c.end + lead)}));
-  const result = {...scene, index: i, start: round(cursor), duration: round(dur), lead, trimIn: round(onset), trimOut: round(offset), speech: round(speech), captions};
-  cursor += dur;
-  console.log(`${scene.id.padEnd(9)} ${result.start.toFixed(2)}–${cursor.toFixed(2)}s · ${scene.voice}`);
+  const events = Object.fromEntries(Object.entries(scene.gagCues || {}).map(([name, spec]) => {
+    const caption = captions[spec.caption];
+    if (!caption || !Number.isFinite(spec.offset)) throw new Error(`${scene.id}: invalid cue ${name}`);
+    const at = round(caption.start + spec.offset);
+    if (at < 0 || at >= dur) throw new Error(`${scene.id}: cue outside scene: ${name}`);
+    return [name, at];
+  }));
+  const result = {...scene, index: i, startFrame: cursorFrames, endFrame: cursorFrames + frames, frames, start: round(cursorFrames / script.format.fps), duration: round(dur), lead, tail, events, trimIn: round(onset), trimOut: round(offset), speech: round(speech), captions};
+  cursorFrames += frames;
+  console.log(`${scene.id.padEnd(9)} ${result.start.toFixed(2)}–${(cursorFrames / script.format.fps).toFixed(2)}s · ${scene.voice}`);
   for (const c of captions) console.log(`  ${c.start.toFixed(2)}–${c.end.toFixed(2)}  ${c.text}`);
   return result;
 });
-const data = {...script, scenes, total: round(cursor), audio: 'soundtrack.m4a', version: script.version || 'day-1'};
+const data = {...script, scenes, totalFrames: cursorFrames, total: round(cursorFrames / script.format.fps), audio: 'soundtrack.m4a', version: script.version || 'day-1'};
 const outputDir = process.env.BODY51_DAY_BUILD_DIR || dayDir;
 fs.mkdirSync(outputDir, {recursive: true});
 fs.writeFileSync(path.join(outputDir, 'timeline.json'), JSON.stringify(data, null, 2) + '\n');

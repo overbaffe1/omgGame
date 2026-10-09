@@ -3,7 +3,7 @@
 (function (root) {
   'use strict';
   root.Body51DayGames = function (a) {
-    const {g, C, box, oval, shape, line, poly, label, local, asset, tag, sparkle, shadow, floor, person, cue, ease, seg, lerp, clamp} = a;
+    const {g, C, box, oval, shape, line, poly, label, local, asset, tag, sparkle, shadow, floor, person, cat, cue, beat, ease, seg, lerp, clamp} = a;
     const TAU = Math.PI * 2;
     function header(title, color = '#c4d6c0', sub = '') {
       box(128, 490, 824, 74, 20, color, C.ink, 4);
@@ -27,8 +27,8 @@
         for (let i = 0; i < 4; i++) shape(p => { p.moveTo(-53 + i * 32, 8); p.quadraticCurveTo(-44 + i * 32, -3, -51 + i * 32, -13); }, null, '#a5784b', 4);
       }, angle);
     }
-    function villager(x, y, s, t, baker = false, arm = 0) {
-      asset(baker ? 'Пекарь' : 'Персонаж White Meridian', x, y, s, [-82, -229, 82, 11], () => {
+    function villager(x, y, s, t, baker = false, arm = 0, shocked = false) {
+      asset(baker ? 'Пекарь' : 'Персонаж White Meridian', x, y, s, [-101, -238, 99, 15], () => {
         const walk = Math.sin(t * 9), bob = Math.abs(walk) * 3;
         line([[-22, -51], [-29 + walk * 7, 0]], C.ink, 21);
         line([[24, -51], [30 - walk * 7, 0]], C.ink, 21);
@@ -48,7 +48,14 @@
             poly([[-40, -124], [39, -124], [24, -101], [-10, -108]], C.coral, C.ink, 3);
           }
           for (const d of [-1, 1]) { oval(d * 16, -153, 3, 5, C.ink); line([[d * 16 - 6, -168 + (baker ? d * 3 : 0)], [d * 16 + 7, -168 - (baker ? d * 3 : 0)]], C.ink, 3); }
-          shape(p => { p.moveTo(-8, -136); p.quadraticCurveTo(0, baker ? -142 : -127, 12, -136); }, null, C.ink, 3);
+          if (shocked && !baker) oval(2, -136, 7, 10, C.ink);
+          else shape(p => { p.moveTo(-8, -136); p.quadraticCurveTo(0, baker ? -142 : -127, 12, -136); }, null, C.ink, 3);
+          if (baker && shocked) {
+            // The ultimate bread guardian's weapon is only a rolling pin.
+            box(-81, -210, 15, 103, 7, '#bb8758', C.ink, 3);
+            box(-95, -203, 42, 69, 15, '#d8ae75', C.ink, 3);
+            line([[-82, -194], [-82, -145]], '#efd0a2', 3);
+          }
         });
       });
     }
@@ -110,15 +117,27 @@
         label('ЛУТ +1', 758, 890 - p * 24, 26, '#e4ce8c', 800, 'center', 190);
       }
       box(182, 1163, 702, 56, 14, '#20363c', '#78907f', 3);
-      label('АВТОБОЙ', 358, 1200, 23, '#bbd4ba', 800, 'left', 220);
-      for (let i = 0; i < 5; i++) { box(526 + i * 60, 1173, 44, 36, 5, '#3b5352', null); coin(548 + i * 60, 1191, 10, i); }
+      label('АВТОБОЙ', 421, 1200, 23, '#bbd4ba', 800, 'left', 220);
+      for (let i = 0; i < 5; i++) { box(590 + i * 54, 1173, 44, 36, 5, '#3b5352', null); coin(612 + i * 54, 1191, 10, i); }
       g.restore();
-      person(235, 1421, .59, t, {pose: 'point'});
-      tag(t > cue(s, 2) ? 'ДАЖЕ ИГРА РАБОТАЕТ' : 'САМ БЬЁТ. САМ ЛУТАЕТ.', 682, 1375, 449, C.yellow, 26, -.018);
+      const camera = ease(seg(t, beat(s, 'camera', cue(s, 2) + .25), beat(s, 'camera', cue(s, 2) + .25) + .26));
+      if (camera > 0) {
+        g.save(); g.globalAlpha = camera;
+        box(100, 1028, 289, 413, 17, '#edf0dc', C.teal, 5);
+        box(100, 1028, 289, 51, 16, C.ink, null);
+        oval(126, 1053, 7, 7, Math.sin(t*4) > 0 ? C.coral : '#ac604e');
+        label('REC', 149, 1062, 24, C.white, 800, 'left', 85);
+        oval(329, 1053, 13, 8, null, '#c0d4b6', 2); oval(329, 1053, 4, 4, '#c0d4b6');
+        label('1', 357, 1061, 22, '#c0d4b6', 800, 'center', 33);
+        g.restore();
+      }
+      person(235, 1421, .59, t, {pose: 'point', puzzled: camera > .5});
+      tag(camera > .5 ? 'ТЕПЕРЬ АРТЁМ — КОНТЕНТ' : 'САМ БЬЁТ. САМ ЛУТАЕТ.', 682, 1375, 449, C.yellow, 25, -.018);
     }
 
-    function backpack(x, y, s, t) {
-      asset('Рюкзак', x, y, s, [-156, -354, 156, 20], () => {
+    function backpack(x, y, s, t, bulge = 0) {
+      asset('Рюкзак', x, y, s, [-183, -403, 183, 22], () => {
+        g.scale(1 + bulge * .11, 1 + bulge * .065);
         shadow(0, 5, 157, 19);
         shape(p => { p.moveTo(-57, -292); p.quadraticCurveTo(-64, -366, 0, -359); p.quadraticCurveTo(64, -366, 57, -292); }, null, C.ink, 25);
         shape(p => { p.moveTo(-57, -292); p.quadraticCurveTo(-64, -366, 0, -359); p.quadraticCurveTo(64, -366, 57, -292); }, null, '#ae805f', 15);
@@ -145,10 +164,18 @@
         label('РЕЛИЗ', 0, -158, 35, C.white, 800, 'center', 260);
         for (const x of [-85, 85]) box(x - 9, -224, 18, 40, 8, '#8d9b91', C.ink, 3);
         for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) box(-105 + c * 62, -104 + r * 51, 30, 26, 4, '#d6dccb', null);
-        label(t < cue(s, 1) + .3 ? 'ПЕРЕНЕСТИ?' : 'ОЙ.', 0, 80, t < cue(s, 1) + .3 ? 27 : 57, C.ink, 800, 'center', 257);
+        const cool = ease(seg(t, beat(s, 'cool', cue(s, 2)), beat(s, 'cool', cue(s, 2)) + .24));
+        if (cool > 0) {
+          local(0, -70*(1-cool), 1, () => {
+            box(-97, 4, 81, 39, 8, C.ink, C.ink, 3); box(16, 4, 81, 39, 8, C.ink, C.ink, 3);
+            line([[-16, 15], [16, 15]], C.ink, 7);
+            line([[-81, 12], [-48, 32]], '#9caaa3', 3); line([[30, 12], [63, 32]], '#9caaa3', 3);
+          });
+          shape(p => { p.moveTo(-30, 76); p.quadraticCurveTo(0, 105, 33, 75); }, null, C.ink, 5);
+        } else label(t < cue(s, 1) + .3 ? 'ПЕРЕНЕСТИ?' : 'ОЙ.', 0, 80, t < cue(s, 1) + .3 ? 27 : 57, C.ink, 800, 'center', 257);
       }, Math.sin(t * 3) * .015 * shower);
       // Arcing cards land inside the open bag, instead of spilling off-screen.
-      backpack(756, 1202, 1.01, t);
+      backpack(756, 1202, 1.01, t, shower * (1 + .06 * Math.sin(t*7)));
       if (t > cue(s, 1)) for (let i = 0; i < 8; i++) {
         const p = ((t - cue(s, 1)) * .69 + i * .123) % 1;
         const x = lerp(429, 760, p), y = lerp(950, 951, p) - Math.sin(p * Math.PI) * 127;
@@ -185,10 +212,14 @@
       box(253, 912, 218, 40, 8, '#f4e2b8', C.ink, 3); label('ПЕКАРНЯ', 362, 941, 25, C.ink, 800, 'center', 193);
       const steal = ease(seg(t, cue(s, 2) + .1, cue(s, 2) + 1.4));
       const chase = t > cue(s, 2) + .1 ? t : 0;
-      villager(354 + steal * 55, 1188, .96, chase, true, steal);
-      villager(712 + Math.sin(chase * 2) * 20 * steal, 1190, 1, chase, false, 0);
+      const boss = ease(seg(t, beat(s, 'boss', cue(s, 3) + .45), beat(s, 'boss', cue(s, 3) + .45) + .42));
+      if (boss > 0) {
+        g.save(); g.globalAlpha = boss * .1; box(142, 591, 796, 639, 0, '#90584b', null); g.restore();
+      }
+      villager(354 + steal * 55 - boss * 10, 1188, .96 + boss * 1.08, chase, true, steal, boss > .1);
+      villager(712 + Math.sin(chase * 2) * 20 * steal + boss * 28, 1190, 1 - boss*.09, chase, false, 0, boss > .1);
       bread(lerp(454, 657, steal), 1091 - Math.sin(steal * Math.PI) * 76, .62, Math.sin(t * 3) * .05);
-      if (steal > .5) {
+      if (steal > .5 && boss < .2) {
         tag('ГДЕ ХЛЕБ?!', 690, 861, 275, C.white, 28, -.025);
         poly([[620, 891], [641, 912], [659, 887]], C.white, C.ink, 3);
       }
@@ -199,9 +230,17 @@
         oval(640 - p * 45 + i * 7, 1198 - p * 20, 10 + p * 13, 7 + p * 6, C.white);
         g.restore();
       }
+      if (boss > 0) {
+        g.save(); g.globalAlpha = boss;
+        box(163, 604, 754, 109, 13, '#293b3c', '#172f34', 4);
+        label('ПЕКАРЬ · ХРАНИТЕЛЬ БАТОНА', 540, 645, 27, C.white, 800, 'center', 711);
+        box(183, 669, 714, 22, 8, '#795851', null);
+        box(187, 673, 686, 14, 5, C.coral, null);
+        g.restore();
+      }
       g.restore();
-      if (t > cue(s, 3)) {
-        tag('ЭПИЧЕСКИЙ ЛУТ', 328, 1326, 355, C.yellow, 29, -.015);
+      if (boss > .4) {
+        tag('АГРО +100', 328, 1326, 355, C.yellow, 29, -.015);
         bread(771, 1325, 1.32, -.09 + Math.sin(t * 2) * .025);
         sparkle(625, 1330, 15, '#af9852', .2); sparkle(914, 1291, 13, '#af9852', -.2);
       } else tag('СНАЧАЛА — НАКОРМИТЬ НПС', 540, 1334, 644, '#cbdabd', 27, -.018);
