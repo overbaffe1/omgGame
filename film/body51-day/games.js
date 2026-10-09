@@ -3,7 +3,7 @@
 (function (root) {
   'use strict';
   root.Body51DayGames = function (a) {
-    const {g, C, box, oval, shape, line, poly, label, local, asset, tag, sparkle, shadow, floor, person, cat, cue, beat, ease, seg, lerp, clamp} = a;
+    const {g, C, box, oval, shape, line, poly, label, local, asset, tag, sparkle, shadow, floor, person, cat, focus, cue, beat, ease, seg, lerp, clamp} = a;
     const TAU = Math.PI * 2;
     function header(title, color = '#c4d6c0', sub = '') {
       box(128, 490, 824, 74, 20, color, C.ink, 4);
@@ -95,23 +95,39 @@
         },swing);
       });
     }
-    function dungeonSkeleton(x,y,t,shop=false) {
+    function dungeonSkeleton(x,y,t,shop=false,sit=0) {
       local(x,y,1,()=>{
-        const tap=shop?Math.max(0,Math.sin(t*8))*6:Math.sin(t*11)*6;
-        line([[-14,-40],[-25,1]],'#c6cbb1',10);line([[14,-40],[24,1-tap]],'#c6cbb1',10);
-        oval(-27,5,16,6,'#b8c2a8',C.ink,2);oval(27,5-tap,16,6,'#b8c2a8',C.ink,2);
-        line([[0,-100],[0,-36]],'#c6cbb1',10);
-        for(let k=0;k<3;k++)line([[-23,-88+k*15],[24,-88+k*15]],'#c6cbb1',7);
-        oval(0,-130,35,34,'#d7d8bf',C.ink,4);
-        for(const d of [-1,1])oval(d*12,-133,7,9,C.ink);
-        line([[-18,-111],[18,-111]],C.ink,3);
-        line([[-20,-97],shop?[-66,-95]:[-47,-76]],'#c6cbb1',9);
-        line([[20,-96],shop?[53,-65]:[48,-108]],'#c6cbb1',9);
-        if(shop){
-          line([[-21,-147],[-6,-143]],C.ink,3);
-          box(-23,-94,45,65,5,'#a7786c',C.ink,3);
-          line([[-18,-92],[19,-92]],'#c4a38a',3);
+        if(sit>0){
+          g.save();g.globalAlpha=ease(Math.min(1,sit*3));
+          line([[-43,-34],[-50,6]],'#a37f58',8);line([[43,-34],[50,6]],'#a37f58',8);
+          box(-59,-48,118,14,6,'#d9b879',C.ink,3);g.restore();
         }
+        const tap=shop&&sit<.8?Math.max(0,Math.sin(t*8))*6:0;
+        const hips=-63+23*sit;
+        for(const d of [-1,1]){
+          const knee=[d*(18+30*sit),-30+6*sit],foot=[d*30,1-(d>0?tap:0)];
+          line([[d*14,hips],knee,foot],'#c6cbb1',10);
+          oval(d*31,5-(d>0?tap:0),17,6,'#b8c2a8',C.ink,2);
+        }
+        local(0,hips+36,1,()=>{
+          line([[0,-100],[0,-36]],'#c6cbb1',10);
+          for(let k=0;k<3;k++)line([[-23,-88+k*15],[24,-88+k*15]],'#c6cbb1',7);
+          local(0,-130,1,()=>{
+            oval(0,0,35,34,'#d7d8bf',C.ink,4);
+            for(const d of [-1,1])oval(d*12,-3,7,shop?6:9,C.ink);
+            line([[-18,19],[18,19]],C.ink,3);
+            if(shop)line([[-24,-17],[-7,-12]],C.ink,3);
+          },sit*.11);
+          line([[-20,-97],shop?[-66,-95]:[-47,-76]],'#c6cbb1',9);
+          line([[20,-96],shop?[51,-68-sit*13]:[48,-108]],'#c6cbb1',9);
+          if(shop){
+            box(-23,-94,45,65,5,'#a7786c',C.ink,3);line([[-18,-92],[19,-92]],'#c4a38a',3);
+            // The monster has become the bored attendant: checks its wrist,
+            // then sits on a stool and waits while the player changes again.
+            oval(43,-77-sit*8,8,8,C.yellow,C.ink,2);
+            line([[43,-82-sit*8],[43,-77-sit*8],[48,-75-sit*8]],C.ink,1.5);
+          }
+        });
       });
     }
     function hellfarmer(s,t) {
@@ -136,12 +152,13 @@
       }
       const fight=beat(s,'fight',cue(s,2)),fittingAt=beat(s,'fitting',cue(s,3)+.15);
       const shop=ease(seg(t,fittingAt,fittingAt+.36));
+      const sitAt=beat(s,'stool',fittingAt+1.85),sit=ease(seg(t,sitAt,sitAt+.42));
       const phase=t<fight?0:((t-fight)/.85)%1;
       const hit=shop>0?0:ease(seg(phase,.12,.30))*(1-ease(seg(phase,.52,.85)));
       const down=t>fight&&phase>.26&&phase<.65&&shop===0;
       shadow(479,1132,91,16);shadow(755,1132,65,13);
-      dungeonHero(475+hit*20,1122,t,shop>0?-.1:lerp(-.63,.75,hit),shop>0?(Math.floor(t*2)%2?'#7b997f':'#698aab'):'#b7c1a4');
-      if(!down)dungeonSkeleton(756-hit*17,1120,t,shop>.8);
+      dungeonHero(475+hit*20+(shop>.8?Math.sin(t*7)*3:0),1122-(shop>.8?Math.max(0,Math.sin(t*7))*4:0),t,shop>0?-.1:lerp(-.63,.75,hit),shop>0?(Math.floor(t*2)%2?'#7b997f':'#698aab'):'#b7c1a4');
+      if(!down)dungeonSkeleton(756-hit*17,1120,t,shop>.8,sit);
       if(down){
         const p=seg(phase,.26,.65);
         for(let k=0;k<7;k++)sparkle(725+Math.cos(k*TAU/7)*(16+p*63),982+Math.sin(k*TAU/7)*p*53,7*(1-p)+3,C.yellow,k);
@@ -169,7 +186,7 @@
           if(selected)poly([[xx+34,947],[xx+36,914],[xx+60,937],[xx+47,937],[xx+53,949],[xx+45,953],[xx+39,941]],C.white,C.ink,2);
         }
         g.restore();
-        if(t>beat(s,'anotherPair',cue(s,3)+1.25))trousers(690,1060,.73,'#c39496',true);
+        if(t>beat(s,'anotherPair',cue(s,3)+1.25))trousers(690,1033+23*sit,.73,'#c39496',true);
       }
       // Genre cues, not the old AUTO button or a fake webcam/viewer counter.
       box(166,1198,748,83,15,'#203139','#667667',3);
@@ -183,8 +200,8 @@
         else{box(339+k*78,1226,17,26,5,k?'#6786b0':'#b36c58',null);box(342+k*78,1220,11,9,2,'#d0bb82',null);}
       }
       g.restore();
-      if(shop>.8) tag('ДЕМОНЫ ПОДОЖДУТ',540,1380,476,C.yellow,29,-.016);
-      else tag('ЕЩЁ ОДИН ЗАБЕГ',540,1380,425,'#d6c094',29,-.016);
+      // The waiting pose carries the punchline; no second explanatory banner.
+      focus('Примерочная',170,605,725,590);
     }
 
     function backpack(x, y, s, t, bulge = 0) {

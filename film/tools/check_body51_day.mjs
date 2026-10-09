@@ -19,7 +19,7 @@ if (data.version !== 'day-1') {
   assert(!data.scenes.some(s => s.voice === 'd08'));
   assert.equal(data.format.fps, 60);
 }
-if (data.version === 'day-5') {
+if (['day-5','day-6'].includes(data.version)) {
   assert.equal(data.scenes.length,10);
   assert(!data.scenes.some(s=>s.id==='printers'||/принтер/i.test(s.text)||/printers/i.test(s.voice)),'Removed subject returned');
   const game=data.scenes.find(s=>s.id==='hellfarmer');
@@ -57,7 +57,7 @@ for (let frame = 0; frame < frames; frame++) {
     for (const text of report.drawnText || []) assert(!forbidden.test(text), `Forbidden overlay: ${text}`);
   }
   const pose = report.scene === 'wake' ? report.action?.bedPose : null;
-  if (pose && ['day-4','day-5'].includes(data.version)) {
+  if (pose && ['day-4','day-5','day-6'].includes(data.version)) {
     if (frame < data.format.fps) {
       assert.equal(pose.phase, 'lying');
       assert(Math.abs(pose.angle + Math.PI/2) < .001, 'Sleeper must be horizontal');
@@ -73,9 +73,20 @@ for (let frame = 0; frame < frames; frame++) {
     lastBedPose=pose;
   }
   for (const b of report.bounds) {
-    assert(b.x >= actionBounds.left && b.right <= actionBounds.right && b.y >= actionBounds.top && b.bottom <= actionBounds.bottom,
-      `frame ${frame} / ${report.scene}: ${b.name} outside action area: ${JSON.stringify(b)}`);
+    const portraitCrop=report.shot?.crop?.includes(b.name);
+    // Only the lower figure may leave a designed portrait; the face, cat and
+    // visible palms have independent all-frame guards below. Wide shots remain
+    // fully bounded. This is not a blanket exemption for zoomed images.
+    assert(b.x >= actionBounds.left && b.right <= actionBounds.right && b.y >= actionBounds.top && (portraitCrop || b.bottom <= actionBounds.bottom),
+      `frame ${frame} / ${report.scene} / ${report.shot?.name}: ${b.name} outside action area: ${JSON.stringify(b)}`);
     assets++;
+  }
+  if(data.version==='day-6') {
+    for(const name of report.shot.required) {
+      const found=report.focusBoxes.filter(b=>b.name===name);
+      assert(found.length>0,`Missing required close-up subject: ${name}`);
+      for(const b of found) assert(b.x>=32&&b.right<=1048&&b.y>=88&&b.bottom<=1555,`Cropped close-up subject ${name}: ${JSON.stringify(b)}`);
+    }
   }
   for (const b of report.textBoxes) {
     assert(b.x >= 56 && b.x + b.w <= 1024 && b.y >= 60 && b.y + b.h <= 1840,
@@ -89,7 +100,7 @@ for (const s of data.scenes) {
     assert.equal(movie.draw((s.endFrame - 1) / data.format.fps).scene, s.id, `Early scene cut: ${s.id}`);
   }
 }
-if (data.version === 'day-5') {
+if (['day-5','day-6'].includes(data.version)) {
   const s=data.scenes[0],ev=s.events;
   const at=t=>movie.draw(s.start+t).action.bedPose;
   for(const [time,phase] of [[ev.swat-.03,'waiting'],[ev.swat+.12,'outbound'],[(ev.pillow+ev.rebound)/2,'pillow'],[(ev.rebound+ev.catch)/2,'returning'],[ev.catch+.4,'caught']]) assert.equal(at(time).catPhase,phase);
@@ -101,6 +112,17 @@ if (data.version === 'day-5') {
   const f=data.scenes.at(-1),perched=movie.draw(f.start+f.events.catPerch+.5).action.finaleCat;
   assert.equal(perched.phase,'perched');assert(Math.hypot(perched.position[0]-perched.head[0],perched.position[1]-perched.head[1])<.01);
   console.log('✓ Palm contact → pillow squash → rebound → catch; finale perch; no removed scene/premise');
+}
+if(data.version==='day-6') {
+  const wake=data.scenes[0],late=movie.draw(wake.start+wake.events.catch+.6);
+  assert.equal(late.shot.name,'wake-reaction');assert(late.shot.zoom>2.9);
+  assert(!late.drawnText.some(t=>t==='Кот не удаляется.'),'Punchline must be acted, not a headline');
+  const f=data.scenes.at(-1),high=movie.draw(f.start+f.events.catLaunch-.05).action.pullup;
+  const low=movie.draw(f.start+f.events.catPerch+.8).action.pullup;
+  assert(high.noseY<high.barY,'Pull-up never reaches the bar');
+  assert(low.noseY>low.barY+200,'Cat has no visible weight');
+  for(const p of [high,low])assert(Math.abs(p.feetY+p.gripY*1.085-p.barY)<.001,'Hands left the bar');
+  console.log('✓ Designed close-ups, unobstructed faces/cat/hands, pull-up anticipation and weighted drop');
 }
 const digest = t => { movie.draw(t); return createHash('sha256').update(canvas.toBuffer('image/png')).digest('hex'); };
 for (const t of data.scenes.map(s => s.start + s.duration * .7)) {

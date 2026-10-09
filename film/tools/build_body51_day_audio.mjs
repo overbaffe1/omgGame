@@ -83,7 +83,7 @@ for (const s of data.scenes) {
     add(event(s,'blanket'),1.8,(t,u)=>{soft+=.1*(noise()-soft);return soft*.029*Math.sin(Math.PI*u);});
     knock(event(s,'feet')+.25,.026);knock(event(s,'feet')+.39,.024);
     const swat=event(s,'swat'),pillow=event(s,'pillow'),rebound=event(s,'rebound'),caught=event(s,'catch');
-    musicRest(swat-.10,caught-swat+.40);
+    musicRest(swat-.10,Math.max(caught+.40,s.start+s.lead+s.speech+.16)-(swat-.10));
     knock(swat,.044);
     add(swat,.23,(t,u)=>noise()*.026*Math.sin(Math.PI*u));
     knock(pillow,.038);boing(rebound,.047);
@@ -112,6 +112,7 @@ for (const s of data.scenes) {
     let fabric=0;
     add(changing,.42,(t,u)=>{fabric+=.12*(noise()-fabric);return fabric*.035*Math.sin(Math.PI*u);});
     knock(event(s,'anotherPair'),.034);bell(event(s,'anotherPair')+.10,81,.025,.22);
+    knock(event(s,'stool')+.32,.032);
   }
   if (s.id === 'inspector') {
     for (let j = 0; j < 4; j++) pluck(cue(s, 1, .65 + j * .75), 74 + j * 2, .028, .22);
@@ -133,6 +134,7 @@ for (const s of data.scenes) {
     const from = cue(s, 3, -.08), to = s.start + s.lead + s.speech;
     musicRest(from,to+.05-from);
     knock(event(s,'catPerch'),.038);
+    let creak=0;add(event(s,'catPerch')+.09,.34,(t,u)=>{creak+=.13*(noise()-creak);return creak*.025*Math.sin(Math.PI*u);});
     [74,78,81].forEach((m,i)=>bell(to+.15+i*.14,m,.04,.7));
   }
 }

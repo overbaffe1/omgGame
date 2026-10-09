@@ -113,7 +113,7 @@ try {
     assert(pose.text.every(s => !/@body51|ЗА КАДРОМ|ПО СТРИМАМ|#\d{3}/i.test(s)));
     console.log('✓ Browser bed poses and clean frame: no watermarks or source overlays');
   }
-  if(data.version==='day-5') {
+  if(['day-5','day-6'].includes(data.version)) {
     const story = await page.evaluate(()=>{
       const {movie,data}=window.__body51DayPlayer,s=data.scenes[0];
       const samples=[s.events.swat-.03,s.events.swat+.12,(s.events.pillow+s.events.rebound)/2,(s.events.rebound+s.events.catch)/2,s.events.catch+.5];
@@ -126,6 +126,18 @@ try {
     assert(story.gear.some(t=>t==='ПРИМЕРОЧНАЯ'));
     assert(story.gear.every(t=>!/автобой|принтер/i.test(t)));
     console.log('✓ Browser: swat / soft rebound / catch, ten chapters, new Hellfarmer gear gag');
+  }
+  if(data.version==='day-6') {
+    const acting=await page.evaluate(()=>{
+      const {movie,data}=window.__body51DayPlayer,w=data.scenes[0],f=data.scenes.at(-1);
+      const close=movie.draw(w.events.catch+.6);
+      const high=movie.draw(f.start+f.events.catLaunch-.05).action.pullup;
+      const low=movie.draw(f.start+f.events.catPerch+.8).action.pullup;
+      return {shot:close.shot.name,zoom:close.shot.zoom,faces:close.focusBoxes.filter(b=>b.name==='Лицо Артёма'),high,low};
+    });
+    assert.equal(acting.shot,'wake-reaction');assert(acting.zoom>2.9);assert(acting.faces.length);
+    assert(acting.high.noseY<acting.high.barY);assert(acting.low.noseY>acting.low.barY+200);
+    console.log('✓ Directed portrait composition, facial close-up, pull-up anticipation and weighted drop');
   }
   await page.locator('#toggle').click();
   await page.waitForFunction(() => document.getElementById('live-audio').currentTime > 29.2);

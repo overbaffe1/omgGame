@@ -19,7 +19,7 @@
     // switch GPU → CPU after a snapshot, changing edge pixels on a seek.
     // NAPI's offline context is unchanged; this only affects the live viewer.
     const g = canvas.getContext('2d', canvas.ownerDocument ? {willReadFrequently:true} : undefined);
-    let bounds = [], textBoxes = [], drawnText = [], current, now = 0;
+    let bounds = [], textBoxes = [], drawnText = [], focusBoxes = [], current, view, now = 0;
     const scale = canvas.width / W;
     function fill(col) { g.fillStyle = col; g.fill(); }
     function stroke(col = C.ink, width = 5) { g.strokeStyle = col; g.lineWidth = width; g.stroke(); }
@@ -65,13 +65,19 @@
       bounds.push({name, x: Math.min(...screen.map(p => p[0])), y: Math.min(...screen.map(p => p[1])), right: Math.max(...screen.map(p => p[0])), bottom: Math.max(...screen.map(p => p[1]))});
       local(x, y, s, fn, rotation);
     }
+    function focus(name,x,y,w,h) {
+      const m=g.getTransform(), points=[[x,y],[x+w,y],[x+w,y+h],[x,y+h]].map(([a,b])=>[(m.a*a+m.c*b+m.e)/scale,(m.b*a+m.d*b+m.f)/scale]);
+      focusBoxes.push({name,x:Math.min(...points.map(p=>p[0])),y:Math.min(...points.map(p=>p[1])),right:Math.max(...points.map(p=>p[0])),bottom:Math.max(...points.map(p=>p[1]))});
+    }
     function tag(str, x, y, w, col = C.yellow, size = 27, angle = 0) {
       local(x, y, 1, () => { box(-w / 2, -31, w, 62, 13, col, C.ink, 3); label(str, 0, 10, size, C.ink, 800, 'center', w - 28); }, angle);
     }
     function sparkle(x, y, r, col = C.yellow, t = 0) {
       local(x, y, 1, () => poly([[0, -r], [r * .25, -r * .25], [r, 0], [r * .25, r * .25], [0, r], [-r * .25, r * .25], [-r, 0], [-r * .25, -r * .25]], col, null), t);
     }
-    function shadow(x, y, w, h = 23) { oval(x, y, w, h, '#293b3c14'); }
+    function shadow(x, y, w, h = 23) {
+      local(x,y,1,()=>{g.scale(w,h);const shade=g.createRadialGradient(0,0,.10,0,0,1);shade.addColorStop(0,'#233c3a2b');shade.addColorStop(.5,'#233c3a18');shade.addColorStop(1,'#233c3a00');oval(0,0,1,1,shade);});
+    }
     function floor(y = 1390, dark = false) {
       oval(540, y, 452, 53, dark ? '#182c3d' : '#dfdcc9');
       line([[102, y + 49], [979, y + 49]], dark ? '#536774' : '#c4caba', 3);
@@ -113,9 +119,11 @@
     // This remains an illustration, not a face texture pasted onto a character.
     function artemFace(t, options = {}) {
       const sleepy = options.sleepy, puzzled = options.puzzled;
-      const look = options.pose === 'type' ? 4 : options.pose === 'point' || puzzled ? 5 : Math.sin(t * .8) * 1.6;
+      const look = options.gazeX ?? (options.pose === 'type' ? 4 : options.pose === 'point' || puzzled ? 5 : Math.sin(t * .8) * 1.6);
+      const turn = options.turn || 0, expression = options.expression || '';
+      const nightLight = current?.id === 'night';
       g.save(); g.translate(0, -385 + Math.sin(t * 1.7) * 1.4);
-      g.rotate(Math.sin(t * .9) * (puzzled ? .035 : .012)); g.translate(0, 385);
+      g.rotate((options.tilt || 0) + Math.sin(t * .9) * (puzzled ? .025 : .010)); g.translate(0, 385);
       for (const d of [-1, 1]) {
         oval(d * 77, -427, 14, 23, C.skin, C.ink, 4);
         shape(p => { p.moveTo(d * 79, -436); p.quadraticCurveTo(d * 86, -426, d * 78, -416); }, null, '#ba9376', 2.5);
@@ -125,6 +133,11 @@
         p.quadraticCurveTo(85, -462, 78, -416); p.quadraticCurveTo(77, -354, 17, -340);
         p.quadraticCurveTo(-55, -340, -72, -398); p.quadraticCurveTo(-85, -445, -67, -473); p.closePath();
       }, C.skin, C.ink, 4.5);
+      g.save();
+      g.beginPath();g.moveTo(-67,-473);g.bezierCurveTo(-59,-521,30,-530,66,-488);g.quadraticCurveTo(85,-462,78,-416);g.quadraticCurveTo(77,-354,17,-340);g.quadraticCurveTo(-55,-340,-72,-398);g.quadraticCurveTo(-85,-445,-67,-473);g.closePath();g.clip();
+      const cheek=g.createLinearGradient(-83,0,85,0);
+      cheek.addColorStop(0,nightLight?'#233e5b4d':'#fff1c833');cheek.addColorStop(.53,'#f5d2ae00');cheek.addColorStop(1,nightLight?'#8bd4df66':'#b4765040');
+      g.fillStyle=cheek;g.fillRect(-95,-535,190,210);g.restore();
       // Short brushed-up hair, receding temples and a visible forehead; no quiff.
       shape(p => {
         p.moveTo(-75, -415); p.lineTo(-82, -458); p.quadraticCurveTo(-83, -500, -50, -516);
@@ -141,14 +154,15 @@
       // Gentle forehead creases and warm, less childlike cheeks.
       shape(p => { p.moveTo(-30, -464); p.quadraticCurveTo(0, -471, 31, -464); }, null, '#d7ac8b', 2);
       oval(-49, -399, 16, 8, '#e5b394'); oval(53, -399, 14, 8, '#e5b394');
-      const blink = sleepy || t % 4.6 > 4.43;
+      g.save();g.translate(turn*13,0);g.scale(1-Math.abs(turn)*.12,1);
+      const blink = sleepy || (options.blink !== undefined ? options.blink : t % 4.6 > 4.43);
       for (const d of [-1, 1]) {
         const ex = d * 29 + 2;
-        const raise = puzzled && d === 1 ? -9 : Math.sin(t * .8 + d) * 1.3;
+        const raise = expression === 'surprised' ? -13 : expression === 'strain' ? -3*d : expression === 'resigned' ? 3 : puzzled && d === 1 ? -9 : Math.sin(t * .8 + d) * 1.3;
         shape(p => { p.moveTo(ex - 15, -444 + raise); p.quadraticCurveTo(ex, -451 + raise, ex + 15, -443 + raise); }, null, '#6c634b', 5);
         if (blink) shape(p => { p.moveTo(ex - 13, -424); p.quadraticCurveTo(ex, -417, ex + 13, -424); }, null, C.ink, 3.5);
         else {
-          oval(ex, -423, 13, 12.5, '#fff4df'); oval(ex + look, -422 + (options.lookY || 0), 5.8, 9, '#73909a');
+          oval(ex, -423, 13*(1-(d===Math.sign(turn)?Math.abs(turn)*.3:0)), expression==='surprised'?16:12.5, '#fff4df'); oval(ex + look, -422 + (options.lookY || 0), 5.8, 9, '#73909a');
           oval(ex + look + .6, -421 + (options.lookY || 0), 2.8, 5.8, C.ink); oval(ex + look + 2, -425 + (options.lookY || 0), 1.8, 2, C.white);
           shape(p => { p.moveTo(ex - 13, -426); p.quadraticCurveTo(ex, -439, ex + 13, -426); }, null, '#655b48', 2.5);
         }
@@ -157,8 +171,10 @@
       // A broader nose with a rounded tip, instead of the old little triangle.
       shape(p => { p.moveTo(5, -426); p.quadraticCurveTo(5, -407, 14, -397); p.quadraticCurveTo(15, -387, 3, -388); }, null, '#b98565', 3);
       shape(p => { p.moveTo(-7, -393); p.quadraticCurveTo(-1, -385, 8, -390); }, null, '#b98565', 2.5);
+      g.restore();
       // Full rounded beard, silver at the lower cheeks; follows the reference's
       // silhouette and overlaps the collar rather than becoming sparse stubble.
+      g.save();g.translate(0,-389);g.rotate(options.beardSwing || Math.sin(t*1.7)*.006);g.translate(0,389);
       shape(p => {
         p.moveTo(-73, -414); p.quadraticCurveTo(-57, -404, -54, -383);
         p.quadraticCurveTo(-34, -390, -17, -379); p.quadraticCurveTo(6, -386, 29, -378);
@@ -169,19 +185,28 @@
       }, '#5d6457', C.ink, 4.5);
       shape(p => { p.moveTo(-65, -380); p.quadraticCurveTo(-80, -327, -44, -299); p.quadraticCurveTo(-57, -349, -40, -370); }, '#7e8370', null);
       shape(p => { p.moveTo(60, -377); p.quadraticCurveTo(72, -329, 39, -298); p.quadraticCurveTo(52, -344, 38, -368); }, '#737b68', null);
-      shape(p => { p.moveTo(-25, -373); p.quadraticCurveTo(5, -388, 32, -372); p.quadraticCurveTo(36, -353, 7, -348); p.quadraticCurveTo(-23, -350, -25, -373); }, C.skin, null);
-      if (options.yawn) oval(4, -362, 12, 16, '#845c4c', C.ink, 2.5);
-      else if (sleepy) shape(p => { p.moveTo(-10, -363); p.quadraticCurveTo(4, -360, 17, -364); }, null, '#624f43', 2.5);
-      else if (options.deadpan) line([[-14,-362],[25,-362]],'#624f43',3);
-      else if (options.talk) oval(5, -361, 10, 3 + Math.abs(Math.sin(t * 13)) * 8, '#805b4e', '#624f43', 2);
-      else shape(p => { p.moveTo(-15, -363); p.quadraticCurveTo(6, puzzled ? -362 : -352, 26, -365); }, null, '#624f43', 3);
-      // Moustache is drawn last so the mouth can emote without changing identity.
-      shape(p => { p.moveTo(3, -384); p.quadraticCurveTo(-18, -390, -34, -372); p.quadraticCurveTo(-19, -365, 4, -378); p.quadraticCurveTo(21, -366, 38, -372); p.quadraticCurveTo(28, -388, 3, -384); }, '#625e48', null);
       for (let i = 0; i < 19; i++) {
         const row = Math.floor(i / 5), col = i % 5;
         const x = -48 + col * 22 + (row % 2) * 6, y = -348 + row * 17 + (i % 3) * 3;
         shape(p => { p.moveTo(x - 4, y - 4); p.quadraticCurveTo(x - 6, y + 7, x + 2, y + 9); }, null, i % 3 ? '#89917c' : '#a3a68d', 2.2);
       }
+      if(nightLight){
+        const rim=g.createLinearGradient(-55,0,77,0);rim.addColorStop(0,'#73bdcd00');rim.addColorStop(1,'#8ed7d13b');
+        shape(p=>{p.moveTo(43,-386);p.quadraticCurveTo(80,-348,48,-301);p.quadraticCurveTo(68,-333,43,-386);},rim,null);
+      }
+      g.restore();
+      shape(p => { p.moveTo(-25, -373); p.quadraticCurveTo(5, -388, 32, -372); p.quadraticCurveTo(36, -353, 7, -348); p.quadraticCurveTo(-23, -350, -25, -373); }, C.skin, null);
+      if (expression==='strain') { box(-16,-372,41,17,5,'#f6e9d3','#624f43',2.5);line([[-10,-364],[19,-364]],'#886950',2); }
+      else if (expression==='surprised') oval(4,-363,11,16,'#785447',C.ink,2.5);
+      else if (options.yawn) oval(4, -362, 12, 16, '#845c4c', C.ink, 2.5);
+      else if (sleepy) shape(p => { p.moveTo(-10, -363); p.quadraticCurveTo(4, -360, 17, -364); }, null, '#624f43', 2.5);
+      else if (options.deadpan || expression==='resigned') line([[-14,-362],[25,-362]],'#624f43',3);
+      else if (options.talk) oval(5, -361, 10, 3 + Math.abs(Math.sin(t * 13)) * 8, '#805b4e', '#624f43', 2);
+      else shape(p => { p.moveTo(-15, -363); p.quadraticCurveTo(6, puzzled ? -362 : -352, 26, -365); }, null, '#624f43', 3);
+      // Moustache is drawn last so the mouth can emote without changing identity.
+      shape(p => { p.moveTo(3, -384); p.quadraticCurveTo(-18, -390, -34, -372); p.quadraticCurveTo(-19, -365, 4, -378); p.quadraticCurveTo(21, -366, 38, -372); p.quadraticCurveTo(28, -388, 3, -384); }, '#625e48', null);
+
+      focus('Лицо Артёма',-102,-541,204,286);
       g.restore();
     }
 
@@ -189,6 +214,9 @@
         box(-31, -354, 62, 71, 16, C.skin, C.ink, 4);
         const breath = Math.sin(t * 1.7) * 1.6;
         shape(p => { p.moveTo(-42, -323); p.quadraticCurveTo(-110, -330, -101, -271); p.lineTo(-93 - breath, -157); p.quadraticCurveTo(0, -138, 95 + breath, -158); p.lineTo(103, -271); p.quadraticCurveTo(104, -326, 40, -323); p.quadraticCurveTo(0, -299, -42, -323); p.closePath(); }, '#343d3b');
+        const clothShade=g.createLinearGradient(-100,0,103,0);
+        clothShade.addColorStop(0,current?.id==='night'?'#172e4f44':'#eff1ce0c');clothShade.addColorStop(.6,'#25445100');clothShade.addColorStop(1,current?.id==='night'?'#81c8d145':'#101c202e');
+        shape(p=>{p.moveTo(-78,-301);p.lineTo(77,-299);p.lineTo(91,-174);p.quadraticCurveTo(0,-155,-87,-174);p.closePath();},clothShade,null);
         line([[-89, -175], [91, -175]], '#525e55', 4);
         // A light screen-printed graphic echoes the dark T-shirt in the photo.
         line([[-54, -245], [54, -245], [54, -198], [-54, -198], [-54, -245]], '#aeb9a9', 1.7);
@@ -197,11 +225,16 @@
         artemFace(t, options);
     }
 
+    function elbowJoint(sx,sy,hx,hy,side) {
+      const dx=hx-sx,dy=hy-sy,d=Math.max(.001,Math.hypot(dx,dy)),l=173;
+      const along=Math.min(d/2,l),height=Math.sqrt(Math.max(0,l*l-along*along));
+      return [sx+dx/d*along-dy/d*height*side,sy+dy/d*along+dx/d*height*side];
+    }
     function person(x, y, s, t, options = {}) {
       const hang = options.hang || 0, pose = options.pose || 'stand';
       const sleepy = options.sleepy || false, flip = options.flip ? -1 : 1;
       const sway = hang * Math.sin(t * 1.9) * .027, gripY = options.gripY ?? -545;
-      asset('Артём', x, y, s, [-204, Math.min(-578, gripY-32), 204, 20], () => {
+      asset('Артём', x, y, s, [-lerp(204,302,hang), Math.min(-578, gripY-32), lerp(204,302,hang), 20], () => {
         // A hanging body sways below the grip, but neither hand slides off the bar.
         g.transform(1, 0, sway, 1, -gripY*sway, 0); g.scale(flip, 1);
         // Feet / trouser legs. Every limb has a filled silhouette, not a stick rig.
@@ -225,19 +258,19 @@
           const type = pose === 'type' && d === 1;
           const handX = lerp(d * (point || type ? 169 : 111), d * 128, hang);
           const handY = lerp(point ? -330 : type ? -264 + Math.sin(t * 11) * 7 : -164, gripY, hang);
-          const elbowX = lerp(d * (point || type ? 119 : 105), d * 105, hang);
-          const elbowY = lerp(point ? -270 : type ? -235 : -231, -415, hang);
           const shoulderX = d * 83, shoulderY = -292;
-          shape(p => { p.moveTo(shoulderX, shoulderY); p.quadraticCurveTo(elbowX, elbowY, handX, handY); }, null, C.ink, 44);
-          shape(p => { p.moveTo(shoulderX, shoulderY); p.quadraticCurveTo(elbowX, elbowY, handX, handY); }, null, C.skin, 35);
-          const k = .42, sleeveX = (1-k)**2 * shoulderX + 2*(1-k)*k * elbowX + k*k * handX;
-          const sleeveY = (1-k)**2 * shoulderY + 2*(1-k)*k * elbowY + k*k * handY;
-          shape(p => { p.moveTo(shoulderX, shoulderY); p.quadraticCurveTo(lerp(shoulderX, elbowX, k), lerp(shoulderY, elbowY, k), sleeveX, sleeveY); }, null, C.ink, 50);
-          shape(p => { p.moveTo(shoulderX, shoulderY); p.quadraticCurveTo(lerp(shoulderX, elbowX, k), lerp(shoulderY, elbowY, k), sleeveX, sleeveY); }, null, '#343d3b', 41);
+          const hangingElbow=elbowJoint(shoulderX,shoulderY,handX,handY,d);
+          const elbowX = lerp(d * (point || type ? 119 : 105), hangingElbow[0], hang);
+          const elbowY = lerp(point ? -270 : type ? -235 : -231, hangingElbow[1], hang);
+          const arm=p=>{p.moveTo(shoulderX,shoulderY);p.lineTo(lerp(shoulderX,elbowX,.82),lerp(shoulderY,elbowY,.82));p.quadraticCurveTo(elbowX,elbowY,lerp(elbowX,handX,.18),lerp(elbowY,handY,.18));p.lineTo(handX,handY);};
+          shape(arm, null, C.ink, 44);shape(arm, null, C.skin, 35);
+          const sleeveX=lerp(shoulderX,elbowX,.55),sleeveY=lerp(shoulderY,elbowY,.55);
+          line([[shoulderX,shoulderY],[sleeveX,sleeveY]],C.ink,50);
+          line([[shoulderX,shoulderY],[sleeveX,sleeveY]],'#343d3b',41);
           oval(handX, handY, 23, 26, C.skin, C.ink, 4, -.25 * d);
           if (hang > .8) line([[handX - 9, handY - 11], [handX - 7, handY + 3]], '#c28d71', 3);
         }
-        upperBody(t, {sleepy, pose, puzzled: options.puzzled, talk: options.talk, yawn: options.yawn, lookY: options.lookY});
+        upperBody(t, {sleepy, pose, puzzled: options.puzzled, talk: options.talk, yawn: options.yawn, lookY: options.lookY, gazeX:options.gazeX, turn:options.turn, expression:options.expression, beardSwing:options.beardSwing});
       });
     }
 
@@ -254,6 +287,7 @@
         }
         poly([[12, -138], [31, -138], [22, -130]], '#85535b', C.ink, 2);
         line([[22, -130], [22, -122], [11, -120]], C.ink, 2.7); line([[22, -122], [33, -120]], C.ink, 2.7);
+        focus('Мордочка Гуччи',-59,-246,153,144);
         for (let i = 0; i < 3; i++) shape(p => { p.moveTo(1 + i * 4, -178 - i * 7); p.quadraticCurveTo(21, -170 - i * 7, 37 - i * 4, -180 - i * 7); }, null, '#ad7679', 2.3);
     }
 
@@ -391,8 +425,8 @@
     }
     const cue = (s, i, shift = 0) => (s.captions[i]?.start || 0) + shift;
     const beat = (s, name, fallback = 0) => s.events?.[name] ?? fallback;
-    const gameScenes = root.Body51DayGames({g, C, box, oval, shape, line, poly, label, local, asset, tag, sparkle, shadow, floor, person, cat, cue, beat, ease, seg, lerp, clamp});
-    const bedroom = root.Body51Bedroom({g, C, box, oval, shape, line, poly, label, local, asset, floor, shadow, windowView, plant, upperBody, person, cat, catLeap, catLoaf, cue, beat, ease, seg, lerp, clamp});
+    const gameScenes = root.Body51DayGames({g, C, box, oval, shape, line, poly, label, local, asset, tag, sparkle, shadow, floor, person, cat, focus, cue, beat, ease, seg, lerp, clamp});
+    const bedroom = root.Body51Bedroom({g, C, box, oval, shape, line, poly, label, local, asset, floor, shadow, windowView, plant, upperBody, person, cat, catLeap, catLoaf, focus, cue, beat, ease, seg, lerp, clamp});
 
     function pawPrint(x, y, s, col = C.coral) {
       local(x, y, s, () => {
@@ -426,7 +460,7 @@
       });
     }
 
-    function wake(s,t) { return bedroom.wake(s,t); }
+    function wake(s,t) { return bedroom.wake(s,t,view); }
     function finale(s,t) { return pullup(s,t,true); }
 
     function service(s, t) {
@@ -515,14 +549,18 @@
       box(337, 553, 416, 850, 24, '#e5ddca', C.ink, 4);
       line([[331, 1407], [753, 1407]], '#bfa885', 8);
       const lift = ending ? 1 : ease(seg(t, cue(s, 1) - .45, cue(s, 1) + .28));
-      const feetY = lerp(1413, 1320, lift);
-      const size = 1.085;
-      const gripY = -630;
-      const barY = 1320 + gripY * size;
+      const size = 1.085, barY = 1320 - 630 * size;
+      const launch=ending?beat(s,'catLaunch',cue(s,3)+.08):0,perch=ending?beat(s,'catPerch',cue(s,3)+.68):0;
+      const effort=ending?ease(seg(t,cue(s,2)+.18,launch-.18)):0;
+      const surrender=ending?ease(seg(t,perch+.07,perch+.56)):0;
+      const weight=t>perch&&ending?Math.sin((t-perch)*20)*Math.exp(-(t-perch)*7)*5:0;
+      const raised=270*effort*(1-surrender);
+      const feetY=lerp(1413,1320,lift)-raised+weight;
+      const gripY=(barY-feetY)/size;
       box(300, barY - 8, 490, 19, 9, '#517b76', C.ink, 5);
       for (const xx of [302, 784]) box(xx - 13, barY - 19, 27, 43, 7, '#96aea1', C.ink, 4);
       const frozen = !ending && t > beat(s, 'freeze', cue(s, 2) + .55);
-      person(547, feetY, size, frozen ? beat(s, 'freeze', cue(s, 2) + .55) : t, {hang: lift, gripY, puzzled: ending && t > beat(s,'catPerch',cue(s,3)), lookY: ending && t > beat(s,'catPerch',cue(s,3)) ? -5 : 0});
+      person(547, feetY, size, frozen ? beat(s, 'freeze', cue(s, 2) + .55) : t, {hang:lift,gripY,expression:ending?(surrender>.9?'resigned':effort>.12?'strain':''):'',puzzled:ending&&t>perch,lookY:ending&&t>perch?-4:0,gazeX:ending&&t>perch?0:undefined,beardSwing:ending&&t>perch?Math.sin((t-perch-.05)*20)*Math.exp(-(t-perch)*6)*.045:0});
       // Fingers wrap over the bar; rendered after the character.
       if (lift > .88) for (const d of [-1, 1]) {
         const xx = 547 + d * 128 * size;
@@ -548,14 +586,15 @@
           for (let j = 0; j < 8; j++) oval(Math.cos(j*TAU/8)*24, Math.sin(j*TAU/8)*24, 4.5, 4.5, (Math.floor(t*8)%8) === j ? C.teal : '#adbeac');
         });
       } else {
+        if(view.name!=='finale-load'){
         feeder(177,1330,.76,t,t>cue(s,1)?1:0);
         box(824,1176,142,91,10,C.navy,C.ink,4);box(835,1188,120,61,5,'#bdd5c1',null);
         label('{}',895,1230,32,C.teal,800,'center',94);
         box(812,1267,167,12,5,'#bac4b5',C.ink,3);
-        const launch=beat(s,'catLaunch',cue(s,3)+.08),perch=beat(s,'catPerch',cue(s,3)+.68);
+        }
         const u=seg(t,launch,perch),forward=ease(seg(u,.45,1));
         const sway=Math.sin(t*1.9)*.027;
-        const head=[547+size*105*sway,1320-525*size+3+Math.sin(t*1.7)*1.4*size];
+        const head=[547+size*(-525-gripY)*sway,feetY-525*size+3+Math.sin(t*1.7)*1.4*size];
         let position;
         if(t<launch){position=[861,1392];catLoaf(...position,.65,t,false);}
         else if(t<perch){
@@ -566,7 +605,7 @@
           oval(head[0],head[1]+2,43,7,'#233e3b2a');
           catLoaf(...position,.65,t,t>perch+.5);
         }
-        return {finaleCat:{phase:t<launch?'waiting':t<perch?'jumping':'perched',position,head}};
+        return {pullup:{feetY,barY,gripY,raised,effort,surrender,noseY:feetY-395*size},finaleCat:{phase:t<launch?'waiting':t<perch?'jumping':'perched',position,head}};
 
       }
     }
@@ -670,21 +709,11 @@
       catLoaf(817, 1400, .72, t, true);
     }
 
-    function heading(s, t) {
-      const dark = s.id === 'night';
-      const ink = dark ? '#f1e8d4' : C.ink;
-      let titles = s.title;
-      if (s.id === 'wake') titles = t < cue(s,1) ? ['Один день', 'Артёма.'] : t < cue(s,3) ? ['Кот.', 'Не выключается.'] : t < cue(s,4) ? ['Мягкая', 'перезагрузка.'] : ['Ошибка.', 'Кот не удаляется.'];
-      if (s.id === 'stream' && t < beat(s, 'mute', cue(s, 2) + .65)) titles = ['Начался стрим.', 'Всё по плану.'];
-      if (s.id === 'break' && t > cue(s, 2) + .7) titles = ['Завис.', 'Не Unity.'];
-      if (s.id === 'sword' && t < cue(s, 3)) titles = ['Нейронка', 'сделала меч.'];
-      if (s.id === 'inspector') titles = t < cue(s, 2) ? ['Не перенёс', 'дату релиза.'] : ['Календарь —', 'маркетолог.'];
-      if (s.id === 'meridian' && t < beat(s, 'boss', cue(s, 3))) titles = t < cue(s,2) ? ['Мир мечты.', 'Большие планы.'] : ['Первый квест.', 'Спёр батон.'];
-      if (s.id === 'night' && t > cue(s, 3)) titles = t < cue(s,4) ? ['Три часа спустя.', 'Всё ещё последний.'] : ['Последний.', 'Финальный_2.'];
-      if (s.id === 'finale') titles = t < cue(s,3) ? ['Наконец-то', 'перерыв.'] : t < cue(s,4) ? ['Дополнительная', 'нагрузка.'] : ['От кота', 'не отвиснешь.'];
-      if (s.id === 'hellfarmer' && t > beat(s,'fitting',cue(s,3))) titles=['Попал в ад.','Застрял в примерочной.'];
-      label(titles[0], 77, 190, 84, ink, 800, 'left', 925);
-      label(titles[1], 77, 282, 84, dark ? C.yellow : s.accent, 800, 'left', 925);
+    function heading(s,t) {
+      if(s.id!=='wake'||t>1.9)return;
+      g.save();g.globalAlpha=1-ease(seg(t,1.35,1.9));
+      label('Один день',77,164,80,C.ink,800,'left',925);
+      label('Артёма.',77,252,80,C.coral,800,'left',925);g.restore();
     }
     function caption(s, t) {
       let active = s.captions.find(c => t >= c.start && t < c.end);
@@ -700,6 +729,10 @@
       }
       if (row) lines.push(row);
       const startY = lines.length === 1 ? 1708 : 1673;
+      if(view.portrait){
+        const width=Math.min(974,Math.max(...lines.map(l=>g.measureText(l).width))+62);
+        box(540-width/2,startY-54,width,lines.length*70+12,20,'#f4eedff0',null);
+      }
       lines.forEach((l, i) => label(l, 540, startY + i * 70, 48, ink, 700, 'center', 892));
     }
     function draw(time, debug = false) {
@@ -707,26 +740,43 @@
       const frame = Math.floor(now * data.format.fps + .000001);
       current = data.scenes.find(s => frame >= (s.startFrame ?? Math.round(s.start * data.format.fps)) && frame < (s.endFrame ?? Math.round((s.start+s.duration) * data.format.fps))) || data.scenes.at(-1);
       const t = Math.max(0, now - current.start), dark = current.id === 'night';
-      bounds = []; textBoxes = []; drawnText = [];
+      bounds = []; textBoxes = []; drawnText = []; focusBoxes = [];
+      view = root.Body51Direction.plan(current,t);
       g.save(); g.setTransform(scale, 0, 0, scale, 0, 0);
       g.lineJoin = 'round'; g.lineCap = 'round'; g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-      g.fillStyle = dark ? '#253c50' : C.paper; g.fillRect(0, 0, W, H);
+      const wash=g.createLinearGradient(0,0,W,H);
+      wash.addColorStop(0,dark?'#203448':'#f6f0df');wash.addColorStop(1,dark?'#304c5c':'#eae6d4');
+      g.fillStyle=wash;g.fillRect(0,0,W,H);
+      if(view.portrait){
+        box(-180,170,394,900,65,'#b6d0c34b',null);
+        line([[40,195],[40,1050]],'#f8f1d542',12);
+        line([[-150,718],[194,718]],'#f8f1d542',12);
+        box(951,305,266,227,18,'#c9c4a82a',null);
+      }
       // Stationary paper grain. Seeded and quiet; doesn't shimmer between frames.
       g.fillStyle = dark ? '#dfd8b907' : '#5b73550b';
       for (let i = 0; i < 650; i++) g.fillRect(hash(i * 2.11) * W, hash(i * 5.32) * H, 1 + hash(i) * 2, .8 + hash(i + 1) * 2);
-      heading(current, t);
-      g.save(); g.beginPath(); g.rect(52, 350, 976, 1230); g.clip();
+      g.save(); g.beginPath(); g.rect(0,72,W,view.portrait?H-72:1538); g.clip();
+      g.translate(view.outX,view.outY);g.scale(view.zoom,view.zoom);g.translate(-view.x,-view.y);
       const painters = {...gameScenes, wake, service, stream, break: pullup, sword, night, finale};
       const action = painters[current.id](current, t);
       g.restore();
-      caption(current, t);
+      // A quiet lower matte makes a deliberate waist-up crop legible, while
+      // captions remain screen-space and never scale with the camera.
+      if(!view.portrait){
+      const matte=g.createLinearGradient(0,1510,0,1630);
+      matte.addColorStop(0,dark?'#2c455500':'#ede8d700');matte.addColorStop(1,dark?'#2c4555':'#ede8d7');
+      g.fillStyle=matte;g.fillRect(0,1510,W,150);
+      g.fillStyle=dark?'#2c4555':'#ede8d7';g.fillRect(0,1660,W,H-1660);
+      }
+      heading(current,t);caption(current, t);
       if (debug) {
         g.strokeStyle = '#e54b9b'; g.lineWidth = 2;
-        g.strokeRect(52, 350, 976, 1230);
+        g.strokeRect(24,72,1032,1538);
         for (const b of bounds) g.strokeRect(b.x, b.y, b.right - b.x, b.bottom - b.y);
       }
       g.restore();
-      return {scene: current.id, localTime: t, bounds, textBoxes, drawnText, action};
+      return {scene: current.id, localTime: t, bounds, textBoxes, drawnText, action, focusBoxes, shot:view};
     }
     return {draw, get data() { return data; }};
   }

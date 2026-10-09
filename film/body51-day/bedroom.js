@@ -4,7 +4,7 @@
 (function (root) {
   'use strict';
   root.Body51Bedroom = function (a) {
-    const {g, C, box, oval, shape, line, poly, label, local, asset, floor, shadow, windowView, plant, upperBody, person, cat, catLeap, catLoaf, cue, beat, ease, seg, lerp, clamp} = a;
+    const {g, C, box, oval, shape, line, poly, label, local, asset, floor, shadow, windowView, plant, upperBody, person, cat, catLeap, catLoaf, focus, cue, beat, ease, seg, lerp, clamp} = a;
     const mixPoint = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u)];
     const FOOT_Y = 1380, UNIT = .94;
     function joint(from, to, l1, l2, bend = 1) {
@@ -22,6 +22,9 @@
       const sitLegs=ease(seg(t,getUp+.45,uncoverAt));
       const stand=ease(seg(t,feetAt-.1,feetAt+.94));
       const hip=mixPoint(mixPoint([628,1068],[666,1137],rise),[747,1103],stand);
+      // Weight shifts into the sweep, then settles on both planted feet.
+      const recoil=t<swatAt-.5?0:Math.sin(seg(t,swatAt-.5,swatAt+.48)*Math.PI*2)*5.5;
+      hip[0]+=recoil;
       const angle=lerp(-Math.PI/2,0,rise),co=Math.cos(angle),sn=Math.sin(angle);
       const world=(x,y)=>[hip[0]+UNIT*(x*co-y*sn),hip[1]+UNIT*(x*sn+y*co)];
       const feet=[-1,1].map((d,i)=>{
@@ -82,6 +85,7 @@
       if(frontHands) {
         for(const h of [...(p.rise > .58 ? [p.leftHand] : []),p.rightHand]) {
           oval(h[0],h[1],18,21,C.skin,C.ink,3.5);
+          focus('Ладонь',h[0]-22,h[1]-26,44,52);
           for(let j=0;j<3;j++)line([[h[0]-9+j*7,h[1]-7],[h[0]-8+j*7,h[1]+3]],'#bd8b6f',1.8);
         }
         return;
@@ -124,7 +128,14 @@
     function torso(p,t) {
       local(p.hip[0],p.hip[1],UNIT,()=>{
         g.rotate(p.angle);g.translate(0,165);
-        upperBody(t,{sleepy:p.sleepy,yawn:p.yawn||(t>p.catchAt-.12&&t<p.catchAt+.28),deadpan:t>=p.catchAt+.28,puzzled:p.stand>.7,lookY:t>=p.catchAt+.28?3:0,pose:'stand'});
+        const caught=t-p.catchAt;
+        const returning=ease(seg(t,p.reboundAt,p.catchAt));
+        const toCamera=ease(seg(caught,.25,.58));
+        const impulse=(at,amp)=>t<at?0:Math.sin((t-at)*21)*Math.exp(-(t-at)*6)*amp;
+        const expression=caught>=.28?'resigned':caught>-.13?'surprised':t>p.pillowAt&&t<p.reboundAt?'confident':'';
+        const look=lerp(lerp(4,-6,returning),0,toCamera);
+        const blink=(caught>.42&&caught<.49)||(caught>.65&&caught<.73);
+        upperBody(t,{sleepy:p.sleepy,yawn:p.yawn,expression,deadpan:caught>=.28,puzzled:p.stand>.7,gazeX:look,lookY:caught>=.28?lerp(3,0,toCamera):0,turn:lerp(-.26*returning,0,toCamera),tilt:impulse(p.swatAt+.06,.025),beardSwing:impulse(p.swatAt+.10,-.065)+impulse(p.catchAt+.055,.045),blink:caught>0?blink:undefined,pose:'stand'});
       });
     }
     function clothPath(p,z) {
@@ -190,15 +201,23 @@
       });
       plant(977,1395,.43);
     }
-    function wake(s,t) {
+    function wake(s,t,view={name:"wake-room"}) {
       const p=poseAt(s,t);
       const q=seg(t,p.pillowAt,p.reboundAt), squash=t>=p.pillowAt&&t<p.reboundAt?Math.sin(q*Math.PI):0;
-      room(t,false,squash);
-      slipper(710,FOOT_Y);slipper(791,FOOT_Y);
+      const detailed=view.name==='wake-room';
+      if(detailed)room(t,false,squash);
+      else if(!view.portrait) {
+        // This shot is composed around the hands/blanket, not an enlargement of
+        // the entire poster. Background furniture is deliberately simplified.
+        box(141,1201,795,83,16,'#bb936e',C.ink,5);box(141,1154,793,93,30,C.white,C.ink,5);
+        box(158,1054,282,107,37,C.white,C.ink,4);
+        line([[905,1284],[913,1394]],C.ink,14);
+      }
+      if(!view.portrait){slipper(710,FOOT_Y);slipper(791,FOOT_Y);}
       const behind=p.catPhase==='outbound';
-      body(p,t,!behind);blanket(p,t);
+      body(p,t,!behind);if(!view.portrait)blanket(p,t);
       if(!behind)forearms(p);
-      slipper(710,FOOT_Y,true);slipper(791,FOOT_Y,true);
+      if(!view.portrait){slipper(710,FOOT_Y,true);slipper(791,FOOT_Y,true);}
       let catFoot=[845,clothSurface(p,845)],contactY=null;
       if(p.catPhase==='waiting') {
         contactY=catFoot[1];cat(...catFoot,.66,t,{boss:true});
@@ -228,7 +247,9 @@
         }
       } else {
         const settle=Math.sin(Math.min(1,(t-p.catchAt)/.28)*Math.PI)*5;
-        catFoot=[p.hold[0],p.hold[1]+settle];cat(...catFoot,.60,t,{boss:true,sleepy:t>p.catchAt+.7});
+        catFoot=[p.hold[0],p.hold[1]+settle];
+        oval(catFoot[0]-1,catFoot[1]-43,65,60,'#10252426');
+        cat(...catFoot,.60,t,{boss:true,sleepy:t>p.catchAt+.7});
       }
       if(behind){torso(p,t);forearms(p);} // Outgoing flight is behind him, along the bed.
       // His palms remain in FRONT of the held cat. Both forearms visibly catch it.

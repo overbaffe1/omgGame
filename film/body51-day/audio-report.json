@@ -13,7 +13,7 @@
     "normalization_type": "dynamic",
     "target_offset": "0.04"
   },
-  "version": "day-5",
+  "version": "day-6",
   "events": [
     {
       "scene": "wake",
@@ -94,6 +94,11 @@
       "scene": "hellfarmer",
       "id": "anotherPair",
       "at": 52.44239
+    },
+    {
+      "scene": "hellfarmer",
+      "id": "stool",
+      "at": 53.19239
     },
     {
       "scene": "inspector",
