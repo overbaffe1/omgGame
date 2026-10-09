@@ -276,26 +276,42 @@ class Scene{
     for(const it of adds)paint(it,true);
     return{project:(p)=>project(toCam(p)),eye,right,upv,fwd,focal,cx,cy};
   }
-  // 2D-содержимое на 3D-плоскости: 4 мировые точки, рисование в системе (0..wpx, 0..hpx)
+  // 2D-содержимое на 3D-плоскости: 4 мировые точки, рисование в системе (0..wpx, 0..hpx).
+  // Перспектива бьёт аффинное приближение — текст «уезжал» за края плоскости;
+  // поэтому плоскость режется на NxN ячеек и каждая рисуется со своим аффинным
+  // преобразованием и клипом по своей ячейке: содержимое всегда лежит на кваде.
   screen(quadWorld,wpx,hpx,drawFn,opt={}){
     const g=this.g;
-    const cam=this.render?null:null; // проекция уже посчитана вызовом render() и сохранена
     const P=this._lastProj;if(!P)return;
     const p=quadWorld.map(q=>P.project(q));
     if(p.some(q=>q.z<=0))return;
-    // аффинное приближение по трём углам: (0,0)->p0, (1,0)->p1, (0,1)->p3
-    const ax=(p[1].x-p[0].x)/wpx, ay=(p[1].y-p[0].y)/wpx;
-    const bx=(p[3].x-p[0].x)/hpx, by=(p[3].y-p[0].y)/hpx;
-    g.save();
-    g.beginPath();g.moveTo(p[0].x,p[0].y);g.lineTo(p[1].x,p[1].y);g.lineTo(p[2].x,p[2].y);g.lineTo(p[3].x,p[3].y);g.closePath();
-    if(opt.clip!==false)g.clip();
-    g.setTransform(ax,ay,bx,by,p[0].x,p[0].y);
-    drawFn(g,wpx,hpx,opt);
-    g.setTransform(1,0,0,1,0,0);
-    if(opt.glow){g.globalCompositeOperation='screen';g.globalAlpha=opt.glow;
+    const wl=quadWorld,N=opt.cells||3;
+    const bl=(u,v)=>({x:(wl[0].x+(wl[1].x-wl[0].x)*u)+((wl[3].x+(wl[2].x-wl[3].x)*u)-(wl[0].x+(wl[1].x-wl[0].x)*u))*v,
+                      y:(wl[0].y+(wl[1].y-wl[0].y)*u)+((wl[3].y+(wl[2].y-wl[3].y)*u)-(wl[0].y+(wl[1].y-wl[0].y)*u))*v,
+                      z:(wl[0].z+(wl[1].z-wl[0].z)*u)+((wl[3].z+(wl[2].z-wl[3].z)*u)-(wl[0].z+(wl[1].z-wl[0].z)*u))*v});
+    g.textAlign='left';g.textBaseline='alphabetic';   // HUD ставит center/middle — панели ждут left
+    for(let j=0;j<N;j++)for(let i=0;i<N;i++){
+      const u0=i/N,u1=(i+1)/N,v0=j/N,v1=(j+1)/N;
+      const q=[bl(u0,v0),bl(u1,v0),bl(u1,v1),bl(u0,v1)].map(x=>P.project(x));
+      if(q.some(x=>x.z<=0))continue;
+      const tw=wpx/N,th=hpx/N,tx0=wpx*u0,ty0=hpx*v0;
+      const ax=(q[1].x-q[0].x)/tw, ay=(q[1].y-q[0].y)/tw;
+      const bx=(q[3].x-q[0].x)/th, by=(q[3].y-q[0].y)/th;
+      // клип чуть шире ячейки, чтобы соседние клетки перекрывались без швов
+      const cx=(q[0].x+q[1].x+q[2].x+q[3].x)/4,cy=(q[0].y+q[1].y+q[2].y+q[3].y)/4;
+      const inf=p=>({x:p.x+(p.x-cx)*0.06+(p.x>=cx?0.6:-0.6)*0, y:p.y+(p.y-cy)*0.06});
+      g.save();
+      g.beginPath();const qe=q.map(inf);
+      g.moveTo(qe[0].x,qe[0].y);g.lineTo(qe[1].x,qe[1].y);g.lineTo(qe[2].x,qe[2].y);g.lineTo(qe[3].x,qe[3].y);g.closePath();
+      if(opt.clip!==false)g.clip();
+      g.setTransform(ax,ay,bx,by,q[0].x-(ax*tx0+bx*ty0),q[0].y-(ay*tx0+by*ty0));
+      drawFn(g,wpx,hpx,opt);
+      g.setTransform(1,0,0,1,0,0);
+      g.restore();
+    }
+    if(opt.glow){g.save();g.globalCompositeOperation='screen';g.globalAlpha=opt.glow;
       g.fillStyle=rgb2css(opt.glowCol?colorOf(opt.glowCol)[0]:120,opt.glowCol?colorOf(opt.glowCol)[1]:200,opt.glowCol?colorOf(opt.glowCol)[2]:255,.35);
-      g.beginPath();g.moveTo(p[0].x,p[0].y);g.lineTo(p[1].x,p[1].y);g.lineTo(p[2].x,p[2].y);g.lineTo(p[3].x,p[3].y);g.closePath();g.fill()}
-    g.restore();
+      g.beginPath();g.moveTo(p[0].x,p[0].y);g.lineTo(p[1].x,p[1].y);g.lineTo(p[2].x,p[2].y);g.lineTo(p[3].x,p[3].y);g.closePath();g.fill();g.restore()}
   }
 }
 // рендер + сохранение проекции для screen()

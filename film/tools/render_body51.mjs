@@ -51,6 +51,9 @@ const CUTS = {
   minute: { script: 'script-minute.json', timing: 'body51-timing-min.js', out: 'body51-min.mp4',
             subset: ['cat', 'workshop', 'limits', 'gag', 'wishlist', 'release'],
             lead: 0.5, tail: 0.4, qgap: 0.25, minDur: 6, padEnd: 4.6 },
+  day: { script: 'script-day.json', timing: 'body51-timing-day.js', out: 'body51-day.mp4',
+            subset: ['polar', 'cat', 'workshop', 'stream', 'limits', 'burnout', 'release'],
+            lead: 0.45, tail: 0.35, qgap: 0.25, minDur: 6, padEnd: 3.8 },
 };
 const CUT = arg('cut', null);
 const CFG = CUT ? (CUTS[CUT] || (() => { console.error('неизвестная нарезка:', CUT, '· есть:', Object.keys(CUTS).join(', ')); process.exit(1); })()) : null;
@@ -156,7 +159,9 @@ const sandbox = {
 sandbox.window = sandbox; sandbox.globalThis = sandbox;
 sandbox.window.addEventListener = () => {};
 vm.createContext(sandbox);
-for (const f of [TIMING_FILE, 'body51-film.js', 'body51-3d.js', 'body51-3d-scenes.js', 'body51-scenes.js', 'body51-score.js', 'body51-run.js'])
+// для нарезки «день» дополнительно грузится film/body51-day.js (до film.js — он задаёт и заголовки глав)
+const EXTRA = CUT === 'day' ? ['body51-day.js'] : [];
+for (const f of [TIMING_FILE, ...EXTRA, 'body51-film.js', 'body51-3d.js', 'body51-3d-scenes.js', 'body51-scenes.js', 'body51-score.js', 'body51-run.js'])
   vm.runInContext(fs.readFileSync(path.join(film, f), 'utf8'), sandbox, { filename: f });
 const filmApi = sandbox.__body51;
 if (!filmApi) { console.error('фильм не инициализировался'); process.exit(1); }

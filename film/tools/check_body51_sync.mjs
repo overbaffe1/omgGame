@@ -23,7 +23,8 @@ const arg = (n, d) => { const i = argv.indexOf('--' + n); return i < 0 ? d : arg
 const FF = process.env.FFMPEG_BIN || (() => { try { return require('@ffmpeg-installer/ffmpeg').path; } catch { return 'ffmpeg'; } })();
 const SR = 44100;
 
-const CUTS = { minute: { timing: 'body51-timing-min.js', mp4: 'body51-min.mp4' } };
+const CUTS = { minute: { timing: 'body51-timing-min.js', mp4: 'body51-min.mp4' },
+  day: { timing: 'body51-timing-day.js', mp4: 'body51-day.mp4' } };
 const CUT = arg('cut', null);
 if (CUT && !CUTS[CUT]) { console.error('неизвестная нарезка:', CUT); process.exit(1); }
 const mp4 = arg('mp4', process.env.BODY51_OUT
@@ -86,11 +87,12 @@ for (const c of checks) {
   const starts = [...(spec.stderr || '').matchAll(/silence_start: ([\d.]+)/g)].map(m => +m[1]);
   const ends = [...(spec.stderr || '').matchAll(/silence_end: ([\d.]+)/g)].map(m => +m[1]);
   const onset = (starts[0] != null && starts[0] < 0.02 && ends[0] != null) ? ends[0] : 0;
-  const ref = pcm(c.file, onset + 0.15, 2.2);
+  const refFull = pcm(c.file, null, onset + 0.15 + 2.2 + 0.3);
+  const ref = refFull.slice(Math.round((onset + 0.15) * SR), Math.round((onset + 0.15) * SR) + Math.round(2.2 * SR));
   if (ref.length < SR) { console.log('  слишком короткая реплика:', c.what); continue; }
   const from = Math.max(0, c.at - 1.2), dur = 2.2 + 3.0;
   const big = pcm(mp4, from, dur);
-  const { c: corr, lag } = bestLag(ref, big, 200);
+  const { c: corr, lag } = bestLag(ref, big, 44);
   const found = from + lag / SR - 0.15;
   const off = found - (c.at + onset /* ожидаемое начало речи в mp4 */);
   // решаем по сдвигу; корреляция — только уверенность (музыка и микс её занижают)

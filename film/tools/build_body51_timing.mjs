@@ -19,7 +19,10 @@ const arg = (n, d) => { const i = argv.indexOf('--' + n); return i < 0 ? d : arg
 // нарезки: --cut minute → короткая мем-версия
 const CUTS = { minute: { script: 'script-minute.json', timing: 'body51-timing-min.js',
   subset: ['cat', 'workshop', 'limits', 'gag', 'wishlist', 'release'],
-  lead: 0.5, tail: 0.4, qgap: 0.25, minDur: 6, padEnd: 4.6 } };
+  lead: 0.5, tail: 0.4, qgap: 0.25, minDur: 6, padEnd: 4.6 },
+  day: { script: 'script-day.json', timing: 'body51-timing-day.js',
+  subset: ['polar', 'cat', 'workshop', 'stream', 'limits', 'burnout', 'release'],
+  lead: 0.45, tail: 0.35, qgap: 0.25, minDur: 6, padEnd: 3.8 } };
 const CFG = arg('cut', null) ? (CUTS[arg('cut', null)] || null) : null;
 if (arg('cut', null) && !CFG) { console.error('неизвестная нарезка:', arg('cut', null)); process.exit(1); }
 const script = JSON.parse(readFileSync(path.join(film, 'body51-voices', CFG ? CFG.script : 'script.json'), 'utf8'));

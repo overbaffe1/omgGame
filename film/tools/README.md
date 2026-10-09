@@ -137,6 +137,24 @@ BODY51_DEPS=$DEPS node film/tools/render_body51.mjs --jobs $(nproc)             
 BODY51_DEPS=$DEPS node film/tools/render_body51.mjs --cut minute --jobs $(nproc)   # минутная → film/body51-min.mp4
 ```
 
+## Нарезка «один день» (`--cut day`)
+
+Минутный ролик «как проходит его день» (7 глав: подъём в полярную ночь, завтрак с котом
+Гуччи и Валерой, перерывчик на турнике, стрим, нейронки, 4 утра, релиз). Сценарий —
+`film/body51-voices/script-day.json`, озвучка `d01…d07` (рассказчик) и `dq01…dq07`
+(дословные цитаты, второй диктор), тайминг — `film/body51-timing-day.js`,
+страница — `film/body51-day.html`, ролик — `film/body51-day.mp4`.
+
+Сцены переиспользуют геометрию полной версии (`film/body51-day.js` задаёт свои камеры
+и 2D-панели), все панели с текстом держатся в кадре; мем-наезд камеры на цитатах
+ограничивается `zoomCap()` в `body51-run.js` по квадам `panels.safe`.
+
+```bash
+DEPS=$(bash film/tools/body51_deps.sh)
+BODY51_DEPS=$DEPS node film/tools/render_body51.mjs --cut day --jobs $(nproc)
+BODY51_DEPS=$DEPS node film/tools/check_body51_sync.mjs --cut day
+```
+
 ## Правила монтажа (важные)
 
 - В кадре **нет** синтезированного голоса Артёма. Реплики — только титрами, дословно по субтитрам,

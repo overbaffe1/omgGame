@@ -153,6 +153,30 @@ function deriveLight(sc,pan,t){
   if(d)sc.dust(t,d.n||18,d.c[0],d.c[1],d.c[2],d.w[0],d.w[1],d.w[2],d.col||'#e8dcc0',d.a==null?0.5:d.a);
 }
 
+// «день»: ограничение мем-наезда камеры, чтобы 2D-экраны (панели с текстом) не уезжали за кадр.
+// Сцена отдаёт panels.safe — список мировых квадов, которые обязаны остаться в кадре;
+// считаем, во сколько раз максимум можно укрупнить (уменьшить fov), не обрезав их.
+function zoomCap(s3,pan,amt){
+  if(!(window.BODY51_CUT&&window.DAY3&&pan&&pan.safe&&pan.safe.length))return amt;
+  const cam=s3.cam,B=B3;
+  const fwd=B.vnorm(B.vsub(cam.target,cam.eye));
+  let up=B.v3(0,1,0);if(Math.abs(B.vdot(fwd,up))>0.995)up=B.v3(0,0,1);
+  const right=B.vnorm(B.vcross(fwd,up)),upv=B.vcross(right,fwd);
+  const focal=(H/2)/Math.tan(B.rad(cam.fov)/2);
+  let qmax=1e9;
+  for(const quad of pan.safe)for(const p of quad){
+    const d=B.vsub(p,cam.eye);
+    const cz=B.vdot(d,fwd);if(cz<=0.25)continue;
+    const px=B.vdot(d,right)*focal/cz,py=B.vdot(d,upv)*focal/cz;
+    qmax=Math.min(qmax,(W*0.485)/Math.max(24,Math.abs(px)),(H*0.485)/Math.max(24,Math.abs(py)));
+  }
+  if(qmax<=1)return 0;                       // базовый кадр уже впритык — наезд отключаем
+  const t0=Math.tan(B.rad(cam.fov)/2);
+  const fovMin=2*Math.atan(t0/qmax);         // минимальный fov, при котором всё ещё в кадре
+  const zMax=1-fovMin/B.rad(cam.fov);
+  return Math.max(0,Math.min(amt,zMax*0.98));
+}
+
 // мягкое свечение вокруг ламп/экранов/окон — «с кайфом»
 function glowSprites(sc,pan,t){
   if(!pan||!pan.glows)return;
@@ -185,9 +209,10 @@ function drawPanels(id,sc,pan,u,t){
     },{glow:.16,glowCol:'#ffcf8a'});
   }
   if(id==='cat'){
-    const mu=[P3(-3.15,0.86,-1.4),P3(-0.85,0.86,-1.4),P3(-0.85,0.72,-1.4),P3(-3.15,0.72,-1.4)];
-    sc.screen(mu,420,90,(gg,w,h)=>{gg.fillStyle='#0e0b14cc';gg.fillRect(0,0,w,h);
-      gg.fillStyle='#7fe0c0';gg.font='700 30px monospace';gg.fillText('ВАЛЕРА · кормлю по расписанию',20,60);
+    const mu=[P3(-1.55,2.02,-3.30),P3(-0.05,2.02,-3.30),P3(-0.05,1.52,-3.30),P3(-1.55,1.52,-3.30)];
+    sc.screen(mu,640,150,(gg,w,h)=>{gg.fillStyle='#0e0b14cc';gg.fillRect(0,0,w,h);
+      gg.fillStyle='#7fe0c0';gg.font='700 62px monospace';gg.fillText('ВАЛЕРА',20,78);
+      gg.font='600 34px monospace';gg.fillText('кормлю по расписанию',20,128);
     },{glow:.08,glowCol:'#7fe0c0'});
   }
   if(id==='workshop'&&pan.monitor){
@@ -321,22 +346,25 @@ function frame(t){
     if(ls>=0&&ls<0.30){const k=1-ls/0.30,a=k*k*16;
       const n1=B.hp(Math.floor(t*24)*3.1+1.7),n2=B.hp(Math.floor(t*24)*5.7+2.9);
       g.translate((n1*2-1)*a,(n2*2-1)*a);}}
-  if(B3&&S3&&S3[scene.kind]){
+  const DAY=(window.BODY51_CUT&&window.DAY3)?window.DAY3:null;
+  if(B3&&S3&&(S3[scene.kind]||(DAY&&DAY.scenes[scene.kind]))){
     s3=new B3.Scene(g,W,H);
     sceneBg(scene.kind,t);
-    panels=S3[scene.kind](s3,u,t)||{};
+    const scenefn=(DAY&&DAY.scenes[scene.kind])||S3[scene.kind];
+    panels=scenefn(s3,u,t)||{};
     // мем-склейка: на реплике цитаты камера наезжает — плавный заезд, короткая пауза, плавный отъезд
     if(window.BODY51_CUT&&scene.quote){const q=scene.quote,local=t-scene.start,dd=local-q.on;
       if(dd>=0){const atk=Math.min(1,dd/0.18),rel=Math.max(0,1-Math.max(0,dd-0.55)/1.15);
         const k=atk*atk*(3-2*atk)*rel;   // smoothstep на заезде — без рывка на стыке кадров
-        if(k>0)s3.cam.fov*=1-0.13*k;}
+        if(k>0)s3.cam.fov*=1-zoomCap(s3,panels,0.13)*k;}
       // панчлайн: когда последняя цитата (релиз) заканчивается — микро-наезд и вспышка
       if(scene.id==='release'){const d2=local-q.off;
         if(d2>=-0.06&&d2<0.32){const kk=Math.max(0,1-d2/0.32);
-          s3.cam.fov*=1-0.10*kk;flash=0.3*kk;}}}
+          s3.cam.fov*=1-zoomCap(s3,panels,0.10)*kk;flash=0.3*kk;}}}
     deriveLight(s3,panels,t);
     B3.draw(s3);
-    drawPanels(scene.kind,s3,panels,u,t);
+    if(DAY&&DAY.panels&&DAY.panels[scene.kind])DAY.panels[scene.kind](s3,panels,u,t);
+    else drawPanels(scene.kind,s3,panels,u,t);
     glowSprites(s3,panels,t);
     if(scene.kind==='polar'||scene.kind==='finale')B.snow(t,scene.kind==='finale'?18:80,scene.kind==='finale'?.4:.7);
   }else{
@@ -368,7 +396,7 @@ function score(ac,out){
     gn.gain.exponentialRampToValueAtTime(.00001,at+Math.max(.08,e.dur));
     o.connect(gn);gn.connect(mus);o.start(at);o.stop(at+Math.max(.1,e.dur)+.06);
   }
-  const V=ac.createGain();V.gain.value=1.3;V.connect(master);
+  const V=ac.createGain();V.gain.value=1.45;V.connect(master);
   // второй голос (цитаты) — с лёгкой «радио»-окраской, чтобы отличался от рассказчика
   const QV=ac.createGain();QV.gain.value=1.15;
   const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=180;
@@ -381,8 +409,8 @@ function score(ac,out){
     mus.gain.setTargetAtTime(.34,at+buf.duration+.15,.35);
   };
   for(const s of SC){
-    play(s.narr&&VBUF[s.narr],T+s.start+(s.narrAt||.6),V,.16);
-    if(s.quote&&s.quote.id)play(VBUF[s.quote.id],T+s.start+s.quote.at,QV,.14);
+    play(s.narr&&VBUF[s.narr],T+s.start+(s.narrAt||.6),V,.09);
+    if(s.quote&&s.quote.id)play(VBUF[s.quote.id],T+s.start+s.quote.at,QV,.08);
   }
 }
 
