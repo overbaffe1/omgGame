@@ -78,14 +78,17 @@ for (const s of data.scenes) {
   for (let i = a; i < b; i++) duck[i] = .42;
   console.log(`${s.voice} at ${(s.start + s.lead).toFixed(3)}s · gain ${gain.toFixed(3)} · trim ${s.trimIn}–${s.trimOut}`);
   if (s.id === 'wake') {
-    bell(.45, 86, .035, .22); bell(.71, 83, .035, .22); bell(.97, 86, .026, .22);
-    const cloth = event(s, 'blanket');
-    let soft = 0;
-    add(cloth, 1.25, (t,u) => { soft += .1*(noise()-soft); return soft*.035*Math.sin(Math.PI*u); });
-    const landing=event(s,'claim')+.74;
-    knock(landing,.048);
-    knock(event(s,'feet')+.25,.028);knock(event(s,'feet')+.39,.024);
-    musicRest(cue(s,3)-.08,.48);
+    bell(.45,86,.03,.20);bell(.71,83,.03,.20);bell(.97,86,.023,.20);
+    let soft=0;
+    add(event(s,'blanket'),1.8,(t,u)=>{soft+=.1*(noise()-soft);return soft*.029*Math.sin(Math.PI*u);});
+    knock(event(s,'feet')+.25,.026);knock(event(s,'feet')+.39,.024);
+    const swat=event(s,'swat'),pillow=event(s,'pillow'),rebound=event(s,'rebound'),caught=event(s,'catch');
+    musicRest(swat-.10,caught-swat+.40);
+    knock(swat,.044);
+    add(swat,.23,(t,u)=>noise()*.026*Math.sin(Math.PI*u));
+    knock(pillow,.038);boing(rebound,.047);
+    add(rebound,.23,(t,u)=>noise()*.017*Math.sin(Math.PI*u));
+    knock(caught,.031);
   }
   if (s.id === 'service' || s.id === 'finale') {
     const start = cue(s, s.id === 'service' ? 0 : 1, .5);
@@ -102,18 +105,13 @@ for (const s of data.scenes) {
     musicRest(event(s, 'comment') - .07, .4);
   }
   if (s.id === 'break') { bell(cue(s, 1, -.35), 81, .052, .23); bell(cue(s, 1, -.15), 86, .045, .3); boing(cue(s, 1, .2), .09); musicRest(event(s, 'freeze'), .46); }
-  if (s.id === 'printers') {
-    const a = Math.round(event(s, 'idle') * SR), b = Math.round((s.start + s.duration) * SR);
-    for (let i = a; i < Math.min(n, b); i++) bed[i] *= .16;
-    knock(cue(s, 2, .6), .035);
-  }
   if (s.id === 'sword') { bell(cue(s, 0, .3), 81, .07); bell(cue(s, 0, .45), 86, .06); knock(cue(s, 1, .2), .13); knock(cue(s, 2, .2), .13); boing(cue(s, 3, .1), .04); knock(event(s, 'throne') + .5, .04); }
   if (s.id === 'hellfarmer') {
-    musicRest(event(s, 'camera') - .06, .48);
-    knock(event(s, 'camera'), .045); knock(event(s, 'camera') + .055, .035);
-    for (let at = s.start + .36 / .69; at < s.start + s.duration - .4; at += 1 / .69) {
-      knock(at, .052); pluck(at + .13, 81, .028, .18);
-    }
+    for(let at=event(s,'fight')+.26*.85;at<event(s,'fitting');at+=.85){knock(at,.047);pluck(at+.13,81,.027,.18);}
+    const changing=event(s,'fitting');musicRest(changing-.10,.52);
+    let fabric=0;
+    add(changing,.42,(t,u)=>{fabric+=.12*(noise()-fabric);return fabric*.035*Math.sin(Math.PI*u);});
+    knock(event(s,'anotherPair'),.034);bell(event(s,'anotherPair')+.10,81,.025,.22);
   }
   if (s.id === 'inspector') {
     for (let j = 0; j < 4; j++) pluck(cue(s, 1, .65 + j * .75), 74 + j * 2, .028, .22);
@@ -131,10 +129,10 @@ for (const s of data.scenes) {
     for (const i of [1, 2, 4]) pluck(cue(s, i), 74, .065, .28);
   }
   if (s.id === 'finale') {
-    // The bedroom match-cut is a quiet cloth movement, not a voiced effect.
+    // A soft contact, then the narrator's full punchline; never cut a word.
     const from = cue(s, 3, -.08), to = s.start + s.lead + s.speech;
     musicRest(from,to+.05-from);
-    knock(event(s,'barCut'),.03);
+    knock(event(s,'catPerch'),.038);
     [74,78,81].forEach((m,i)=>bell(to+.15+i*.14,m,.04,.7));
   }
 }

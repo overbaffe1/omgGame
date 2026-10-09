@@ -113,6 +113,20 @@ try {
     assert(pose.text.every(s => !/@body51|ЗА КАДРОМ|ПО СТРИМАМ|#\d{3}/i.test(s)));
     console.log('✓ Browser bed poses and clean frame: no watermarks or source overlays');
   }
+  if(data.version==='day-5') {
+    const story = await page.evaluate(()=>{
+      const {movie,data}=window.__body51DayPlayer,s=data.scenes[0];
+      const samples=[s.events.swat-.03,s.events.swat+.12,(s.events.pillow+s.events.rebound)/2,(s.events.rebound+s.events.catch)/2,s.events.catch+.5];
+      const phases=samples.map(t=>movie.draw(s.start+t).action.bedPose.catPhase);
+      const h=data.scenes.find(s=>s.id==='hellfarmer');
+      return {phases,gear:movie.draw(h.start+h.duration-.4).drawnText,sceneIds:data.scenes.map(s=>s.id)};
+    });
+    assert.deepEqual(story.phases,['waiting','outbound','pillow','returning','caught']);
+    assert(!story.sceneIds.includes('printers'));
+    assert(story.gear.some(t=>t==='ПРИМЕРОЧНАЯ'));
+    assert(story.gear.every(t=>!/автобой|принтер/i.test(t)));
+    console.log('✓ Browser: swat / soft rebound / catch, ten chapters, new Hellfarmer gear gag');
+  }
   await page.locator('#toggle').click();
   await page.waitForFunction(() => document.getElementById('live-audio').currentTime > 29.2);
   await page.locator('#toggle').click();

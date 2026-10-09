@@ -2,98 +2,123 @@
   "targetLUFS": -16,
   "truePeakCeiling": -1.5,
   "input": {
-    "input_i": "-17.32",
-    "input_tp": "-2.19",
-    "input_lra": "2.90",
+    "input_i": "-17.31",
+    "input_tp": "-2.11",
+    "input_lra": "2.80",
     "input_thresh": "-28.14",
-    "output_i": "-16.08",
+    "output_i": "-16.04",
     "output_tp": "-1.50",
-    "output_lra": "2.70",
-    "output_thresh": "-26.85",
+    "output_lra": "2.90",
+    "output_thresh": "-26.82",
     "normalization_type": "dynamic",
-    "target_offset": "0.08"
+    "target_offset": "0.04"
   },
-  "version": "day-4",
+  "version": "day-5",
   "events": [
     {
       "scene": "wake",
       "id": "wake",
-      "at": 2.32772
+      "at": 2.23596
     },
     {
       "scene": "wake",
       "id": "blanket",
-      "at": 2.82772
+      "at": 2.73596
     },
     {
       "scene": "wake",
-      "id": "claim",
-      "at": 4.41846
+      "id": "uncover",
+      "at": 5.57019
     },
     {
       "scene": "wake",
       "id": "feet",
-      "at": 4.86846
+      "at": 5.87019
+    },
+    {
+      "scene": "wake",
+      "id": "swat",
+      "at": 6.90221
+    },
+    {
+      "scene": "wake",
+      "id": "pillow",
+      "at": 7.48221
+    },
+    {
+      "scene": "wake",
+      "id": "rebound",
+      "at": 7.72221
+    },
+    {
+      "scene": "wake",
+      "id": "catch",
+      "at": 8.65201
     },
     {
       "scene": "service",
       "id": "demand",
-      "at": 16.39888
+      "at": 16.68222
     },
     {
       "scene": "stream",
       "id": "mute",
-      "at": 24.77985
+      "at": 25.06319
     },
     {
       "scene": "stream",
       "id": "comment",
-      "at": 26.34578
+      "at": 26.62912
     },
     {
       "scene": "break",
       "id": "freeze",
-      "at": 33.35747
-    },
-    {
-      "scene": "printers",
-      "id": "idle",
-      "at": 37.80797
-    },
-    {
-      "scene": "printers",
-      "id": "parallel",
-      "at": 39.88836
+      "at": 33.6408
     },
     {
       "scene": "sword",
       "id": "throne",
-      "at": 49.01707
+      "at": 42.53374
     },
     {
       "scene": "hellfarmer",
-      "id": "camera",
-      "at": 56.74442
+      "id": "fight",
+      "at": 49.42483
+    },
+    {
+      "scene": "hellfarmer",
+      "id": "fitting",
+      "at": 51.34239
+    },
+    {
+      "scene": "hellfarmer",
+      "id": "anotherPair",
+      "at": 52.44239
     },
     {
       "scene": "inspector",
       "id": "cool",
-      "at": 67.66532
+      "at": 61.38198
     },
     {
       "scene": "meridian",
       "id": "boss",
-      "at": 77.08114
+      "at": 70.79781
     },
     {
       "scene": "night",
       "id": "deadline",
-      "at": 84.11919
+      "at": 77.83585
     },
     {
       "scene": "finale",
-      "id": "barCut",
-      "at": 92.6163
+      "id": "catLaunch",
+      "at": 87.36932
+    },
+    {
+      "scene": "finale",
+      "id": "catPerch",
+      "at": 87.96932
     }
   ],
   "note": "Narration, music and Foley are separate. Comic music rests preserve speech and impact sounds. Ducking never affects narration."

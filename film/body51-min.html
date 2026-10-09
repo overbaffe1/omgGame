@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1c3435">
-  <meta name="description" content="Один день Артёма : кот Гуччи, кормушка Валера, турничок и ещё один промптик. Новый рисованный мультфильм по стримам, 1:38.">
+  <meta name="description" content="Один день Артёма : кот Гуччи, кормушка Валера, турничок и ещё один промптик. Новый рисованный мультфильм по стримам, 1:33.">
   <title>Один день Артёма</title>
-  <link rel="stylesheet" href="body51-day/player.css?v=day4-final">
+  <link rel="stylesheet" href="body51-day/player.css?v=day5">
 </head>
 <body>
   <header class="topbar">
@@ -17,49 +17,49 @@
     <section class="screen-column" aria-label="Мультфильм">
       <div class="player" id="player">
         <div class="picture" id="picture">
-          <video id="video" width="1080" height="1920" controls playsinline preload="metadata" poster="body51-day/poster.jpg?v=day4-final" src="body51-min.mp4?v=day4-final" aria-label="Один день Артёма. Субтитры уже в кадре.">
-            <track kind="captions" src="body51-day/captions.vtt?v=day4-final" srclang="ru" label="Субтитры">
+          <video id="video" width="1080" height="1920" controls playsinline preload="metadata" poster="body51-day/poster.jpg?v=day5" src="body51-min.mp4?v=day5" aria-label="Один день Артёма. Субтитры уже в кадре.">
+            <track kind="captions" src="body51-day/captions.vtt?v=day5" srclang="ru" label="Субтитры">
             Ваш браузер не поддерживает видео. <a href="body51-min.mp4" download>Скачать MP4</a>.
           </video>
           <canvas id="live-canvas" width="1080" height="1920" hidden aria-label="Процедурная версия мультфильма"></canvas>
-          <button class="start" id="start" hidden><span class="start-icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg></span><span id="start-label">Смотреть со звуком</span><small>1 минута 38 секунд</small></button>
+          <button class="start" id="start" hidden><span class="start-icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg></span><span id="start-label">Смотреть со звуком</span><small>1 минута 33 секунды</small></button>
         </div>
         <div class="transport" id="transport" hidden>
-          <div class="scrub-row"><label class="sr-only" for="seek">Позиция в видео</label><input id="seek" type="range" min="0" max="98.05" step="0.01" value="0" aria-valuetext="0:00 из 1:38"></div>
+          <div class="scrub-row"><label class="sr-only" for="seek">Позиция в видео</label><input id="seek" type="range" min="0" max="92.68333" step="0.01" value="0" aria-valuetext="0:00 из 1:33"></div>
           <div class="transport-row">
             <button id="toggle" class="icon-button" aria-label="Воспроизвести" title="Пробел — воспроизведение"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path class="play-shape" d="M7 4v16l13-8z"/><path class="pause-shape" d="M5 4h5v16H5zm9 0h5v16h-5z"/></svg></button>
-            <span class="time"><span id="current">0:00</span><span class="time-divider">/</span><span id="duration">1:38</span></span>
+            <span class="time"><span id="current">0:00</span><span class="time-divider">/</span><span id="duration">1:33</span></span>
             <span class="transport-spacer"></span>
             <button id="mute" class="icon-button sound-button" aria-label="Выключить звук" title="Звук"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M11 4 5 9H2v6h3l6 5z"/><path class="sound-waves" d="M15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14"/><path class="sound-cross" d="m16 9 6 6m0-6-6 6"/></svg></button>
             <button id="fullscreen" class="icon-button" aria-label="Полный экран" title="F — полный экран"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/></svg></button>
           </div>
         </div>
       </div>
-      <p class="playback-note" id="status" role="status">Подогрев кровати закончил смену.</p>
+      <p class="playback-note" id="status" role="status">Кот не удаляется. Даже после перезагрузки.</p>
     </section>
     <aside class="about">
-      <p class="eyebrow"><span class="live-dot"></span> РИСОВАННАЯ КОМЕДИЯ · 01:38</p>
+      <p class="eyebrow"><span class="live-dot"></span> РИСОВАННАЯ КОМЕДИЯ · 01:33</p>
       <h1>Один день<br><span>Артёма.</span></h1>
-      <p class="intro">Всё автоматизировано.<br>Тёплое место — занято.</p>
-      <p class="description">Артём только вылез из-под одеяла — Гуччи уже забрал тёплое место. Впереди стрим, три игры, турник и ещё один последний промптик. Теперь без служебных надписей в кадре, с живыми позами и маленькими кошачьими хитростями.</p>
+      <p class="intro">Будильник выключается.<br>Гуччи — нет.</p>
+      <p class="description">День независимого разработчика, согласованный с котом. Подушка работает как пружина. В аду открылась примерочная. А на турнике обнаружилась дополнительная нагрузка. Три игры и ни минуты покоя.</p>
       <div class="actions"><a class="download" href="body51-min.mp4" download="Один день Артёма.mp4">Скачать MP4 <span aria-hidden="true">↓</span></a><span class="spec">1080 × 1920<br>60 кадров/с</span></div>
-      <div class="chapter-heading"><h2>Этот день по порядку</h2><span>11 СЦЕН</span></div>
+      <div class="chapter-heading"><h2>Этот день по порядку</h2><span>10 СЦЕН</span></div>
       <nav class="chapters" id="chapters" aria-label="Сцены мультфильма"></nav>
       <details class="sources">
         <summary>Что здесь правда, а что — шутка?</summary>
         <p>Это <b>собирательный день</b> из разных стримов, не запись одного конкретного дня. Часы и действия — комедийная инсценировка.</p>
-        <p>Гуччи — кот, Валера — автокормушка. Турник, семь принтеров, кошачий саботаж, 13 500 вишлистов Backpack Inspector и кража хлеба в прототипе White Meridian — из стримов. Число вишлистов историческое, не текущий счётчик. Внешность перерисована по присланному скриншоту.</p>
+        <p>Гуччи — кот, Валера — автокормушка. Турник, кошачий саботаж, 13 500 вишлистов Backpack Inspector и кража хлеба в прототипе White Meridian — из стримов. Число вишлистов историческое, не текущий счётчик. Внешность перерисована по присланному скриншоту.</p>
         <p>Все реплики — авторский закадровый текст. Голос синтетического рассказчика не имитирует Артёма. Личные темы не используются.</p>
         <a href="body51-day/sources.md">Сценарий и проверяемые источники ↗</a>
       </details>
       <div class="footlinks"><a id="mode-link" href="?live=1">Как это рисуется кодом ↗</a><a href="body51.html">Длинный фильм ↗</a></div>
     </aside>
   </main>
-  <audio id="live-audio" preload="none" src="body51-day/soundtrack.m4a?v=day4-final"></audio>
-  <script src="body51-day/timeline.js?v=day4-final"></script>
-  <script src="body51-day/games.js?v=day4-final"></script>
-  <script src="body51-day/bedroom.js?v=day4-final"></script>
-  <script src="body51-day/film.js?v=day4-final"></script>
-  <script src="body51-day/player.js?v=day4-final"></script>
+  <audio id="live-audio" preload="none" src="body51-day/soundtrack.m4a?v=day5"></audio>
+  <script src="body51-day/timeline.js?v=day5"></script>
+  <script src="body51-day/games.js?v=day5"></script>
+  <script src="body51-day/bedroom.js?v=day5"></script>
+  <script src="body51-day/film.js?v=day5"></script>
+  <script src="body51-day/player.js?v=day5"></script>
 </body>
 </html>

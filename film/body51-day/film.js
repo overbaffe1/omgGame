@@ -148,8 +148,8 @@
         shape(p => { p.moveTo(ex - 15, -444 + raise); p.quadraticCurveTo(ex, -451 + raise, ex + 15, -443 + raise); }, null, '#6c634b', 5);
         if (blink) shape(p => { p.moveTo(ex - 13, -424); p.quadraticCurveTo(ex, -417, ex + 13, -424); }, null, C.ink, 3.5);
         else {
-          oval(ex, -423, 13, 12.5, '#fff4df'); oval(ex + look, -422, 5.8, 9, '#73909a');
-          oval(ex + look + .6, -421, 2.8, 5.8, C.ink); oval(ex + look + 2, -425, 1.8, 2, C.white);
+          oval(ex, -423, 13, 12.5, '#fff4df'); oval(ex + look, -422 + (options.lookY || 0), 5.8, 9, '#73909a');
+          oval(ex + look + .6, -421 + (options.lookY || 0), 2.8, 5.8, C.ink); oval(ex + look + 2, -425 + (options.lookY || 0), 1.8, 2, C.white);
           shape(p => { p.moveTo(ex - 13, -426); p.quadraticCurveTo(ex, -439, ex + 13, -426); }, null, '#655b48', 2.5);
         }
         shape(p => { p.moveTo(ex - 10, -404); p.quadraticCurveTo(ex, -400, ex + 11, -405); }, null, '#cc9f7f', 2);
@@ -172,6 +172,7 @@
       shape(p => { p.moveTo(-25, -373); p.quadraticCurveTo(5, -388, 32, -372); p.quadraticCurveTo(36, -353, 7, -348); p.quadraticCurveTo(-23, -350, -25, -373); }, C.skin, null);
       if (options.yawn) oval(4, -362, 12, 16, '#845c4c', C.ink, 2.5);
       else if (sleepy) shape(p => { p.moveTo(-10, -363); p.quadraticCurveTo(4, -360, 17, -364); }, null, '#624f43', 2.5);
+      else if (options.deadpan) line([[-14,-362],[25,-362]],'#624f43',3);
       else if (options.talk) oval(5, -361, 10, 3 + Math.abs(Math.sin(t * 13)) * 8, '#805b4e', '#624f43', 2);
       else shape(p => { p.moveTo(-15, -363); p.quadraticCurveTo(6, puzzled ? -362 : -352, 26, -365); }, null, '#624f43', 3);
       // Moustache is drawn last so the mouth can emote without changing identity.
@@ -199,10 +200,10 @@
     function person(x, y, s, t, options = {}) {
       const hang = options.hang || 0, pose = options.pose || 'stand';
       const sleepy = options.sleepy || false, flip = options.flip ? -1 : 1;
-      const sway = hang * Math.sin(t * 1.9) * .027;
-      asset('Артём', x, y, s, [-204, -578, 204, 20], () => {
+      const sway = hang * Math.sin(t * 1.9) * .027, gripY = options.gripY ?? -545;
+      asset('Артём', x, y, s, [-204, Math.min(-578, gripY-32), 204, 20], () => {
         // A hanging body sways below the grip, but neither hand slides off the bar.
-        g.transform(1, 0, sway, 1, 545*sway, 0); g.scale(flip, 1);
+        g.transform(1, 0, sway, 1, -gripY*sway, 0); g.scale(flip, 1);
         // Feet / trouser legs. Every limb has a filled silhouette, not a stick rig.
         const swing = hang * Math.sin(t * 1.9 + .35) * 17;
         if (pose === 'type') {
@@ -223,7 +224,7 @@
           const point = pose === 'point' && d === 1;
           const type = pose === 'type' && d === 1;
           const handX = lerp(d * (point || type ? 169 : 111), d * 128, hang);
-          const handY = lerp(point ? -330 : type ? -264 + Math.sin(t * 11) * 7 : -164, -545, hang);
+          const handY = lerp(point ? -330 : type ? -264 + Math.sin(t * 11) * 7 : -164, gripY, hang);
           const elbowX = lerp(d * (point || type ? 119 : 105), d * 105, hang);
           const elbowY = lerp(point ? -270 : type ? -235 : -231, -415, hang);
           const shoulderX = d * 83, shoulderY = -292;
@@ -236,7 +237,7 @@
           oval(handX, handY, 23, 26, C.skin, C.ink, 4, -.25 * d);
           if (hang > .8) line([[handX - 9, handY - 11], [handX - 7, handY + 3]], '#c28d71', 3);
         }
-        upperBody(t, {sleepy, pose, puzzled: options.puzzled, talk: options.talk, yawn: options.yawn});
+        upperBody(t, {sleepy, pose, puzzled: options.puzzled, talk: options.talk, yawn: options.yawn, lookY: options.lookY});
       });
     }
 
@@ -256,9 +257,11 @@
         for (let i = 0; i < 3; i++) shape(p => { p.moveTo(1 + i * 4, -178 - i * 7); p.quadraticCurveTo(21, -170 - i * 7, 37 - i * 4, -180 - i * 7); }, null, '#ad7679', 2.3);
     }
 
-    function catLeap(x,y,size,t,flight) {
-      const land=ease(seg(flight,.70,1));
-      asset('Гуччи — прыжок',x,y,size,[-191,-204,178,27],()=>{
+    function catLeap(x,y,size,t,flight,options={}) {
+      const land=options.settle===false?0:ease(seg(flight,.70,1));
+      const rect=options.right?[-178,-204,191,27]:[-191,-204,178,27];
+      asset('Гуччи — прыжок',x,y,size,rect,()=>{
+        if(options.right)g.scale(-1,1);
         g.translate(0,56*land);
         g.save();g.globalAlpha=1-land;
         shape(p=>{p.moveTo(80,-100);p.bezierCurveTo(151,-85,173,-156,136,-174);},null,C.ink,18);
@@ -424,11 +427,7 @@
     }
 
     function wake(s,t) { return bedroom.wake(s,t); }
-    function finale(s,t) {
-      if(t < beat(s,'barCut',cue(s,3))) return bedroom.finaleBed(s,t);
-      pullup(s,t,true);
-      return {bedPose:{phase:'awake-on-bar'}};
-    }
+    function finale(s,t) { return pullup(s,t,true); }
 
     function service(s, t) {
       floor(1381);
@@ -518,11 +517,12 @@
       const lift = ending ? 1 : ease(seg(t, cue(s, 1) - .45, cue(s, 1) + .28));
       const feetY = lerp(1413, 1320, lift);
       const size = 1.085;
-      const barY = 1320 - 545 * size;
+      const gripY = -630;
+      const barY = 1320 + gripY * size;
       box(300, barY - 8, 490, 19, 9, '#517b76', C.ink, 5);
       for (const xx of [302, 784]) box(xx - 13, barY - 19, 27, 43, 7, '#96aea1', C.ink, 4);
       const frozen = !ending && t > beat(s, 'freeze', cue(s, 2) + .55);
-      person(547, feetY, size, frozen ? beat(s, 'freeze', cue(s, 2) + .55) : t, {hang: lift, puzzled: ending && t > beat(s, 'veto', cue(s, 3))});
+      person(547, feetY, size, frozen ? beat(s, 'freeze', cue(s, 2) + .55) : t, {hang: lift, gripY, puzzled: ending && t > beat(s,'catPerch',cue(s,3)), lookY: ending && t > beat(s,'catPerch',cue(s,3)) ? -5 : 0});
       // Fingers wrap over the bar; rendered after the character.
       if (lift > .88) for (const d of [-1, 1]) {
         const xx = 547 + d * 128 * size;
@@ -548,67 +548,29 @@
           for (let j = 0; j < 8; j++) oval(Math.cos(j*TAU/8)*24, Math.sin(j*TAU/8)*24, 4.5, 4.5, (Math.floor(t*8)%8) === j ? C.teal : '#adbeac');
         });
       } else {
-        // The alternative 'sleeping place' is only a joke: he stays awake,
-        // looking back toward the bedroom. No duplicated cat or floating form.
-        box(160, 951, 15, 27, 6, C.wood, C.ink, 3);
-        shape(p=>{p.moveTo(173,964);p.quadraticCurveTo(151,1001,125,999);p.lineTo(127,1257);p.quadraticCurveTo(174,1276,221,1252);p.lineTo(217,1005);p.quadraticCurveTo(182,1002,173,964);p.closePath();},'#99bba5',C.ink,4);
-        line([[151,1027],[151,1238]],'#d0dec0',3); line([[181,1018],[184,1244]],'#d0dec0',3);
-        box(824, 1176, 142, 91, 10, C.navy, C.ink, 4);
-        box(835, 1188, 120, 61, 5, '#bdd5c1', null);
-        line([[869,1217],[882,1229],[916,1199]],C.teal,6);
+        feeder(177,1330,.76,t,t>cue(s,1)?1:0);
+        box(824,1176,142,91,10,C.navy,C.ink,4);box(835,1188,120,61,5,'#bdd5c1',null);
+        label('{}',895,1230,32,C.teal,800,'center',94);
         box(812,1267,167,12,5,'#bac4b5',C.ink,3);
+        const launch=beat(s,'catLaunch',cue(s,3)+.08),perch=beat(s,'catPerch',cue(s,3)+.68);
+        const u=seg(t,launch,perch),forward=ease(seg(u,.45,1));
+        const sway=Math.sin(t*1.9)*.027;
+        const head=[547+size*105*sway,1320-525*size+3+Math.sin(t*1.7)*1.4*size];
+        let position;
+        if(t<launch){position=[861,1392];catLoaf(...position,.65,t,false);}
+        else if(t<perch){
+          position=[lerp(861,head[0],forward),lerp(1392,head[1],ease(u))-Math.sin(u*Math.PI)*225];
+          catLeap(...position,.55,t,u);
+        } else {
+          position=head;
+          oval(head[0],head[1]+2,43,7,'#233e3b2a');
+          catLoaf(...position,.65,t,t>perch+.5);
+        }
+        return {finaleCat:{phase:t<launch?'waiting':t<perch?'jumping':'perched',position,head}};
 
       }
     }
 
-    function printer(x, y, s, number, t, asleep) {
-      asset(`Принтер ${number}`, x, y, s, [-120, -279, 120, 19], () => {
-        shadow(0, 15, 112, 12);
-        oval(78, -230, 42, 42, number % 2 ? '#9caf9a' : '#d3b684', C.ink, 5);
-        oval(78, -230, 23, 23, C.paper, C.ink, 4);
-        oval(78, -230, 7, 7, C.ink);
-        box(-92, -223, 20, 211, 7, C.navy, C.ink, 4);
-        box(64, -223, 20, 211, 7, C.navy, C.ink, 4);
-        box(-97, -225, 186, 21, 6, '#92aca6', C.ink, 4);
-        box(-78, -158, 149, 14, 3, '#92aca6', C.ink, 4);
-        box(-23, -171, 42, 47, 5, C.coral, C.ink, 4);
-        poly([[-8, -124], [8, -124], [0, -109]], C.yellow, C.ink, 3);
-        box(-78, -52, 144, 11, 3, '#a7bbac', C.ink, 3);
-        box(-104, -31, 208, 43, 8, C.navy, C.ink, 4);
-        box(48, -25, 41, 21, 3, '#c2d2b5', null);
-        label(String(number), -72, 1, 24, C.white, 800);
-        if (asleep) {
-          // Breathing displays, no phantom prints or moving extruders.
-          const breath = Math.sin(t * 1.6 + number) * 1.5;
-          shape(p => { p.moveTo(-59, -82 + breath); p.quadraticCurveTo(-42, -68 + breath, -26, -82 + breath); }, null, '#6d8e84', 4);
-          shape(p => { p.moveTo(17, -82 + breath); p.quadraticCurveTo(33, -68 + breath, 50, -82 + breath); }, null, '#6d8e84', 4);
-        }
-      });
-    }
-    function printers(s, t) {
-      floor(1381);
-      box(106, 677, 868, 649, 30, '#e4e1cf', null);
-      for (const x of [152, 935]) box(x, 695, 15, 684, 5, '#b4b7a0', C.ink, 3);
-      line([[540, 465], [540, 500]], C.ink, 5);
-      shape(p => { p.moveTo(474, 540); p.quadraticCurveTo(478, 490, 540, 488); p.quadraticCurveTo(600, 490, 606, 540); p.closePath(); }, C.yellow, C.ink, 5);
-      line([[470, 546], [610, 546]], C.ink, 5);
-      const asleep = t > beat(s, 'idle', cue(s, 1));
-      for (let i = 0; i < 3; i++) printer(260 + i * 280, 972, .91, i + 1, t, asleep);
-      box(115, 985, 850, 22, 5, C.wood, C.ink, 4);
-      for (let i = 0; i < 4; i++) printer(192 + i * 232, 1292, .79, i + 4, t, asleep);
-      box(115, 1305, 850, 22, 5, C.wood, C.ink, 4);
-      if (asleep) {
-        for (let i = 0; i < 7; i++) {
-          const xx = i < 3 ? 245 + i * 280 : 172 + (i - 3) * 232;
-          const yy = (i < 3 ? 688 : 1049) - Math.sin(t * 1.1 + i) * 6;
-          const parallel = t > beat(s, 'parallel', cue(s, 2));
-          const zzz = 'z'.repeat(parallel ? 1 + Math.floor((t * 2 + i * .7) % 3) : 1);
-          label(zzz, xx, yy, 29, '#6f9288', 800, 'center', 91);
-        }
-
-      }
-      plant(945, 1399, .42);
-    }
     function swordShape(x, y, s, t, grain) {
       local(x, y, s, () => {
         // Intentionally square: the joke is an asset from stream #061.
@@ -709,18 +671,18 @@
     }
 
     function heading(s, t) {
-      const dark = s.id === 'night' || (s.id === 'finale' && t < beat(s,'barCut',cue(s,3)));
+      const dark = s.id === 'night';
       const ink = dark ? '#f1e8d4' : C.ink;
       let titles = s.title;
-      if (s.id === 'wake') titles = t < cue(s,1) ? ['Один день', 'Артёма.'] : t < cue(s,3) ? ['Пора вставать.', 'Место уже занято.'] : ['Подогрев кровати', 'закончил смену.'];
+      if (s.id === 'wake') titles = t < cue(s,1) ? ['Один день', 'Артёма.'] : t < cue(s,3) ? ['Кот.', 'Не выключается.'] : t < cue(s,4) ? ['Мягкая', 'перезагрузка.'] : ['Ошибка.', 'Кот не удаляется.'];
       if (s.id === 'stream' && t < beat(s, 'mute', cue(s, 2) + .65)) titles = ['Начался стрим.', 'Всё по плану.'];
       if (s.id === 'break' && t > cue(s, 2) + .7) titles = ['Завис.', 'Не Unity.'];
-      if (s.id === 'printers' && t < cue(s, 2)) titles = ['Семь', '3D-принтеров.'];
       if (s.id === 'sword' && t < cue(s, 3)) titles = ['Нейронка', 'сделала меч.'];
       if (s.id === 'inspector') titles = t < cue(s, 2) ? ['Не перенёс', 'дату релиза.'] : ['Календарь —', 'маркетолог.'];
       if (s.id === 'meridian' && t < beat(s, 'boss', cue(s, 3))) titles = t < cue(s,2) ? ['Мир мечты.', 'Большие планы.'] : ['Первый квест.', 'Спёр батон.'];
       if (s.id === 'night' && t > cue(s, 3)) titles = t < cue(s,4) ? ['Три часа спустя.', 'Всё ещё последний.'] : ['Последний.', 'Финальный_2.'];
-      if (s.id === 'finale') titles = t < cue(s,2) ? ['Все задачи', 'распределены.'] : t < cue(s,3) ? ['Кровать', 'тоже распределена.'] : t < cue(s,4) ? ['Свободен', 'только турник.'] : ['Такие', 'пирожочки.'];
+      if (s.id === 'finale') titles = t < cue(s,3) ? ['Наконец-то', 'перерыв.'] : t < cue(s,4) ? ['Дополнительная', 'нагрузка.'] : ['От кота', 'не отвиснешь.'];
+      if (s.id === 'hellfarmer' && t > beat(s,'fitting',cue(s,3))) titles=['Попал в ад.','Застрял в примерочной.'];
       label(titles[0], 77, 190, 84, ink, 800, 'left', 925);
       label(titles[1], 77, 282, 84, dark ? C.yellow : s.accent, 800, 'left', 925);
     }
@@ -728,7 +690,7 @@
       let active = s.captions.find(c => t >= c.start && t < c.end);
       if (!active && t >= s.captions.at(-1).start) active = s.captions.at(-1);
       if (!active) return;
-      const dark = s.id === 'night' || (s.id === 'finale' && t < beat(s,'barCut',cue(s,3)));
+      const dark = s.id === 'night';
       const ink = dark ? '#f1e8d4' : C.ink;
       g.font = '700 48px Manrope, sans-serif';
       const words = active.text.split(' '), lines = []; let row = '';
@@ -744,7 +706,7 @@
       now = clamp(time, 0, data.total - 1 / data.format.fps);
       const frame = Math.floor(now * data.format.fps + .000001);
       current = data.scenes.find(s => frame >= (s.startFrame ?? Math.round(s.start * data.format.fps)) && frame < (s.endFrame ?? Math.round((s.start+s.duration) * data.format.fps))) || data.scenes.at(-1);
-      const t = Math.max(0, now - current.start), dark = current.id === 'night' || (current.id === 'finale' && t < beat(current,'barCut',cue(current,3)));
+      const t = Math.max(0, now - current.start), dark = current.id === 'night';
       bounds = []; textBoxes = []; drawnText = [];
       g.save(); g.setTransform(scale, 0, 0, scale, 0, 0);
       g.lineJoin = 'round'; g.lineCap = 'round'; g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
@@ -754,7 +716,7 @@
       for (let i = 0; i < 650; i++) g.fillRect(hash(i * 2.11) * W, hash(i * 5.32) * H, 1 + hash(i) * 2, .8 + hash(i + 1) * 2);
       heading(current, t);
       g.save(); g.beginPath(); g.rect(52, 350, 976, 1230); g.clip();
-      const painters = {...gameScenes, wake, service, stream, break: pullup, printers, sword, night, finale};
+      const painters = {...gameScenes, wake, service, stream, break: pullup, sword, night, finale};
       const action = painters[current.id](current, t);
       g.restore();
       caption(current, t);

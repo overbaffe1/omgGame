@@ -15,10 +15,11 @@
     }
     function poseAt(s,t) {
       const getUp=beat(s,'wake',cue(s,1)-.3), pullAt=beat(s,'blanket',cue(s,1)+.2);
-      const claimAt=beat(s,'claim',cue(s,2)+.6), feetAt=beat(s,'feet',cue(s,2)+1.05);
+      const uncoverAt=beat(s,'uncover',cue(s,2)+.15), feetAt=beat(s,'feet',cue(s,2)+.45);
+      const swatAt=beat(s,'swat',cue(s,3)+.2),pillowAt=beat(s,'pillow',cue(s,3)+.78),reboundAt=beat(s,'rebound',cue(s,3)+1.02),catchAt=beat(s,'catch',cue(s,4)+.12);
       const rise=ease(seg(t,getUp,getUp+1.15));
-      const uncover=ease(seg(t,pullAt,claimAt+.18));
-      const sitLegs=ease(seg(t,getUp+.45,claimAt+.16));
+      const uncover=ease(seg(t,pullAt,uncoverAt));
+      const sitLegs=ease(seg(t,getUp+.45,uncoverAt));
       const stand=ease(seg(t,feetAt-.1,feetAt+.94));
       const hip=mixPoint(mixPoint([628,1068],[666,1137],rise),[747,1103],stand);
       const angle=lerp(-Math.PI/2,0,rise),co=Math.cos(angle),sn=Math.sin(angle);
@@ -31,11 +32,33 @@
       });
       const clothLeft=lerp(493,821,uncover),clothTop=lerp(966,1084,uncover);
       const grip=[clothLeft+13,clothTop+20];
-      const release=ease(seg(t,claimAt+.06,claimAt+.55));
-      const rightHand=mixPoint(grip,world(116,8),release);
-      const leftHand=mixPoint(world(-95,-19),[hip[0]-100,hip[1]+18],rise);
-      const flight=seg(t,claimAt,claimAt+.74),claim=ease(flight);
-      return {phase:stand>.995?'standing':uncover>.85?'leaving-bed':rise>.4?'sitting':'lying',rise,uncover,stand,angle,hip,feet,world,rightHand,leftHand,grip,release,clothLeft,clothTop,claim,flight,claimAt,sleepy:t<getUp+.1,yawn:t>getUp+.15&&t<getUp+.66};
+      const release=ease(seg(t,uncoverAt+.05,uncoverAt+.36));
+      let rightHand=mixPoint(grip,world(116,8),release);
+      let leftHand=mixPoint(world(-95,-19),[hip[0]-100,hip[1]+18],rise);
+      const aimY=clothSurface({clothLeft:821,clothTop:1084},845)-72*.66;
+      const contact=[845+52*.66+18,aimY];
+      const wind=[934,aimY-13], follow=[738,aimY-4];
+      // A visible wind-up, real palm/body contact, and a leftward follow-through.
+      if(t>=swatAt-.64&&t<swatAt-.14) rightHand=mixPoint(rightHand,wind,ease(seg(t,swatAt-.64,swatAt-.14)));
+      else if(t>=swatAt-.14&&t<swatAt) rightHand=mixPoint(wind,contact,ease(seg(t,swatAt-.14,swatAt)));
+      else if(t>=swatAt&&t<swatAt+.22) rightHand=mixPoint(contact,follow,ease(seg(t,swatAt,swatAt+.22)));
+      else if(t>=swatAt+.22&&t<pillowAt) rightHand=mixPoint(follow,world(116,8),ease(seg(t,swatAt+.22,pillowAt)));
+      const hold=[hip[0]+18,hip[1]+17];
+      const catchReady=ease(seg(t,reboundAt+.18,catchAt-.05));
+      rightHand=mixPoint(rightHand,[hold[0]+42,hold[1]-46],catchReady);
+      leftHand=mixPoint(leftHand,[hold[0]-49,hold[1]-45],catchReady);
+      let catPhase='waiting';
+      if(t>=swatAt)catPhase='outbound';
+      if(t>=pillowAt)catPhase='pillow';
+      if(t>=reboundAt)catPhase='returning';
+      if(t>=catchAt)catPhase='caught';
+      return {phase:stand>.995?'standing':uncover>.85?'leaving-bed':rise>.4?'sitting':'lying',rise,uncover,stand,angle,hip,feet,world,rightHand,leftHand,grip,release,clothLeft,clothTop,swatAt,pillowAt,reboundAt,catchAt,contact,hold,catchReady,catPhase,sleepy:t<getUp+.1,yawn:t>getUp+.15&&t<getUp+.66};
+
+    }
+    function clothSurface(z,x) {
+      const q=clamp((x-z.clothLeft)/(946-z.clothLeft));
+      const u=(1.04-Math.sqrt(1.0816-.16*q))/.08;
+      return z.clothTop+21*(1-u)**2-36*(1-u)*u+52*u*u+2;
     }
     function slipper(x,y,front=false) {
       if (!front) {
@@ -79,7 +102,16 @@
         line([shoulder,sleeve],C.ink,46);line([shoulder,sleeve],'#343d3b',37);
       }
     }
-    function body(p,t) {
+    function forearms(p) {
+      if(p.rise<.70)return;
+      // Cross-body gestures must cover the shirt, otherwise only a floating
+      // palm is visible. Upper arms remain behind the shoulder seams.
+      for(const [d,hand] of [[-1,p.leftHand],[1,p.rightHand]]) {
+        const shoulder=p.world(d*80,-132),elbow=joint(shoulder,hand,83,86,d===1?1:-1);
+        line([elbow,hand],C.ink,39);line([elbow,hand],C.skin,31);
+      }
+    }
+    function body(p,t,withTorso=true) {
       // A conservative dynamic AABB includes the real rotated upper body,
       // articulated legs and arms; it is also used by all-frame release QA.
       const pts=[p.world(-115,-370),p.world(115,-370),p.world(-115,25),p.world(115,25),...p.feet,p.leftHand,p.rightHand];
@@ -87,9 +119,12 @@
       const top=Math.min(...pts.map(v=>v[1]))-18,bottom=Math.max(...pts.map(v=>v[1]))+25;
       asset('Артём — поза в кровати',(left+right)/2,(top+bottom)/2,1,[-(right-left)/2,-(bottom-top)/2,(right-left)/2,(bottom-top)/2],()=>{});
       limbs(p,t);
+      if(withTorso)torso(p,t);
+    }
+    function torso(p,t) {
       local(p.hip[0],p.hip[1],UNIT,()=>{
         g.rotate(p.angle);g.translate(0,165);
-        upperBody(t,{sleepy:p.sleepy,yawn:p.yawn,puzzled:p.stand>.7,pose:'stand'});
+        upperBody(t,{sleepy:p.sleepy,yawn:p.yawn||(t>p.catchAt-.12&&t<p.catchAt+.28),deadpan:t>=p.catchAt+.28,puzzled:p.stand>.7,lookY:t>=p.catchAt+.28?3:0,pose:'stand'});
       });
     }
     function clothPath(p,z) {
@@ -119,7 +154,7 @@
       const w2=946-p.clothLeft;
       shape(q=>{q.moveTo(p.clothLeft,p.clothTop+21);q.quadraticCurveTo(p.clothLeft+w2*.52,p.clothTop-18,946,p.clothTop+52);q.lineTo(941,p.clothTop+76);q.quadraticCurveTo(p.clothLeft+w2*.5,p.clothTop+19,p.clothLeft+5,p.clothTop+46);q.closePath();},'#c1d4b7',C.ink,3);
     }
-    function room(t,night=false) {
+    function room(t,night=false,pillowSquash=0) {
       floor(1398,night);
       windowView(135,445,263,437,t,night);
       // A bounded wash of light, wood, bed seams and ordinary bedside objects.
@@ -141,8 +176,9 @@
       line([[170,1180],[908,1180]],'#cdd4c0',3);
       for(let i=0;i<17;i++)oval(177+i*42,1223,2,2,'#b9c7b6');
       // Cushion is under the head, never behind a vertical standing sprite.
-      box(158,1054,282,107,37,night?'#e1dfcc':C.white,C.ink,4);
-      shape(q=>{q.moveTo(177,1079);q.quadraticCurveTo(282,1060,419,1078);},null,'#d8dcc8',2.4);
+      const squash=pillowSquash;
+      box(158-16*squash,1054+43*squash,282+32*squash,107-43*squash,Math.max(17,37-16*squash),night?'#e1dfcc':C.white,C.ink,4);
+      shape(q=>{q.moveTo(177-10*squash,1079+38*squash);q.quadraticCurveTo(282,1060+50*squash,419+10*squash,1078+38*squash);},null,'#d8dcc8',2.4);
       // Bedside table sits beyond the pillow; the alarm visibly stops ringing.
       box(77,1066,88,19,5,'#c39b75',C.ink,4);line([[89,1085],[86,1394]],C.ink,7);line([[150,1085],[155,1394]],C.ink,7);shadow(121,1398,54,7);
       local(122,1019,.66,()=>{
@@ -155,38 +191,55 @@
       plant(977,1395,.43);
     }
     function wake(s,t) {
-      const p=poseAt(s,t);room(t);
+      const p=poseAt(s,t);
+      const q=seg(t,p.pillowAt,p.reboundAt), squash=t>=p.pillowAt&&t<p.reboundAt?Math.sin(q*Math.PI):0;
+      room(t,false,squash);
       slipper(710,FOOT_Y);slipper(791,FOOT_Y);
-      body(p,t);
-      blanket(p,t);
-      limbs(p,t,true);
-      // The slippers have visible empty interiors before his socked feet arrive.
+      const behind=p.catPhase==='outbound';
+      body(p,t,!behind);blanket(p,t);
+      if(!behind)forearms(p);
       slipper(710,FOOT_Y,true);slipper(791,FOOT_Y,true);
-      const jump=p.claim;
-      let catFoot=[306,1080],contactY=null;
-      if(jump<1) {
-        const surface=z=>{
-          const q=clamp((845-z.clothLeft)/(946-z.clothLeft));
-          const u=(1.04-Math.sqrt(1.0816-.16*q))/.08;
-          return z.clothTop+21*(1-u)**2-36*(1-u)*u+52*u*u+2;
-        };
-        const fromY=surface(jump===0?p:poseAt(s,p.claimAt));
-        const advance=ease(seg(p.flight,.14,1));
-        const x=lerp(845,306,advance),y=lerp(fromY,1080,advance)-Math.sin(p.flight*Math.PI)*430;
-        catFoot=[x,y];if(jump===0)contactY=fromY;
-        if(p.flight>0) catLeap(x,y,.66,t,p.flight);
-        else cat(x,y,.66,t,{boss:true});
-      } else {
-        // Knead first, then curl up exactly where the human head used to be.
-        catLoaf(306,1080,.78,t,t>p.claimAt+1.55);
-        if(t>p.claimAt+1.15) {
-          const happy=seg(t,p.claimAt+1.15,p.claimAt+2.1);
-          g.save();g.globalAlpha=(1-happy)*.7;
-          for(let i=0;i<3;i++)oval(341+i*16,944-happy*28+i*3,4,4,'#b18a53');
-          g.restore();
+      let catFoot=[845,clothSurface(p,845)],contactY=null;
+      if(p.catPhase==='waiting') {
+        contactY=catFoot[1];cat(...catFoot,.66,t,{boss:true});
+      } else if(p.catPhase==='outbound') {
+        const u=seg(t,p.swatAt,p.pillowAt), advance=ease(seg(u,.08,1));
+        const takeoff=clothSurface(poseAt(s,p.swatAt),845);
+        catFoot=[lerp(845,306,advance),lerp(takeoff,1080,advance)-Math.sin(u*Math.PI)*430];
+        catLeap(...catFoot,.66,t,u);
+        // Short trails make the push read as a cartoon swipe, not teleportation.
+        if(u>.1&&u<.75) for(let k=0;k<3;k++) line([[catFoot[0]+116+k*9,catFoot[1]-68+k*13],[catFoot[0]+147+k*9,catFoot[1]-74+k*13]],'#b6907b',2.3);
+      } else if(p.catPhase==='pillow') {
+        catFoot=[306,1080+43*squash];
+        g.save();g.translate(306,1161);g.scale(1+.14*squash,1-.26*squash);g.translate(-306,-1161);
+        catLoaf(...catFoot,.78,t,false);g.restore();
+        for(let k=0;k<3;k++) {
+          const side=k%2?1:-1,x=306+side*(130+squash*20),y=1105-k*12;
+          line([[x,y],[x+side*15,y-9]],'#b8bdac',3);
         }
+      } else if(p.catPhase==='returning') {
+        const u=seg(t,p.reboundAt,p.catchAt),advance=ease(u);
+        catFoot=[lerp(306,p.hold[0],advance),lerp(1080,p.hold[1],advance)-Math.sin(u*Math.PI)*46];
+        if(u<.84)catLeap(...catFoot,.60,t,u,{right:true,settle:false});
+        else {
+          const land=ease(seg(u,.84,1));
+          g.save();g.globalAlpha=1-land;catLeap(...catFoot,.60,t,u,{right:true,settle:false});g.restore();
+          g.save();g.globalAlpha=land;cat(...catFoot,.60,t,{boss:true});g.restore();
+        }
+      } else {
+        const settle=Math.sin(Math.min(1,(t-p.catchAt)/.28)*Math.PI)*5;
+        catFoot=[p.hold[0],p.hold[1]+settle];cat(...catFoot,.60,t,{boss:true,sleepy:t>p.catchAt+.7});
       }
-      return {bedPose:{phase:p.phase,angle:p.angle,blanketLeft:p.clothLeft,blanketTop:p.clothTop,feet:p.feet,hip:p.hip,rightHand:p.rightHand,grip:p.grip,release:p.release,stand:p.stand,claim:p.claim,catFoot,catSurfaceY:contactY,head:p.world(0,-255),floor:FOOT_Y}};
+      if(behind){torso(p,t);forearms(p);} // Outgoing flight is behind him, along the bed.
+      // His palms remain in FRONT of the held cat. Both forearms visibly catch it.
+      limbs(p,t,true);
+      if(t>=p.swatAt-.07&&t<p.swatAt+.23) {
+        const f=seg(t,p.swatAt-.07,p.swatAt+.23);
+        g.save();g.globalAlpha=Math.sin(f*Math.PI)*.65;
+        for(let k=0;k<3;k++)line([[921-k*5,p.contact[1]-28-k*10],[861-k*8,p.contact[1]-37-k*10]],'#b38b65',3);
+        g.restore();
+      }
+      return {bedPose:{phase:p.phase,angle:p.angle,blanketLeft:p.clothLeft,blanketTop:p.clothTop,feet:p.feet,hip:p.hip,rightHand:p.rightHand,grip:p.grip,release:p.release,stand:p.stand,catPhase:p.catPhase,catFoot,catSurfaceY:contactY,head:p.world(0,-255),floor:FOOT_Y,swatAt:p.swatAt,pillowAt:p.pillowAt,reboundAt:p.reboundAt,catchAt:p.catchAt,pillowSquash:squash,contact:p.contact,hold:p.hold,catchReady:p.catchReady}};
     }
     function finaleBed(s,t) {
       room(t,true);

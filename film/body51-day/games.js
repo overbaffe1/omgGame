@@ -61,79 +61,130 @@
       });
     }
 
-    function hellfarmer(s, t) {
-      floor(1386); header('DESKTOP HELLFARMER', '#dab99a', 'В РЕЛИЗЕ');
-      box(128, 580, 824, 682, 25, '#263e48', C.ink, 5);
-      g.save(); g.beginPath(); g.roundRect(142, 592, 796, 656, 18); g.clip();
-      const phase = (t * .69) % 1, hit = ease(seg(phase, .25, .42));
-      // Layered little dungeon. Everything is actually drawn inside the window.
-      for (let i = 0; i < 8; i++) {
-        box(142 + i * 115, 669 + i % 2 * 42, 93, 183, 5, i % 2 ? '#38514e' : '#3f5a56', null);
-        line([[161 + i * 115, 693 + i % 2 * 42], [209 + i * 115, 693 + i % 2 * 42]], '#577068', 3);
-      }
-      box(726, 693, 147, 212, 68, '#926246', '#b28454', 7);
-      box(746, 713, 107, 193, 52, '#d7a24f', null);
-      for (let i = 0; i < 6; i++) oval(764 + i * 14, 799 + Math.sin(t * 3 + i) * 39, 11, 37, '#e5bd603e');
-      poly([[142, 967], [455, 893], [938, 946], [938, 1260], [142, 1260]], '#4a5b50', null);
-      for (let i = 0; i < 5; i++) line([[149, 1016 + i * 51], [937, 1011 + i * 55]], '#64715a', 2);
-      shadow(460, 1100, 89, 16); shadow(740, 1088, 67, 15);
-      // Automated fighter: anticipation, follow-through, recovery, not a static icon.
-      local(462 + hit * 24, 1081, 1.12, () => {
-        const bob = Math.sin(t * 7) * 4;
-        line([[-28, -58], [-43, 0]], '#aebba3', 23); line([[24, -58], [48, 0]], '#aebba3', 23);
-        box(-45, -150 + bob, 90, 104, 20, '#86aeb0', '#172f38', 5);
-        poly([[-48, -60], [50, -60], [62, -37], [-63, -37]], '#bd9b66', C.ink, 4);
-        oval(0, -177 + bob, 45, 41, '#d7c7a3', C.ink, 4);
-        shape(p => { p.moveTo(-49, -168 + bob); p.lineTo(-38, -213 + bob); p.lineTo(15, -240 + bob); p.lineTo(44, -206 + bob); p.lineTo(48, -168 + bob); p.quadraticCurveTo(0, -197 + bob, -49, -168 + bob); }, '#88a6a3', C.ink, 5);
-        line([[-25, -175 + bob], [25, -175 + bob]], '#243c40', 7);
-        line([[-45, -129], [-67, -83]], '#bdc6aa', 23);
-        // A curved slash resolves before the next cycle, never leaving the playfield.
-        const angle = lerp(-.95, .88, hit) * (1 - ease(seg(phase, .62, .94)));
-        local(43, -116, 1, () => {
-          line([[0, 0], [34, -22]], '#bdc6aa', 22); oval(37, -23, 13, 13, '#d7c7a3', C.ink, 3);
-          poly([[37, -39], [43, -182], [60, -214], [75, -182], [67, -34]], '#dce5cf', C.ink, 4);
-          line([[24, -38], [83, -28]], '#b79761', 10);
-        }, angle);
-      });
-      const dead = phase > .36 && phase < .77;
-      if (!dead) local(730 - seg(phase, 0, .36) * 39, 1091, 1, () => {
-        const walk = Math.sin(t * 12) * 7;
-        line([[-14, -39], [-23 + walk, 0]], '#c5ccb4', 10); line([[14, -39], [23 - walk, 0]], '#c5ccb4', 10);
-        line([[0, -101], [0, -35]], '#c5ccb4', 10);
-        for (let j = 0; j < 3; j++) line([[-23, -89 + j * 15], [23, -89 + j * 15]], '#c5ccb4', 7);
-        oval(0, -130, 36, 34, '#d7d8be', C.ink, 4);
-        for (const d of [-1, 1]) oval(d * 12, -132, 7, 9, C.ink);
-        line([[-19, -110], [19, -110]], C.ink, 3);
-        line([[-20, -97], [-45, -77]], '#c5ccb4', 9); line([[20, -97], [48, -107]], '#c5ccb4', 9);
-      });
-      if (dead) {
-        const p = seg(phase, .36, .77);
-        g.save(); g.globalAlpha = 1 - p;
-        for (let i = 0; i < 8; i++) sparkle(694 + Math.cos(i * TAU / 8) * (20 + p * 86), 984 + Math.sin(i * TAU / 8) * p * 71, 7 + (1 - p) * 8, '#e6ce8e', i);
-        g.restore();
-        for (let i = 0; i < 4; i++) {
-          const pp = clamp((p - i * .07) * 1.35);
-          coin(lerp(704, 584, pp) + i * 19, lerp(1028, 1184, pp) - Math.sin(pp * Math.PI) * 149, 11, t * 13 + i);
+    function trousers(x,y,s,color='#6c85a0',hanger=false) {
+      asset('Экипировка — штаны',x,y,s,[-54,-65,55,112],()=>{
+        if(hanger){
+          shape(p=>{p.moveTo(0,-47);p.quadraticCurveTo(0,-65,11,-57);p.quadraticCurveTo(20,-46,4,-42);},null,'#b6bdaa',4);
+          poly([[-45,-18],[0,-43],[45,-18]],null,'#b6bdaa',4);
         }
-        label('ЛУТ +1', 758, 890 - p * 24, 26, '#e4ce8c', 800, 'center', 190);
+        shape(p=>{p.moveTo(-39,-17);p.lineTo(39,-17);p.lineTo(49,99);p.lineTo(10,105);p.lineTo(-1,32);p.lineTo(-13,105);p.lineTo(-50,98);p.closePath();},color,C.ink,4);
+        line([[-39,-7],[38,-7]],'#c5cbbb',4);
+        line([[0,-6],[1,24],[-4,32]],C.ink,2.4);
+        for(const d of [-1,1]){
+          line([[d*29,14],[d*34,78]],'#d8dbc272',2.5);
+          line([[d*13,93],[d*44,90]],'#d4d7c0',3);
+        }
+      });
+    }
+    function dungeonHero(x,y,t,swing=0,pantsColor='#aebba3') {
+      local(x,y,1.07,()=>{
+        const bob=Math.sin(t*5)*2;
+        line([[-26,-59],[-41,0]],C.ink,28);line([[25,-59],[48,0]],C.ink,28);
+        line([[-26,-59],[-41,0]],pantsColor,21);line([[25,-59],[48,0]],pantsColor,21);
+        oval(-41,6,24,10,'#4b544a',C.ink,3);oval(49,6,24,10,'#4b544a',C.ink,3);
+        box(-46,-150+bob,92,104,21,'#8caaa7',C.ink,5);
+        poly([[-49,-64],[50,-64],[61,-41],[-63,-41]],'#b48f5f',C.ink,4);
+        oval(0,-178+bob,43,40,'#d2c0a0',C.ink,4);
+        shape(p=>{p.moveTo(-49,-169+bob);p.lineTo(-39,-213+bob);p.lineTo(13,-240+bob);p.lineTo(43,-205+bob);p.lineTo(48,-168+bob);p.quadraticCurveTo(0,-194+bob,-49,-169+bob);},'#829e9a',C.ink,5);
+        line([[-24,-177+bob],[25,-177+bob]],'#263a3e',7);
+        line([[-43,-126],[-69,-85]],'#b1bea6',23);
+        local(40,-117,1,()=>{
+          line([[0,0],[35,-22]],'#bac3a9',23);oval(37,-23,13,13,'#d6c49f',C.ink,3);
+          poly([[38,-38],[44,-180],[60,-211],[74,-180],[68,-32]],'#dbe4cd',C.ink,4);
+          line([[23,-36],[84,-29]],'#b99b61',10);
+        },swing);
+      });
+    }
+    function dungeonSkeleton(x,y,t,shop=false) {
+      local(x,y,1,()=>{
+        const tap=shop?Math.max(0,Math.sin(t*8))*6:Math.sin(t*11)*6;
+        line([[-14,-40],[-25,1]],'#c6cbb1',10);line([[14,-40],[24,1-tap]],'#c6cbb1',10);
+        oval(-27,5,16,6,'#b8c2a8',C.ink,2);oval(27,5-tap,16,6,'#b8c2a8',C.ink,2);
+        line([[0,-100],[0,-36]],'#c6cbb1',10);
+        for(let k=0;k<3;k++)line([[-23,-88+k*15],[24,-88+k*15]],'#c6cbb1',7);
+        oval(0,-130,35,34,'#d7d8bf',C.ink,4);
+        for(const d of [-1,1])oval(d*12,-133,7,9,C.ink);
+        line([[-18,-111],[18,-111]],C.ink,3);
+        line([[-20,-97],shop?[-66,-95]:[-47,-76]],'#c6cbb1',9);
+        line([[20,-96],shop?[53,-65]:[48,-108]],'#c6cbb1',9);
+        if(shop){
+          line([[-21,-147],[-6,-143]],C.ink,3);
+          box(-23,-94,45,65,5,'#a7786c',C.ink,3);
+          line([[-18,-92],[19,-92]],'#c4a38a',3);
+        }
+      });
+    }
+    function hellfarmer(s,t) {
+      floor(1386);header('DESKTOP HELLFARMER','#c8b59a');
+      box(128,580,824,723,25,'#273d44',C.ink,5);
+      g.save();g.beginPath();g.roundRect(142,592,796,697,18);g.clip();
+      // Diablo-like dungeon language: oblique stonework, fire, two orbs and loot.
+      // This is a cartoon of the genre, not a claim of manual control per hit.
+      for(let row=0;row<4;row++)for(let col=0;col<8;col++){
+        const x=128+col*117+(row%2)*-52,y=594+row*71;
+        box(x,y,109,63,5,row%2?'#35494b':'#3d5150',null);
       }
-      box(182, 1163, 702, 56, 14, '#20363c', '#78907f', 3);
-      label('АВТОБОЙ', 421, 1200, 23, '#bbd4ba', 800, 'left', 220);
-      for (let i = 0; i < 5; i++) { box(590 + i * 54, 1173, 44, 36, 5, '#3b5352', null); coin(612 + i * 54, 1191, 10, i); }
-      g.restore();
-      const camera = ease(seg(t, beat(s, 'camera', cue(s, 2) + .25), beat(s, 'camera', cue(s, 2) + .25) + .26));
-      if (camera > 0) {
-        g.save(); g.globalAlpha = camera;
-        box(100, 1028, 289, 413, 17, '#edf0dc', C.teal, 5);
-        box(100, 1028, 289, 51, 16, C.ink, null);
-        oval(126, 1053, 7, 7, Math.sin(t*4) > 0 ? C.coral : '#ac604e');
-        label('REC', 149, 1062, 24, C.white, 800, 'left', 85);
-        oval(329, 1053, 13, 8, null, '#c0d4b6', 2); oval(329, 1053, 4, 4, '#c0d4b6');
-
+      box(742,667,139,222,62,'#6e5544','#977657',6);
+      box(759,685,105,204,48,'#bc8743',null);
+      for(let i=0;i<5;i++)oval(774+i*17,798+Math.sin(t*3+i)*31,9,42,'#efc56a58');
+      const A=[145,982],B=[535,812],C0=[938,990],D=[549,1201];
+      poly([A,B,C0,D],'#5c6352',null);
+      for(let k=1;k<8;k++){
+        const u=k/8;
+        line([[lerp(A[0],B[0],u),lerp(A[1],B[1],u)],[lerp(D[0],C0[0],u),lerp(D[1],C0[1],u)]],'#7b7e65',2);
+        line([[lerp(B[0],C0[0],u),lerp(B[1],C0[1],u)],[lerp(A[0],D[0],u),lerp(A[1],D[1],u)]],'#7b7e65',2);
+      }
+      const fight=beat(s,'fight',cue(s,2)),fittingAt=beat(s,'fitting',cue(s,3)+.15);
+      const shop=ease(seg(t,fittingAt,fittingAt+.36));
+      const phase=t<fight?0:((t-fight)/.85)%1;
+      const hit=shop>0?0:ease(seg(phase,.12,.30))*(1-ease(seg(phase,.52,.85)));
+      const down=t>fight&&phase>.26&&phase<.65&&shop===0;
+      shadow(479,1132,91,16);shadow(755,1132,65,13);
+      dungeonHero(475+hit*20,1122,t,shop>0?-.1:lerp(-.63,.75,hit),shop>0?(Math.floor(t*2)%2?'#7b997f':'#698aab'):'#b7c1a4');
+      if(!down)dungeonSkeleton(756-hit*17,1120,t,shop>.8);
+      if(down){
+        const p=seg(phase,.26,.65);
+        for(let k=0;k<7;k++)sparkle(725+Math.cos(k*TAU/7)*(16+p*63),982+Math.sin(k*TAU/7)*p*53,7*(1-p)+3,C.yellow,k);
+        for(let k=0;k<4;k++)coin(699+k*18,1084-Math.sin(p*Math.PI)*112,9,t*11+k);
+      }
+      if(shop>0){
+        // The epic adventure becomes a literal fitting room, without a second
+        // speech explaining the joke. The waiting monster is now the attendant.
+        g.save();g.globalAlpha=shop;
+        for(const x of [358,631])line([[x,692],[x,1155]],'#a7aa90',9);
+        line([[342,695],[647,695]],'#d4be87',12);
+        box(374,635,245,46,8,'#d1b684',C.ink,3);
+        label('ПРИМЕРОЧНАЯ',496,667,24,C.ink,800,'center',224);
+        g.save();g.beginPath();g.rect(363,706,263*shop,388);g.clip();
+        box(363,706,263,388,0,'#965e5a','#432f34',3);
+        for(let k=0;k<8;k++){
+          const x=367+k*37+Math.sin(t*2+k)*3;
+          shape(p=>{p.moveTo(x,713);p.bezierCurveTo(x-13,845,x+13,942,x,1083);},null,k%2?'#b78373':'#764746',12);
+        }
         g.restore();
+        for(let k=0;k<2;k++){
+          const xx=k?840:243,selected=Math.floor(t*1.5)%2===k;
+          box(xx-62,740,124,188,14,'#e5ddbf',selected?C.yellow:'#728378',selected?6:3);
+          trousers(xx,798,.74,k?'#85957b':'#718eac');
+          if(selected)poly([[xx+34,947],[xx+36,914],[xx+60,937],[xx+47,937],[xx+53,949],[xx+45,953],[xx+39,941]],C.white,C.ink,2);
+        }
+        g.restore();
+        if(t>beat(s,'anotherPair',cue(s,3)+1.25))trousers(690,1060,.73,'#c39496',true);
       }
-      person(235, 1421, .59, t, {pose: 'point', puzzled: camera > .5});
-      tag(camera > .5 ? 'ТЕПЕРЬ АРТЁМ — КОНТЕНТ' : 'САМ БЬЁТ. САМ ЛУТАЕТ.', 682, 1375, 449, C.yellow, 25, -.018);
+      // Genre cues, not the old AUTO button or a fake webcam/viewer counter.
+      box(166,1198,748,83,15,'#203139','#667667',3);
+      for(const [x,col] of [[222,'#b64e46'],[858,'#587aaf']]){
+        oval(x,1241,42,42,'#c0a373',C.ink,4);oval(x,1241,34,34,col,C.ink,2);
+        oval(x-10,1228,13,16,'#fff4ce42');
+      }
+      for(let k=0;k<5;k++){
+        box(320+k*78,1213,55,49,7,'#3d524d','#96a28b',2);
+        if(k%2)poly([[337+k*78,1220],[354+k*78,1220],[346+k*78,1238],[357+k*78,1238],[335+k*78,1256],[340+k*78,1242],[330+k*78,1242]],C.yellow,null);
+        else{box(339+k*78,1226,17,26,5,k?'#6786b0':'#b36c58',null);box(342+k*78,1220,11,9,2,'#d0bb82',null);}
+      }
+      g.restore();
+      if(shop>.8) tag('ДЕМОНЫ ПОДОЖДУТ',540,1380,476,C.yellow,29,-.016);
+      else tag('ЕЩЁ ОДИН ЗАБЕГ',540,1380,425,'#d6c094',29,-.016);
     }
 
     function backpack(x, y, s, t, bulge = 0) {

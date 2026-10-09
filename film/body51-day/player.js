@@ -5,7 +5,6 @@
   const params = new URLSearchParams(location.search), live = params.get('live') === '1';
   const video = $('video'), canvas = $('live-canvas'), media = live ? $('live-audio') : video;
   const start = $('start'), toggle = $('toggle'), seek = $('seek'), status = $('status');
-  const names = ['Начальник Гуччи', 'Сервис для кота', 'Кошачье ревью', 'На турничок', 'Тихая фабрика', 'Нейромеч', 'Ещё промптик', 'Итог дня'];
   const format = value => `${Math.floor(Math.max(0, value) / 60)}:${String(Math.floor(Math.max(0, value) % 60)).padStart(2, '0')}`;
   const duration = () => Number.isFinite(media.duration) ? Math.min(data.total, media.duration) : data.total;
   let movie = null, raf = 0, lastScene = -1, hasPlayed = false;
@@ -23,11 +22,12 @@
   video.controls = false;
   start.hidden = false; $('transport').hidden = false; seek.max = data.total;
   $('duration').textContent = format(Math.round(data.total));
+  document.querySelector('.chapter-heading > span').textContent = `${data.scenes.length} СЦЕН`;
   const chapterButtons = data.scenes.map((s, i) => {
     const button = document.createElement('button');
     button.className = 'chapter'; button.type = 'button';
     const num = document.createElement('span'); num.className = 'num'; num.textContent = String(i + 1).padStart(2, '0');
-    const name = document.createElement('span'); name.textContent = s.chapterLabel || names[i] || s.title.join(' ');
+    const name = document.createElement('span'); name.textContent = s.chapterLabel || s.title.join(' ');
     const time = document.createElement('time'); time.textContent = format(s.start);
     button.append(num, name, time);
     button.addEventListener('click', () => { jump(s.start); play(); });
@@ -36,7 +36,7 @@
   function update() {
     const t = Math.min(media.currentTime || 0, data.total);
     seek.value = t; seek.setAttribute('aria-valuetext', `${format(t)} из ${format(Math.round(data.total))}`);
-    $('current').textContent = format(t);
+    $('current').textContent = format(media.ended ? Math.round(data.total) : t);
     // Rounded scene durations can overlap the next start by a few microseconds.
     // Pick the latest started scene, so clicking a chapter highlights that
     // chapter immediately instead of briefly keeping its predecessor active.

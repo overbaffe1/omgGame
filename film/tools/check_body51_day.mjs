@@ -19,6 +19,12 @@ if (data.version !== 'day-1') {
   assert(!data.scenes.some(s => s.voice === 'd08'));
   assert.equal(data.format.fps, 60);
 }
+if (data.version === 'day-5') {
+  assert.equal(data.scenes.length,10);
+  assert(!data.scenes.some(s=>s.id==='printers'||/принтер/i.test(s.text)||/printers/i.test(s.voice)),'Removed subject returned');
+  const game=data.scenes.find(s=>s.id==='hellfarmer');
+  assert(!/автобой|всё делает сам|игра стримит|сам бьёт|сам собирает/i.test(game.text),'Old Hellfarmer premise returned');
+}
 let cursor = 0;
 for (const s of data.scenes) {
   assert(Math.abs(s.start - cursor) < .00002, `${s.id}: non-contiguous scene`);
@@ -44,14 +50,14 @@ const frames = Math.round(data.total * data.format.fps);
 let assets = 0, texts = 0;
 let lastBedPose = null;
 const actionBounds = data.presentation?.actionBounds || {left:64,top:449,right:1016,bottom:1459};
-const forbidden = /@body51|за\s+кадром|по\s+стримам|#\d{3}|\b\d{2}\s*\/\s*\d{2}\b|9:16|Собирательный день/i;
+const forbidden = /автобой|принтер|@body51|за\s+кадром|по\s+стримам|#\d{3}|\b\d{2}\s*\/\s*\d{2}\b|9:16|Собирательный день/i;
 for (let frame = 0; frame < frames; frame++) {
   const report = movie.draw(frame / data.format.fps);
   if (data.presentation?.cleanFrame) {
     for (const text of report.drawnText || []) assert(!forbidden.test(text), `Forbidden overlay: ${text}`);
   }
   const pose = report.scene === 'wake' ? report.action?.bedPose : null;
-  if (pose && data.version === 'day-4') {
+  if (pose && ['day-4','day-5'].includes(data.version)) {
     if (frame < data.format.fps) {
       assert.equal(pose.phase, 'lying');
       assert(Math.abs(pose.angle + Math.PI/2) < .001, 'Sleeper must be horizontal');
@@ -82,6 +88,19 @@ for (const s of data.scenes) {
     assert.equal(movie.draw(s.startFrame / data.format.fps).scene, s.id, `Late scene cut: ${s.id}`);
     assert.equal(movie.draw((s.endFrame - 1) / data.format.fps).scene, s.id, `Early scene cut: ${s.id}`);
   }
+}
+if (data.version === 'day-5') {
+  const s=data.scenes[0],ev=s.events;
+  const at=t=>movie.draw(s.start+t).action.bedPose;
+  for(const [time,phase] of [[ev.swat-.03,'waiting'],[ev.swat+.12,'outbound'],[(ev.pillow+ev.rebound)/2,'pillow'],[(ev.rebound+ev.catch)/2,'returning'],[ev.catch+.4,'caught']]) assert.equal(at(time).catPhase,phase);
+  const hit=at(ev.swat);
+  assert(Math.hypot(hit.rightHand[0]-hit.contact[0],hit.rightHand[1]-hit.contact[1])<.001,'Launch is not tied to the hand');
+  assert(at(ev.swat+.12).rightHand[0]<hit.rightHand[0]-40,'No follow-through');
+  assert(at((ev.pillow+ev.rebound)/2).pillowSquash>.95,'Pillow did not absorb the landing');
+  const held=at(ev.catch+.5);assert(Math.hypot(held.catFoot[0]-held.hold[0],held.catFoot[1]-held.hold[1])<.01,'Cat not caught at the chest');
+  const f=data.scenes.at(-1),perched=movie.draw(f.start+f.events.catPerch+.5).action.finaleCat;
+  assert.equal(perched.phase,'perched');assert(Math.hypot(perched.position[0]-perched.head[0],perched.position[1]-perched.head[1])<.01);
+  console.log('✓ Palm contact → pillow squash → rebound → catch; finale perch; no removed scene/premise');
 }
 const digest = t => { movie.draw(t); return createHash('sha256').update(canvas.toBuffer('image/png')).digest('hex'); };
 for (const t of data.scenes.map(s => s.start + s.duration * .7)) {
