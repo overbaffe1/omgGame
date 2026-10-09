@@ -28,6 +28,7 @@ export function drawing(data = timeline(), scale = 1) {
   sandbox.window = sandbox;
   vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(dayDir, 'games.js'), 'utf8'), sandbox, {filename: 'body51-day/games.js'});
+  vm.runInContext(fs.readFileSync(path.join(dayDir, 'bedroom.js'), 'utf8'), sandbox, {filename: 'body51-day/bedroom.js'});
   vm.runInContext(fs.readFileSync(path.join(dayDir, 'film.js'), 'utf8'), sandbox, {filename: 'body51-day/film.js'});
   const movie = sandbox.Body51Day.create(canvas, data);
   return {canvas, movie};

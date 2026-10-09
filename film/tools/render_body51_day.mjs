@@ -44,7 +44,7 @@ if (shots) {
   }
   async function renderChunk(file, a, b) {
     const {canvas, movie} = drawing(data);
-    const p = spawn(ffmpeg, ['-y', '-v', 'error', '-f', 'rawvideo', '-pixel_format', 'rgba', '-video_size', `${data.format.width}x${data.format.height}`, '-framerate', String(FPS), '-i', 'pipe:0', '-an', '-c:v', 'libx264', '-preset', 'fast', '-crf', arg('crf', '18'), '-threads', '1', '-pix_fmt', 'yuv420p', '-frames:v', String(b - a), '-video_track_timescale', String(FPS), '-movflags', '+faststart', file], {stdio: ['pipe', 'inherit', 'inherit']});
+    const p = spawn(ffmpeg, ['-y', '-v', 'error', '-f', 'rawvideo', '-pixel_format', 'rgba', '-video_size', `${data.format.width}x${data.format.height}`, '-framerate', String(FPS), '-i', 'pipe:0', '-an', '-c:v', 'libx264', '-preset', 'fast', '-crf', arg('crf', '17'), '-threads', '1', '-pix_fmt', 'yuv420p', '-frames:v', String(b - a), '-video_track_timescale', String(FPS), '-movflags', '+faststart', file], {stdio: ['pipe', 'inherit', 'inherit']});
     const done = once(p, 'exit');
     // Handle early pipe failure without leaving an unhandled EPIPE.
     p.stdin.on('error', () => {});
@@ -71,7 +71,7 @@ if (shots) {
         const a = first + Math.floor((end - first) * j / jobs), b = first + Math.floor((end - first) * (j + 1) / jobs);
         if (b <= a) continue;
         const file = path.join(temp, `part-${j}.mp4`); parts.push(file); partDurations.push((b - a) / FPS);
-        workers.push(subprocess(process.execPath, [fileURLToPath(import.meta.url), '--worker', '--first', String(a), '--end', String(b), '--out', file, '--crf', arg('crf', '18')]));
+        workers.push(subprocess(process.execPath, [fileURLToPath(import.meta.url), '--worker', '--first', String(a), '--end', String(b), '--out', file, '--crf', arg('crf', '17')]));
       }
       await Promise.all(workers);
       const list = path.join(temp, 'parts.txt');
@@ -80,7 +80,7 @@ if (shots) {
       fs.writeFileSync(list, parts.map((p, i) => `file '${p.replaceAll("'", "'\\''")}'\nduration ${partDurations[i].toFixed(9)}`).join('\n'));
       const final = path.join(temp, 'final.mp4');
       const audioArgs = first ? ['-ss', String(first / FPS)] : [];
-      await subprocess(ffmpeg, ['-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', list, ...audioArgs, '-i', path.join(dayDir, data.audio), '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-c:a', 'copy', '-t', String((end - first) / FPS), '-video_track_timescale', String(FPS), '-movflags', '+faststart', '-metadata', 'title=Один день Артёма — @body51', '-metadata', 'comment=Собирательный день по стримам. Новый 2D-мульт; синтетический рассказчик, не голос Артёма.', final]);
+      await subprocess(ffmpeg, ['-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', list, ...audioArgs, '-i', path.join(dayDir, data.audio), '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-c:a', 'copy', '-t', String((end - first) / FPS), '-video_track_timescale', String(FPS), '-movflags', '+faststart', '-metadata', 'title=Один день Артёма', '-metadata', 'comment=Собирательный день по стримам. Новый 2D-мульт; синтетический рассказчик, не голос Артёма.', final]);
       fs.mkdirSync(path.dirname(path.resolve(out)), {recursive: true});
       // The public path changes only after a successful mux, never mid-render.
       fs.copyFileSync(final, out + '.tmp'); fs.renameSync(out + '.tmp', out);

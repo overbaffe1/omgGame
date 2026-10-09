@@ -2,93 +2,98 @@
   "targetLUFS": -16,
   "truePeakCeiling": -1.5,
   "input": {
-    "input_i": "-17.30",
-    "input_tp": "-2.17",
-    "input_lra": "3.10",
-    "input_thresh": "-28.18",
-    "output_i": "-16.10",
+    "input_i": "-17.32",
+    "input_tp": "-2.19",
+    "input_lra": "2.90",
+    "input_thresh": "-28.14",
+    "output_i": "-16.08",
     "output_tp": "-1.50",
-    "output_lra": "2.90",
-    "output_thresh": "-26.90",
+    "output_lra": "2.70",
+    "output_thresh": "-26.85",
     "normalization_type": "dynamic",
-    "target_offset": "0.10"
+    "target_offset": "0.08"
   },
-  "version": "day-3",
+  "version": "day-4",
   "events": [
     {
       "scene": "wake",
-      "id": "plan",
-      "at": 2.3652
+      "id": "wake",
+      "at": 2.32772
     },
     {
       "scene": "wake",
-      "id": "veto",
-      "at": 4.73566
+      "id": "blanket",
+      "at": 2.82772
+    },
+    {
+      "scene": "wake",
+      "id": "claim",
+      "at": 4.41846
+    },
+    {
+      "scene": "wake",
+      "id": "feet",
+      "at": 4.86846
     },
     {
       "scene": "service",
       "id": "demand",
-      "at": 12.63222
+      "at": 16.39888
     },
     {
       "scene": "stream",
       "id": "mute",
-      "at": 21.01319
+      "at": 24.77985
     },
     {
       "scene": "stream",
       "id": "comment",
-      "at": 22.57912
+      "at": 26.34578
     },
     {
       "scene": "break",
       "id": "freeze",
-      "at": 29.5908
+      "at": 33.35747
     },
     {
       "scene": "printers",
       "id": "idle",
-      "at": 34.0413
+      "at": 37.80797
     },
     {
       "scene": "printers",
       "id": "parallel",
-      "at": 36.12169
+      "at": 39.88836
     },
     {
       "scene": "sword",
       "id": "throne",
-      "at": 45.25041
+      "at": 49.01707
     },
     {
       "scene": "hellfarmer",
       "id": "camera",
-      "at": 52.97776
+      "at": 56.74442
     },
     {
       "scene": "inspector",
       "id": "cool",
-      "at": 63.89865
+      "at": 67.66532
     },
     {
       "scene": "meridian",
       "id": "boss",
-      "at": 73.31447
+      "at": 77.08114
     },
     {
       "scene": "night",
       "id": "deadline",
-      "at": 80.35252
+      "at": 84.11919
     },
     {
       "scene": "finale",
-      "id": "request",
-      "at": 87.32254
-    },
-    {
-      "scene": "finale",
-      "id": "veto",
-      "at": 89.58614
+      "id": "barCut",
+      "at": 92.6163
     }
   ],
   "note": "Narration, music and Foley are separate. Comic music rests preserve speech and impact sounds. Ducking never affects narration."

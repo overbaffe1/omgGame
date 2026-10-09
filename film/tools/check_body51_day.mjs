@@ -42,10 +42,32 @@ assert(Math.abs(cursor - data.total) < .0001);
 const {canvas, movie} = drawing(data, .25);
 const frames = Math.round(data.total * data.format.fps);
 let assets = 0, texts = 0;
+let lastBedPose = null;
+const actionBounds = data.presentation?.actionBounds || {left:64,top:449,right:1016,bottom:1459};
+const forbidden = /@body51|за\s+кадром|по\s+стримам|#\d{3}|\b\d{2}\s*\/\s*\d{2}\b|9:16|Собирательный день/i;
 for (let frame = 0; frame < frames; frame++) {
   const report = movie.draw(frame / data.format.fps);
+  if (data.presentation?.cleanFrame) {
+    for (const text of report.drawnText || []) assert(!forbidden.test(text), `Forbidden overlay: ${text}`);
+  }
+  const pose = report.scene === 'wake' ? report.action?.bedPose : null;
+  if (pose && data.version === 'day-4') {
+    if (frame < data.format.fps) {
+      assert.equal(pose.phase, 'lying');
+      assert(Math.abs(pose.angle + Math.PI/2) < .001, 'Sleeper must be horizontal');
+      assert(pose.head[0] > 220 && pose.head[0] < 450 && pose.head[1] > 990 && pose.head[1] < 1120, 'Head must rest on the pillow');
+    }
+    if (pose.release === 0) assert(Math.hypot(pose.rightHand[0]-pose.grip[0],pose.rightHand[1]-pose.grip[1]) < .01,'Blanket must follow the hand');
+    if (pose.stand > .999) for (const foot of pose.feet) assert(Math.abs(foot[1]-pose.floor) < .01,'Feet must reach the slippers');
+    if (pose.catSurfaceY !== null) assert(Math.abs(pose.catFoot[1]-pose.catSurfaceY)<.01,'Cat floating above the moving blanket');
+    if(lastBedPose) {
+      assert(pose.blanketLeft+.0001 >= lastBedPose.blanketLeft,'Blanket folded backwards');
+      for(let i=0;i<2;i++) assert(Math.hypot(pose.feet[i][0]-lastBedPose.feet[i][0],pose.feet[i][1]-lastBedPose.feet[i][1]) < 25,'Foot teleported');
+    }
+    lastBedPose=pose;
+  }
   for (const b of report.bounds) {
-    assert(b.x >= 64 && b.right <= 1016 && b.y >= 449 && b.bottom <= 1459,
+    assert(b.x >= actionBounds.left && b.right <= actionBounds.right && b.y >= actionBounds.top && b.bottom <= actionBounds.bottom,
       `frame ${frame} / ${report.scene}: ${b.name} outside action area: ${JSON.stringify(b)}`);
     assets++;
   }

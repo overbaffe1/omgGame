@@ -27,7 +27,7 @@
         for (let i = 0; i < 4; i++) shape(p => { p.moveTo(-53 + i * 32, 8); p.quadraticCurveTo(-44 + i * 32, -3, -51 + i * 32, -13); }, null, '#a5784b', 4);
       }, angle);
     }
-    function villager(x, y, s, t, baker = false, arm = 0, shocked = false) {
+    function villager(x, y, s, t, baker = false, arm = 0, shocked = false, relieved = false) {
       asset(baker ? 'Пекарь' : 'Персонаж White Meridian', x, y, s, [-101, -238, 99, 15], () => {
         const walk = Math.sin(t * 9), bob = Math.abs(walk) * 3;
         line([[-22, -51], [-29 + walk * 7, 0]], C.ink, 21);
@@ -47,8 +47,9 @@
             shape(p => { p.moveTo(-44, -155); p.lineTo(-41, -192); p.lineTo(9, -210); p.lineTo(43, -176); p.lineTo(44, -151); p.quadraticCurveTo(12, -180, -44, -155); }, '#527f69', C.ink, 4);
             poly([[-40, -124], [39, -124], [24, -101], [-10, -108]], C.coral, C.ink, 3);
           }
-          for (const d of [-1, 1]) { oval(d * 16, -153, 3, 5, C.ink); line([[d * 16 - 6, -168 + (baker ? d * 3 : 0)], [d * 16 + 7, -168 - (baker ? d * 3 : 0)]], C.ink, 3); }
-          if (shocked && !baker) oval(2, -136, 7, 10, C.ink);
+          for (const d of [-1, 1]) { oval(d * 16, -153, 3, 5, C.ink); line([[d * 16 - 6, -168 + (baker && !relieved ? d * 3 : 0)], [d * 16 + 7, -168 - (baker && !relieved ? d * 3 : 0)]], C.ink, 3); }
+          if (relieved) shape(p => { p.moveTo(-10,-137); p.quadraticCurveTo(1,-124,13,-137); },null,C.ink,3);
+          else if (shocked && !baker) oval(2, -136, 7, 10, C.ink);
           else shape(p => { p.moveTo(-8, -136); p.quadraticCurveTo(0, baker ? -142 : -127, 12, -136); }, null, C.ink, 3);
           if (baker && shocked) {
             // The ultimate bread guardian's weapon is only a rolling pin.
@@ -128,7 +129,7 @@
         oval(126, 1053, 7, 7, Math.sin(t*4) > 0 ? C.coral : '#ac604e');
         label('REC', 149, 1062, 24, C.white, 800, 'left', 85);
         oval(329, 1053, 13, 8, null, '#c0d4b6', 2); oval(329, 1053, 4, 4, '#c0d4b6');
-        label('1', 357, 1061, 22, '#c0d4b6', 800, 'center', 33);
+
         g.restore();
       }
       person(235, 1421, .59, t, {pose: 'point', puzzled: camera > .5});
@@ -216,9 +217,10 @@
       if (boss > 0) {
         g.save(); g.globalAlpha = boss * .1; box(142, 591, 796, 639, 0, '#90584b', null); g.restore();
       }
-      villager(354 + steal * 55 - boss * 10, 1188, .96 + boss * 1.08, chase, true, steal, boss > .1);
-      villager(712 + Math.sin(chase * 2) * 20 * steal + boss * 28, 1190, 1 - boss*.09, chase, false, 0, boss > .1);
-      bread(lerp(454, 657, steal), 1091 - Math.sin(steal * Math.PI) * 76, .62, Math.sin(t * 3) * .05);
+      const give = ease(seg(t,beat(s,'boss',cue(s,3)+.45)+.62,beat(s,'boss',cue(s,3)+.45)+1.47));
+      villager(354 + steal * 55 - boss * 10, 1188, .96 + boss * 1.08, chase, true, steal*(1-give*.8), boss > .1, give > .85);
+      villager(712 + Math.sin(chase * 2) * 20 * steal + boss * 28, 1190, 1 - boss*.09, chase, false, 0, boss > .1, give > .85);
+      bread(lerp(lerp(454,657,steal),552,give),lerp(1091-Math.sin(steal*Math.PI)*76,982,give)-Math.sin(give*Math.PI)*27,.62,Math.sin(t*3)*.05);
       if (steal > .5 && boss < .2) {
         tag('ГДЕ ХЛЕБ?!', 690, 861, 275, C.white, 28, -.025);
         poly([[620, 891], [641, 912], [659, 887]], C.white, C.ink, 3);
@@ -233,14 +235,14 @@
       if (boss > 0) {
         g.save(); g.globalAlpha = boss;
         box(163, 604, 754, 109, 13, '#293b3c', '#172f34', 4);
-        label('ПЕКАРЬ · ХРАНИТЕЛЬ БАТОНА', 540, 645, 27, C.white, 800, 'center', 711);
+        label(give > .85 ? 'БАТОН ВОЗВРАЩЁН. МИР.' : 'ПЕКАРЬ · ХРАНИТЕЛЬ БАТОНА', 540, 645, 27, C.white, 800, 'center', 711);
         box(183, 669, 714, 22, 8, '#795851', null);
-        box(187, 673, 686, 14, 5, C.coral, null);
+        box(187, 673, 686, 14, 5, give > .85 ? '#86ba91' : C.coral, null);
         g.restore();
       }
       g.restore();
       if (boss > .4) {
-        tag('АГРО +100', 328, 1326, 355, C.yellow, 29, -.015);
+        tag(give > .85 ? 'ДИПЛОМАТИЯ' : 'АГРО +100', 328, 1326, 355, C.yellow, 29, -.015);
         bread(771, 1325, 1.32, -.09 + Math.sin(t * 2) * .025);
         sparkle(625, 1330, 15, '#af9852', .2); sparkle(914, 1291, 13, '#af9852', -.2);
       } else tag('СНАЧАЛА — НАКОРМИТЬ НПС', 540, 1334, 644, '#cbdabd', 27, -.018);

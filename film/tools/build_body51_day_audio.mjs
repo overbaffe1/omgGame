@@ -79,8 +79,13 @@ for (const s of data.scenes) {
   console.log(`${s.voice} at ${(s.start + s.lead).toFixed(3)}s · gain ${gain.toFixed(3)} · trim ${s.trimIn}–${s.trimOut}`);
   if (s.id === 'wake') {
     bell(.45, 86, .035, .22); bell(.71, 83, .035, .22); bell(.97, 86, .026, .22);
-    boing(cue(s, 1), .035);
-    const at = event(s, 'veto'); musicRest(at - .16, .77); knock(at, .075); knock(at + .045, .04);
+    const cloth = event(s, 'blanket');
+    let soft = 0;
+    add(cloth, 1.25, (t,u) => { soft += .1*(noise()-soft); return soft*.035*Math.sin(Math.PI*u); });
+    const landing=event(s,'claim')+.74;
+    knock(landing,.048);
+    knock(event(s,'feet')+.25,.028);knock(event(s,'feet')+.39,.024);
+    musicRest(cue(s,3)-.08,.48);
   }
   if (s.id === 'service' || s.id === 'finale') {
     const start = cue(s, s.id === 'service' ? 0 : 1, .5);
@@ -126,12 +131,11 @@ for (const s of data.scenes) {
     for (const i of [1, 2, 4]) pluck(cue(s, i), 74, .065, .28);
   }
   if (s.id === 'finale') {
-    // The callback lands dry. A short, unpitched stamp is the only effect;
-    // no boing, cut-off word or sustained note can sound like an extra syllable.
+    // The bedroom match-cut is a quiet cloth movement, not a voiced effect.
     const from = cue(s, 3, -.08), to = s.start + s.lead + s.speech;
-    musicRest(from, to + .05 - from);
-    knock(event(s, 'veto'), .06);
-    [74, 78, 81].forEach((m, i) => bell(to + .15 + i * .14, m, .04, .7));
+    musicRest(from,to+.05-from);
+    knock(event(s,'barCut'),.03);
+    [74,78,81].forEach((m,i)=>bell(to+.15+i*.14,m,.04,.7));
   }
 }
 const mixed = new Float32Array(n);

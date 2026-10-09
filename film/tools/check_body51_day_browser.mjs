@@ -102,6 +102,17 @@ try {
     movie.draw(29); const a = cv.toDataURL(); movie.draw(52); movie.draw(29); return cv.toDataURL() === a;
   });
   assert(deterministic);
+  if (data.presentation?.cleanFrame) {
+    const pose = await page.evaluate(() => {
+      const {movie} = window.__body51DayPlayer;
+      const a = movie.draw(.5), b = movie.draw(7.5);
+      return {angle:a.action.bedPose.angle, lying:a.action.bedPose.phase, standing:b.action.bedPose.phase, text:[...a.drawnText,...b.drawnText]};
+    });
+    assert.equal(pose.lying, 'lying'); assert.equal(pose.standing, 'standing');
+    assert(Math.abs(pose.angle + Math.PI/2) < .001);
+    assert(pose.text.every(s => !/@body51|ЗА КАДРОМ|ПО СТРИМАМ|#\d{3}/i.test(s)));
+    console.log('✓ Browser bed poses and clean frame: no watermarks or source overlays');
+  }
   await page.locator('#toggle').click();
   await page.waitForFunction(() => document.getElementById('live-audio').currentTime > 29.2);
   await page.locator('#toggle').click();

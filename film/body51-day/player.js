@@ -22,7 +22,7 @@
   }
   video.controls = false;
   start.hidden = false; $('transport').hidden = false; seek.max = data.total;
-  $('duration').textContent = format(Math.ceil(data.total));
+  $('duration').textContent = format(Math.round(data.total));
   const chapterButtons = data.scenes.map((s, i) => {
     const button = document.createElement('button');
     button.className = 'chapter'; button.type = 'button';
@@ -35,7 +35,7 @@
   });
   function update() {
     const t = Math.min(media.currentTime || 0, data.total);
-    seek.value = t; seek.setAttribute('aria-valuetext', `${format(t)} из ${format(Math.ceil(data.total))}`);
+    seek.value = t; seek.setAttribute('aria-valuetext', `${format(t)} из ${format(Math.round(data.total))}`);
     $('current').textContent = format(t);
     // Rounded scene durations can overlap the next start by a few microseconds.
     // Pick the latest started scene, so clicking a chapter highlights that
