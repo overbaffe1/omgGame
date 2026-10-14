@@ -549,8 +549,120 @@ def m_rocket():
     return rig, anim, 3.0
 
 
+# ================================================================== 9. bulb — the idea / novelty
+def m_bulb():
+    rig = Rig()
+    P2["bulbglass"] = ((1.0, 0.93, 0.72), 0.0, 0.08, {})
+    m = rig.mark()
+    # glass envelope (classic A-shape), base, contacts
+    prof = [(0.0, 1.32)]
+    for i in range(1, 20):
+        a = math.pi * i / 24
+        prof.append((0.34 * math.sin(a), 0.98 + 0.34 * math.cos(a)))
+    prof += [(0.19, 0.64), (0.172, 0.56), (0.166, 0.5)]
+    g = lathe("glass", prof, "bulbglass", 64)
+    b = g.data.materials[0].node_tree.nodes["Principled BSDF"]
+    b.inputs["Alpha"].default_value = 0.42
+    g.data.materials[0].surface_render_method = "BLENDED"
+    for k in range(5):
+        torus(f"thread{k}", 0.165, 0.018, (0, 0, 0.47 - k * 0.055), "steel", seg=48, mseg=8)
+    lathe("collar", [(0, 0.5), (0.165, 0.5), (0.165, 0.22), (0, 0.22)], "steel", 48)
+    lathe("cap", [(0, 0.22), (0.15, 0.22), (0.12, 0.16), (0.05, 0.12), (0, 0.12)], "graphite", 40)
+    # stem + support wires
+    lathe("stem", [(0, 0.5), (0.07, 0.5), (0.04, 0.62), (0.025, 0.78), (0, 0.8)], "bulbglass", 24)
+    for sx in (-1, 1):
+        tube("wire", [(sx * 0.02, 0, 0.6), (sx * 0.1, 0, 0.88), (sx * 0.13, 0, 0.98)], 0.006, "steel", 3)
+    rig.take(m, "bulb", head=(0, 0, 0.12))
+    # glowing filament coil
+    m = rig.mark()
+    pts = []
+    for i in range(61):
+        u = i / 60
+        x = -0.13 + 0.26 * u
+        a = TAU * 6 * u
+        pts.append((x, 0.03 * math.sin(a), 0.98 + 0.03 * math.cos(a) + 0.04 * math.sin(math.pi * u)))
+    tube("coil", pts, 0.009, "flame", 2)
+    sphere("glowcore", 0.06, (0, 0, 1.02), "flame", 24, 12)
+    rig.take(m, "fil", head=(0, 0, 1.0), parent="bulb")
+    # rays around the bulb (viewer plane XZ), each pulses outward in turn
+    for k in range(8):
+        a = math.radians(90 + (k - 3.5) * 26)  # fan over the top
+        c = Vector((0.6 * math.cos(a), 0, 1.0 + 0.6 * math.sin(a)))
+        m = rig.mark()
+        r = box(f"ray{k}", (0.05, 0.05, 0.2), (0, 0, 0), "amber", 0.024, seg=3)
+        r.matrix_world = Matrix.Translation(c) @ Matrix.Rotation(-(a - math.pi / 2), 4, "Y")
+        rig.take(m, f"r{k}", head=tuple(c))
+    rig.shift(dz=-0.75)
+
+    def anim(t):
+        p = {"bulb": {"rot": [((0, 1, 0), 4 * wave(t, 1, 0.0))]},
+             "fil": {"scale": 0.85 + 0.15 * (0.5 + 0.5 * math.cos(TAU * 3 * t))}}
+        for k in range(8):
+            u = (t * 2 - k / 16) % 1.0
+            pk = pulse(u, 0.0, 0.12, 0.25, 0.5)
+            p[f"r{k}"] = {"scale": 0.5 + 0.5 * pk}
+        return p
+    return rig, anim, 4.0
+
+
+# ================================================================== 10. books — the sources, pages turning
+def m_books():
+    rig = Rig()
+    W, D = 0.5, 0.7       # page width (X), page depth (Y)
+    z0 = 0.0
+    for i, (col, h, rz, dx) in enumerate((("indigo", 0.12, -4, 0.03), ("mint", 0.1, 5, -0.04))):
+        m = rig.mark()
+        box(f"cover{i}", (1.12, 0.78, h), (0, 0, h / 2), col, 0.012)
+        box(f"pages{i}", (1.06, 0.74, h - 0.03), (0.02, 0, h / 2), "paperw", 0.004)
+        box(f"spine{i}", (0.03, 0.78, h + 0.004), (-0.56, 0, h / 2), col, 0.01)
+        xform(new_since(m), Matrix.Translation((dx, 0, z0)) @ Matrix.Rotation(math.radians(rz), 4, "Z"))
+        z0 += h
+    # open book on top
+    zb = z0
+    box("ocoverL", (W + 0.04, D + 0.06, 0.02), (-(W + 0.04) / 2, 0, zb + 0.01), "amber", 0.006, rot=(0, math.radians(-4), 0))
+    box("ocoverR", (W + 0.04, D + 0.06, 0.02), ((W + 0.04) / 2, 0, zb + 0.01), "amber", 0.006, rot=(0, math.radians(4), 0))
+    box("blockL", (W, D, 0.05), (-W / 2, 0, zb + 0.045), "paperw", 0.01, rot=(0, math.radians(-4), 0))
+    box("blockR", (W, D, 0.05), (W / 2, 0, zb + 0.045), "paperw", 0.01, rot=(0, math.radians(4), 0))
+    for side in (-1, 1):
+        for i in range(6):
+            box("txt", (W * 0.7, 0.025, 0.003), (side * W * 0.5, 0.22 - i * 0.09, zb + 0.072 + side * 0.0), "lineg" if i != 2 else "indigo", 0.001,
+                rot=(0, math.radians(4 * side), 0))
+    tube("ribbon", [(0.02, -0.1, zb + 0.07), (0.05, -0.3, zb + 0.06), (0.06, -0.42, zb - 0.02), (0.07, -0.44, zb - 0.12)], 0.012, "coral", 3)
+    hinge = Vector((0, 0, zb + 0.075))
+    # three loose pages, all built standing upright (max extent); animation rotates them flat
+    for k in range(3):
+        m = rig.mark()
+        pg = box(f"page{k}", (W * 0.98, D * 0.96, 0.006), (W * 0.49, 0, 0), "paperw", 0.002)
+        for i in range(5):
+            box(f"pl{k}{i}", (W * 0.62, 0.022, 0.003), (W * 0.5, 0.2 - i * 0.09, 0.005), "lineg", 0.001)
+        xform(new_since(m), Matrix.Translation(hinge + Vector((0, 0, 0.004 * k))) @ Matrix.Rotation(math.radians(-90), 4, "Y"))
+        rig.take(m, f"p{k}", head=tuple(hinge))
+    rig.shift(dz=-0.3)
+
+    def ang(k, t):
+        e = lambda a, b: smooth((t - a) / (b - a))
+        if k == 0:
+            if t < 0.1: return 90 + 90 * e(0.0, 0.1)
+            if t < 0.84: return 180
+            if t < 0.9: return 180 - 180 * e(0.84, 0.9)
+            return 90 * e(0.92, 1.0)
+        a, b = ((0.14, 0.3), (0.34, 0.5))[k - 1]
+        c, d = ((0.7, 0.82), (0.56, 0.68))[k - 1]
+        if t < a: return 0
+        if t < b: return 180 * e(a, b)
+        if t < c: return 180
+        if t < d: return 180 - 180 * e(c, d)
+        return 0
+
+    def anim(t):
+        # rest pose = upright (90 deg); theta = 0 flat right, 180 flat left; rotation about the spine (Y)
+        return {f"p{k}": {"rot": [((0, 1, 0), -(ang(k, t) - 90))]} for k in range(3)}
+    return rig, anim, 5.0
+
+
 MODELS = {"chat": m_chat, "search": m_search, "target": m_target, "people": m_people, "gears": m_gears,
-          "gpu": m_gpu, "gauge": m_gauge, "rocket": m_rocket}
+          "gpu": m_gpu, "gauge": m_gauge, "rocket": m_rocket,
+          "bulb": m_bulb, "books": m_books}
 
 if __name__ == "__main__":
     want = [a for a in sys.argv[1:] if a in MODELS] or list(MODELS)
