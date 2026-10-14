@@ -185,7 +185,7 @@ const TOPIC = "Разработка интеллектуальной инфор�
     ["Меньше нагрузки на службы", "типовые вопросы — без участия сотрудников"],
     ["Тиражируемость", "перенос в другие вузы и организации"],
     ["Задел на будущее", "основа для внедрения и магистерской работы"]], 2);
-  stage(s, "bulb", { x: 10.25, y: 1.65, s: 2.45, rot: [6, -18, 0], shy: 0.92, glow: 1.2 });
+  stage(s, "bulb", { x: 10.05, y: 1.55, s: 2.8, rot: [6, -18, 0], shy: 0.92, glow: 1.2 });
   card(s, 10.3, 4.5, R - 10.3, 2.3, { fill: CARD2, ag: 3 });
   label(s, "НАУЧНЫЙ ВКЛАД", 10.45, 4.6, R - 10.6, ACC2, 3, 10);
   s.text("Проверена применимость RAG к русскоязычным документам вуза: сканы, таблицы, нормативка, живые данные",
@@ -312,17 +312,18 @@ const TOPIC = "Разработка интеллектуальной инфор�
   const by = 6.18, bwid = gw;
   let x = L;
   label(s, "ПО ТИПУ", L, by - 0.02, 2, MUTED, 4, 9.5);
-  types.forEach(([k, t, c]) => {
-    const w = bwid * k / 33;
+  types.forEach(([k, t, c], i) => {
+    const w = bwid * k / 33, last = i === types.length - 1;
     s.rect({ x, y: by + 0.3, w: w - 0.03, h: 0.12, fill: c, ag: 4 });
-    s.text([run(String(k) + " ", { bold: true, color: c }), run(t, { color: MUTED })], { x, y: by + 0.42, w: Math.max(w, 1.2), h: 0.3, size: 9, ag: 4 });
+    s.text([run(String(k) + " ", { bold: true, color: c }), run(t, { color: MUTED })],
+      { x: last ? x + w - 1.3 : x, y: by + 0.42, w: last ? 1.3 : Math.max(w, 1.2), h: 0.3, size: 9, align: last ? "right" : "left", ag: 4 });
     x += w;
   });
   stage(s, "books", { x: 9.75, y: 1.55, s: 3.0, rot: [30, -12, 0], shy: 0.8, glow: 1.15 });
-  card(s, 9.85, 4.6, R - 9.85, 2.2, { fill: ACCT, line: ACC, ag: 5 });
-  label(s, "КАК ИСКАЛ", 10.0, 4.7, R - 10.1, ACC2, 5, 10);
+  card(s, 9.85, 4.75, R - 9.85, 1.75, { fill: ACCT, line: ACC, ag: 5 });
+  label(s, "КАК ИСКАЛ", 10.0, 4.85, R - 10.1, ACC2, 5, 10);
   s.text("arXiv и труды конференций (NeurIPS, EMNLP, ACL), техотчёты разработчиков моделей, официальная документация, сайты аналогов",
-    { x: 10.0, y: 5.0, w: R - 10.15, h: 1.75, size: 10.5, color: INK, lineSpacingMultiple: 1.05, ag: 5 });
+    { x: 10.0, y: 5.15, w: R - 10.15, h: 1.3, size: 10.5, color: INK, lineSpacingMultiple: 1.05, ag: 5 });
   slides.push(s);
 }
 
