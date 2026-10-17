@@ -6,3 +6,6 @@ __pycache__/
 .arena/
 node_modules/
 *.mp4.tmp
+
+# МИША: рендер и кадры (большие файлы, не в Git)
+film/misha/out/

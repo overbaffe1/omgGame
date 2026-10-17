@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<title>МИША против всего — просмотр</title>
+<style>
+@font-face{font-family:'Manrope';src:url('../body51-day/fonts/Manrope-800.ttf');font-weight:800}
+@font-face{font-family:'Manrope';src:url('../body51-day/fonts/Manrope-400.ttf');font-weight:400}
+body{margin:0;background:#000;color:#eee;font-family:Manrope,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh}
+canvas{height:88vh;aspect-ratio:9/16;background:#000}
+#bar{display:flex;gap:12px;align-items:center;padding:8px}
+button{font:inherit;padding:6px 14px}
+input[type=range]{width:50vw}
+small{opacity:.6}
+</style></head><body>
+<canvas id="c" width="720" height="1280"></canvas>
+<div id="bar"><button id="play">▶ Пуск</button><input id="seek" type="range" min="0" max="300" step="0.1" value="0"><span id="tc">0:00</span></div>
+<small>Просмотр без звука. Полный ролик со звуком — render.mjs (см. README.md).</small>
+<script src="../body51-3d.js"></script>
+<script src="misha.js"></script>
+<script>
+const cv=document.getElementById('c'),g=cv.getContext('2d');
+const M=window.MISHA;let t=+(new URLSearchParams(location.search).get('t')||0),playing=false,last=0;
+const seek=document.getElementById('seek'),tc=document.getElementById('tc'),btn=document.getElementById('play');
+function draw(){M.frame(g,t);seek.value=t;tc.textContent=`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`}
+function loop(ts){if(playing){const dt=(ts-last)/1000;t=Math.min(M.DUR,t+dt);if(t>=M.DUR)playing=false;draw()}last=ts;requestAnimationFrame(loop)}
+btn.onclick=()=>{playing=!playing;btn.textContent=playing?'❚❚ Пауза':'▶ Пуск'};
+seek.oninput=()=>{t=+seek.value;draw()};
+addEventListener('keydown',e=>{if(e.code==='Space'){btn.click();e.preventDefault()}});
+document.fonts.ready.then(draw);draw();requestAnimationFrame(loop);
+</script></body></html>
