@@ -1,0 +1,113 @@
+{
+  "space-cook": {
+    "file": "cut/space-cook.png",
+    "x": 56,
+    "y": 92,
+    "w": 735,
+    "h": 1121,
+    "sw": 848,
+    "sh": 1264
+  },
+  "galley": {
+    "file": "galley.png",
+    "w": 1376,
+    "h": 768,
+    "sw": 1376,
+    "sh": 768
+  },
+  "orbit": {
+    "file": "orbit.png",
+    "w": 1376,
+    "h": 768,
+    "sw": 1376,
+    "sh": 768
+  },
+  "cauldron": {
+    "file": "cut/cauldron.png",
+    "x": 78,
+    "y": 122,
+    "w": 870,
+    "h": 852,
+    "sw": 1024,
+    "sh": 1024
+  },
+  "battlebarge": {
+    "file": "cut/battlebarge.png",
+    "x": 12,
+    "y": 59,
+    "w": 1334,
+    "h": 607,
+    "sw": 1376,
+    "sh": 768
+  },
+  "salt": {
+    "file": "cut/salt.png",
+    "x": 106,
+    "y": 57,
+    "w": 692,
+    "h": 1121,
+    "sw": 896,
+    "sh": 1200
+  },
+  "bread": {
+    "file": "cut/bread.png",
+    "x": 60,
+    "y": 56,
+    "w": 1271,
+    "h": 612,
+    "sw": 1376,
+    "sh": 768
+  },
+  "bust": {
+    "file": "cut/bust.png",
+    "x": 0,
+    "y": 75,
+    "w": 1024,
+    "h": 949,
+    "sw": 1024,
+    "sh": 1024
+  },
+  "hero-left": {
+    "file": "cut/hero-left.png",
+    "x": 56,
+    "y": 469,
+    "w": 215,
+    "h": 307,
+    "sw": 848,
+    "sh": 1264
+  },
+  "hero-right": {
+    "file": "cut/hero-right.png",
+    "x": 636,
+    "y": 451,
+    "w": 155,
+    "h": 353,
+    "sw": 848,
+    "sh": 1264
+  },
+  "hero-head": {
+    "file": "cut/hero-head.png",
+    "x": 318,
+    "y": 92,
+    "w": 197,
+    "h": 170,
+    "sw": 848,
+    "sh": 1264
+  },
+  "hero-body": {
+    "file": "cut/hero-body.png",
+    "x": 130,
+    "y": 111,
+    "w": 643,
+    "h": 1102,
+    "sw": 848,
+    "sh": 1264
+  },
+  "steam": {
+    "file": "cut/steam.png",
+    "w": 256,
+    "h": 256,
+    "sw": 256,
+    "sh": 256
+  }
+}
