@@ -32,6 +32,8 @@ let shakeX=0,shakeY=0,shakeDecay=0;
 let flashAlpha=0,flashColor='#fff';
 let comboCount=0,comboTimer=0;
 let currentFight=0,fightTimer=0,fightDuration=0;
+let fightState='fighting';// fighting | ko | transition | victory
+let koTimer=0,transitionTimer=0;
 let enemies=[],enemy=null,misha=null;
 let particles=[],damageNums=[];
 let hp1=100,hp2=100,maxHp1=100,maxHp2=100;
@@ -630,8 +632,9 @@ function spawnDamageNum(x,y,z,dmg,color){
 function startFight(idx){
   const f=FIGHTS[idx];
   currentFight=idx;fightTimer=0;
+  fightState='fighting';
   fightDuration=f.duration;
-  hp1=100;hp2=100;maxHp1=100;maxHp2=100;
+  hp1=100;hp2=f.hp;maxHp1=100;maxHp2=f.hp;
   // очистка сцены
   while(scene.children.length>0)scene.remove(scene.children[0]);
   // переинициализация освещения
@@ -660,13 +663,7 @@ function startFight(idx){
   // Вспышка при начале боя
   flashAlpha=0.8;flashColor=f.color;
   shake(1.5);
-  // через 2 секунды показать "FIGHT!"
-  setTimeout(()=>{
-    if(currentFight===idx){
-      announce('БОЙ!','#ffff00',1.5);
-      playEpicSound();
-    }
-  },2000);
+  // покажем "БОЙ!" через 2 секунды (обрабатывается в updateFight)
 }
 
 function announce(text,color,dur=2){
@@ -676,20 +673,28 @@ function announce(text,color,dur=2){
 // ========== АНИМАЦИЯ БОЯ ==========
 function updateFight(dt){
   const f=FIGHTS[currentFight];
+  if(!f)return;
   fightTimer+=dt;
-  const progress=fightTimer/fightDuration;
   // slowmo
   if(slowMoTimer>0){slowMoTimer-=dt;slowMo=0.3}else{slowMo=1}
   const sdt=dt*slowMo;
-  // Миша атакует
-  const atkInterval=f.arena==='cosmos'?0.4:f.arena==='solar'?0.5:0.6;
-  const atkPhase=(fightTimer%atkInterval)/atkInterval;
-  animateMisha(atkPhase,fightTimer);
+  
+  // STATE: fighting
+  if(fightState==='fighting'){
+    // через 2 секунды показать "БОЙ!"
+    if(fightTimer>1.9&&fightTimer<2.1){
+      announce('БОЙ!','#ffff00',1.5);
+      playEpicSound();
+    }
+    // Миша атакует
+    const atkInterval=f.arena==='cosmos'?0.4:f.arena==='solar'?0.5:0.6;
+    const atkPhase=(fightTimer%atkInterval)/atkInterval;
+    animateMisha(atkPhase,fightTimer);
   // Враг получает урон и реагирует
   animateEnemy(fightTimer,atkPhase,f);
   // HP врага уменьшается
   if(fightTimer>1){
-    const dmgRate=f.hp/fightDuration*0.8;
+    const dmgRate=f.hp/(fightDuration*0.7);// чуть быстрее чтобы успело убиться
     hp2=Math.max(0,hp2-dmgRate*sdt);
     // комбо
     if(atkPhase<0.05&&fightTimer>1.5){
@@ -713,31 +718,53 @@ function updateFight(dt){
   }else if(fightTimer>fightDuration*0.8){
     hp1=Math.min(100,hp1+dt*20);// финальный рывок
   }
-  // Камера
-  updateCamera(fightTimer,f);
-  // KO
-  if(hp2<=0&&fightTimer>2){
-    playKO();shake(2);flashAlpha=1;flashColor='#ffffff';
-    announce('КО-О-О!!!!!!','#ff0000',2.5);
-    // частицы взрыва
-    for(let i=0;i<50;i++){
-      spawnParticles(enemy.position.x+(Math.random()-0.5)*3,enemy.position.y+(Math.random()-0.5)*3,enemy.position.z+(Math.random()-0.5)*3,f.color,5,10);
+    // Камера
+    updateCamera(fightTimer,f);
+    // Проверка KO
+    if(hp2<=0&&fightTimer>2){
+      fightState='ko';koTimer=3;
+      playKO();shake(2);flashAlpha=1;flashColor='#ffffff';
+      announce('КО-О-О!!!!!!','#ff0000',2.5);
+      for(let i=0;i<50;i++){
+        spawnParticles(enemy.position.x+(Math.random()-0.5)*3,enemy.position.y+(Math.random()-0.5)*3,enemy.position.z+(Math.random()-0.5)*3,f.color,5,10);
+      }
+      slowMoTimer=2;
     }
-    slowMoTimer=2;
-    // удалить врага через секунду
-    setTimeout(()=>{if(enemyGroup)enemyGroup.visible=false},500);
-    // следующий бой
-    setTimeout(()=>{
+  }
+  
+  // STATE: ko
+  if(fightState==='ko'){
+    koTimer-=dt;
+    if(enemy&&enemy.visible){
+      enemy.scale.multiplyScalar(0.95);
+      enemy.rotation.x+=0.1;enemy.position.y-=0.05;
+      if(enemy.scale.x<0.1)enemy.visible=false;
+    }
+    updateCamera(fightTimer,f);
+    if(koTimer<=0){
+      fightState='transition';transitionTimer=0.5;
+    }
+  }
+  
+  // STATE: transition
+  if(fightState==='transition'){
+    transitionTimer-=dt;
+    if(transitionTimer<=0){
       if(currentFight<FIGHTS.length-1){
-        startFight(currentFight+1);
+        startFight(currentFight+1);fightState='fighting';
       }else{
-        victoryTimer=10;
+        fightState='victory';victoryTimer=10;
         announce('МИША — ЛЕГЕНДА ВСЕЛЕННОЙ!','#ffdd00',10);
         playEpicSound();
       }
-    },3500);
-    fightDuration=fightTimer+5;// стоп
+    }
   }
+  
+  // STATE: victory
+  if(fightState==='victory'){
+    victoryTimer-=dt;
+  }
+  
   // Комбо таймер
   if(comboTimer>0)comboTimer-=dt;else comboCount=0;
 }
@@ -968,7 +995,7 @@ function loop(now){
   requestAnimationFrame(loop);
   const dt=Math.min(0.05,(now-lastTime)/1000);lastTime=now;t+=dt;
   updateShake(dt);
-  if(fightTimer<fightDuration+5){
+  if(fightState!=='victory'||victoryTimer>0){
     updateFight(dt);
     updateParticles(dt);
     // обновляем шейдеры
