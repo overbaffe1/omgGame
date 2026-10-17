@@ -68,3 +68,11 @@ python3 -m http.server 8080
 - Источники и шутки нового мульта: [`film/body51-day/sources.md`](film/body51-day/sources.md)
 - Как собрано и как пересобрать: [`film/tools/README.md`](film/tools/README.md)
 - Материал: [`body51/facts.md`](body51/facts.md), [`body51/best_moments.md`](body51/best_moments.md), `body51/hl/`
+
+## Великий суп — операция: обед
+
+Самостоятельный мем-трейлер: 1:26, 1920×1080, 60 fps. Новая графика, оригинальная музыка и выбранный рассказчик. Исходные кадры и хор не используются.
+
+[Плеер](film/great-soup.html) · [MP4](film/great-soup.mp4) · [Сборка и источники](film/great-soup/sources.md).
+
+Превью: `python3 film/tools/serve_great_soup.py --port 8081`. Предыдущие фильмы сохранены.
