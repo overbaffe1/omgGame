@@ -297,6 +297,47 @@ function renderScore(sr) {
   for (const c of CUTS) whoosh(c.t, 0.5);
   whoosh(8, 0.6); whoosh(20, 0.65); whoosh(26, 0.5);
 
+  // ---- комедийные вставки (лайт, чтобы не спорить с оркестром) ----
+  const boing = (t0, gain = 0.3) => {
+    let ph = 0;
+    put(t0, 0.42, 0, x => {
+      const u = x / 0.42;
+      const f = 150 + 420 * Math.exp(-9 * u) * (0.75 + 0.25 * Math.sin(22 * u));
+      ph += 2 * Math.PI * f / sr;
+      return Math.sin(ph) * Math.pow(1 - u, 1.6) * gain;
+    });
+  };
+  const squeak = (t0, gain = 0.25) => {
+    let ph = 0;
+    put(t0, 0.18, 0, x => {
+      const u = x / 0.18;
+      const f = 980 - 380 * u;
+      ph += 2 * Math.PI * f / sr;
+      return (Math.sin(ph) * 0.85 + noise((t0 + x) * 3331) * 0.15) * Math.sin(Math.PI * u) * gain;
+    });
+  };
+  const scratch = (t0, gain = 0.4) => put(t0, 0.3, 0, x => {
+    const u = x / 0.3;
+    return noise((t0 + x) * 5177) * (0.5 + 0.5 * Math.sin(70 * u)) * Math.pow(1 - u, 1.2) * gain;
+  });
+  const wah = (t0, gain = 0.4) => {
+    let lp = 0;
+    put(t0, 0.55, 0, x => {
+      const u = x / 0.55;
+      const f = 220 * (1 - 0.45 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 5.5 * x));
+      const src = 2 * ((f * x) % 1) - 1;
+      lp += 0.22 * (src - lp);
+      return lp * Math.sin(Math.PI * Math.min(1, u * 2.2)) * (1 - u * 0.5) * gain;
+    });
+  };
+  scratch(7.78, 0.42);                                          // резкая остановка перед дропом
+  wah(18.27, 0.34);                                             // фейл «промах» в киллфиде
+  [20.35, 21.05, 21.7, 22.3, 22.85, 23.25].forEach((tt, i) => (i % 2 ? squeak : boing)(tt, 0.15)); // ингредиенты
+  squeak(26.35, 0.22);                                          // очки падают
+  boing(27.6, 0.26);                                            // медаль
+  boing(28.0, 0.2);                                             // теги
+  boing(28.75, 0.22);                                           // плашка-угроза
+
   // ---- раскладка партитуры ----
   // 0–4: дрон + сердце + ризер
   choir(0, [73.42, 110, 146.83], 4.2, 0.11);          // D2 A2 D3
@@ -565,7 +606,7 @@ function ticker(t, y, msg) {
   g.restore();
 }
 
-// ингредиенты летят в кастрюлю: ультрамарины и вода, как в рецепте
+// ингредиенты летят в кастрюлю: 3D-ультрамарины и капли воды
 function ingredients(t) {
   for (let i = 0; i < 18; i++) {
     const t0 = 20.05 + hash(i * 7.7) * 3.15;
@@ -577,31 +618,18 @@ function ingredients(t) {
     const x1 = CX + (hash2(i, 2) - 0.5) * 240;
     const x = lerp(x0, x1, a * a);
     const y = lerp(-60, 1232, a * a);
-    const rot = a * (i % 2 ? 7 : -7) + hash(i * 3.3) * TAU;
-    g.save();
-    g.translate(x, y);
-    g.rotate(rot);
+    const zc = (1 - a) * 320 - 120; // кусочки приближаются к камере, падая
     if (i % 2) {
-      // ультрамарин — светящийся синий куб
-      glowDot(0, 0, 66, '90,140,255', 0.4);
-      const cg2 = g.createLinearGradient(-26, -26, 26, 26);
-      cg2.addColorStop(0, '#6f9dff'); cg2.addColorStop(1, '#2c4fd0');
-      rounded(-26, -26, 52, 52, 12, cg2);
-      text('U', 0, 3, 34, 'rgba(255,255,255,.9)', F_DISP, '900');
+      // ультрамарин — вращающийся 3D-куб
+      cube3(x, y, 58, t * 2.4 + i, t * 1.7 + i * 0.6, '#6f9dff', '#2c4fd0', '#1c36a8', zc, '90,140,255');
     } else {
-      // вода — капля
-      glowDot(0, 0, 56, '120,200,255', 0.38);
-      const wg = g.createLinearGradient(0, -30, 0, 30);
-      wg.addColorStop(0, '#cfeaff'); wg.addColorStop(1, '#4aa3e8');
-      g.fillStyle = wg;
-      g.beginPath();
-      g.moveTo(0, -32);
-      g.quadraticCurveTo(26, -2, 22, 12);
-      g.arc(0, 14, 22, -0.6, Math.PI + 0.6, false);
-      g.quadraticCurveTo(-26, -2, 0, -32);
-      g.fill();
+      // вода — шар-капля с бликом
+      const [px, py, s] = p3(0, 0, zc, x, y);
+      glowDot(px, py, 56 * s, '120,200,255', 0.38);
+      ball3(px, py, 30 * s, '#cfeaff', '#3d8fd8');
+      g.fillStyle = 'rgba(255,255,255,.75)';
+      g.beginPath(); g.ellipse(px - 9 * s, py - 10 * s, 7 * s, 5 * s, -0.5, 0, TAU); g.fill();
     }
-    g.restore();
     // всплеск на поверхности
     if (a > 0.9) {
       const p = (a - 0.9) / 0.1;
@@ -632,9 +660,87 @@ function shockwave(t, t0, x, y, maxR, color = '255,210,130') {
   g.restore();
 }
 
-// медаль за великий суповарство
+// ---- мини-3D: перспектива, кубы, сферы, глубина ----------------------------
+function rot3(x, y, z, rx, ry) {
+  let c = Math.cos(ry), s = Math.sin(ry);
+  let x1 = x * c + z * s, z1 = -x * s + z * c;
+  c = Math.cos(rx); s = Math.sin(rx);
+  const y1 = y * c - z1 * s, z2 = y * s + z1 * c;
+  return [x1, y1, z2];
+}
+function p3(x, y, z, ox, oy, f = 1500) {
+  const s = f / (f + z);
+  return [ox + x * s, oy + y * s, s];
+}
+// вращающийся 3D-куб с тремя гранями и затенением
+function cube3(ox, oy, size, rx, ry, colA, colB, colC, z = 0, glowCol = null) {
+  const h = size / 2;
+  const V = [];
+  for (const [dx, dy, dz] of [[-h, -h, -h], [h, -h, -h], [h, h, -h], [-h, h, -h], [-h, -h, h], [h, -h, h], [h, h, h], [-h, h, h]]) {
+    const [x1, y1, z1] = rot3(dx, dy, dz, rx, ry);
+    V.push(p3(x1, y1, z1 + z, ox, oy));
+  }
+  const faces = [
+    { idx: [4, 5, 6, 7], col: colA, z: (V[4][2] + V[5][2] + V[6][2] + V[7][2]) / 4 },
+    { idx: [0, 1, 5, 4], col: colB, z: (V[0][2] + V[1][2] + V[5][2] + V[4][2]) / 4 },
+    { idx: [1, 2, 6, 5], col: colC, z: (V[1][2] + V[2][2] + V[6][2] + V[5][2]) / 4 },
+    { idx: [2, 3, 7, 6], col: colB, z: (V[2][2] + V[3][2] + V[7][2] + V[6][2]) / 4 },
+    { idx: [3, 0, 4, 7], col: colC, z: (V[3][2] + V[0][2] + V[4][2] + V[7][2]) / 4 },
+  ];
+  faces.sort((a, b) => a.z - b.z);
+  if (glowCol) glowDot(ox, oy, size * 1.7, glowCol, 0.35);
+  for (const f of faces) {
+    g.fillStyle = f.col;
+    g.beginPath();
+    g.moveTo(V[f.idx[0]][0], V[f.idx[0]][1]);
+    for (let i = 1; i < 4; i++) g.lineTo(V[f.idx[i]][0], V[f.idx[i]][1]);
+    g.closePath();
+    g.fill();
+    g.strokeStyle = 'rgba(10,10,30,.35)';
+    g.lineWidth = 2;
+    g.stroke();
+  }
+}
+// шар с затенением (капля)
+function ball3(x, y, r, c1, c2) {
+  const bg = g.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.1, x, y, r);
+  bg.addColorStop(0, c1); bg.addColorStop(1, c2);
+  g.fillStyle = bg;
+  g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+}
+// поле глубины: точки летят на камеру
+function starfield3(t, n = 26, alpha = 0.5) {
+  for (let i = 0; i < n; i++) {
+    const sp = 0.35 + hash(i * 2.2) * 0.85;
+    const z = ((hash(i * 5.5) * 2200 + t * 260 * sp) % 2200) - 200;
+    const x = (hash(i * 3.1) - 0.5) * 2600;
+    const y = (hash(i * 7.7) - 0.5) * 3400;
+    const [px, py, s] = p3(x, y, z, CX, H * 0.5);
+    const rr = s * (3 + hash(i * 9.9) * 7);
+    g.fillStyle = `rgba(255,${200 + hash(i * 4) * 40 | 0},150,${alpha * clamp(s * 0.9)})`;
+    g.beginPath(); g.arc(px, py, rr, 0, TAU); g.fill();
+  }
+}
+// 3D-брызги от слэма
+function splatBurst(t, t0, x0, y0, hue = '255,180,80') {
+  const u = (t - t0) / 0.75;
+  if (u <= 0 || u >= 1) return;
+  for (let i = 0; i < 12; i++) {
+    const a = hash(i * 3.7 + t0) * TAU;
+    const v = 320 + hash(i * 8.1 + t0) * 620;
+    const z = (hash(i * 6.6 + t0) - 0.5) * 700 * u;
+    const d = v * u * (1 - u * 0.35);
+    const [px, py, s] = p3(Math.cos(a) * d, Math.sin(a) * d * 1.35, z + 300, x0, y0);
+    ball3(px, py, s * (16 + hash(i * 4.2 + t0) * 22) * (1 - u * 0.55), `rgba(${hue},.95)`, `rgba(${hue},.25)`);
+  }
+}
+
+// медаль за великий суповарство — крутится как настоящая монета
 function medal(x, y, r, t, pop) {  const s = easeOutBack(clamp(pop));
   if (s <= 0) return;
+  const spin = t * 1.7 + 0.6;
+  const cosp = Math.cos(spin);
+  const flip = 0.22 + 0.78 * Math.abs(cosp);
   g.save();
   g.translate(x - r * 0.72, y + r * 0.66);
   g.scale(s, s);
@@ -644,15 +750,18 @@ function medal(x, y, r, t, pop) {  const s = easeOutBack(clamp(pop));
   g.beginPath(); g.moveTo(-r * 0.26, -r * 0.62); g.lineTo(-r * 0.02, -r * 0.62); g.lineTo(-r * 0.1, -r * 0.1); g.lineTo(-r * 0.34, -r * 0.1); g.closePath(); g.fill();
   g.fillStyle = '#2b4fc2';
   g.beginPath(); g.moveTo(r * 0.02, -r * 0.62); g.lineTo(r * 0.26, -r * 0.62); g.lineTo(r * 0.34, -r * 0.1); g.lineTo(r * 0.1, -r * 0.1); g.closePath(); g.fill();
-  // медалька
+  // медалька: сжатие по X = кручение монеты
+  g.scale(flip, 1);
+  const dark = cosp < 0;
   const mg = g.createRadialGradient(-r * 0.1, -r * 0.12, r * 0.04, 0, 0, r * 0.42);
-  mg.addColorStop(0, '#fff0b8'); mg.addColorStop(1, '#c98a2e');
+  mg.addColorStop(0, dark ? '#d8b060' : '#fff0b8');
+  mg.addColorStop(1, dark ? '#8a5a16' : '#c98a2e');
   g.fillStyle = mg;
   g.beginPath(); g.arc(0, 0, r * 0.4, 0, TAU); g.fill();
   g.lineWidth = r * 0.05; g.strokeStyle = '#8a5a16';
   g.beginPath(); g.arc(0, 0, r * 0.4, 0, TAU); g.stroke();
   // звезда
-  g.fillStyle = '#8a5a16';
+  g.fillStyle = dark ? '#6b430f' : '#8a5a16';
   g.beginPath();
   for (let i = 0; i < 10; i++) {
     const rr = i % 2 ? r * 0.12 : r * 0.3;
@@ -843,7 +952,9 @@ function discordCard(t, x, y, s, rot = 0) {
 function slamWord(word, tIn, y, o = {}) {
   const { tint = '#ffc94a', tint2 = '#ff8a3c', size = 170, max = 720 } = o;
   const u = clamp(tIn / 0.32);
-  const s = lerp(1.28, 1, easeOutBack(u));
+  // 3D-вылет из глубины: слово приближается к камере
+  const zp = easeOutCubic(clamp(tIn / 0.28));
+  const s = 1500 / (1500 + (1 - zp) * 2400);
   const want = Math.max(size, Math.min(max, W * 0.88 / Math.max(0.85, word.length * 0.58)));
   const sizeF = fitFont(word, W * 0.9 / 1.28, want);
   g.save();
@@ -948,6 +1059,7 @@ function S2(t) { // 4–8: СЛОВА-СЛЭМЫ
   const u = t - 4;
   bgBase('#141022', '#07060d');
   sunburst(t * 1.4, 0.13, 16);
+  starfield3(t, 22, 0.55);
   steam(t * 1.2, CX - 300, H * 0.9, 320, 6, 0.12);
   steam(t * 1.2, CX + 300, H * 0.95, 320, 6, 0.12);
   // текущее слово — резкая смена, без наползания
@@ -958,10 +1070,12 @@ function S2(t) { // 4–8: СЛОВА-СЛЭМЫ
   slamWord(cur.word, t - cur.t, H * 0.42);
   // ударные волны от слэма слов + двойной пунч перед дропом
   WORD_SLAMS.forEach(w => shockwave(t, w.t, CX, H * 0.42, W * 0.95, '255,205,120'));
+  WORD_SLAMS.forEach(w => splatBurst(t, w.t, CX, H * 0.42, '255,190,90'));
   shockwave(t, 7.05, CX, H * 0.42, W * 1.18, '255,235,190');
   shockwave(t, 7.2, CX, H * 0.42, W * 1.05, '255,180,80');
+  splatBurst(t, 7.05, CX, H * 0.42, '255,230,170');
   // нижняя строка-подсказка
-  const hints = ['первое слово гимна', 'кто тут варит?', 'чего именно?', 'вот это да'];
+  const hints = ['ага, поехали', 'батя варит!', 'именно суп', 'вот это да!'];
   const idx = WORD_SLAMS.indexOf(cur);
   textFit(hints[idx], CX, H * 0.72, W * 0.8, 56, '#a9b0c8', F_CONDM, '500');
   // мигающая рамка в такт
@@ -984,6 +1098,7 @@ function S3(t) { // 8–14: РЕВИЛ ДЭДА
   const u = t - 8;
   bgBase('#0b1230', '#060a1c');
   sunburst(t * 0.8, 0.10, 14);
+  starfield3(t, 24, 0.45);
   // большое кольцо-ореол
   g.save();
   g.translate(CX, H * 0.42);
@@ -1011,6 +1126,7 @@ function S3(t) { // 8–14: РЕВИЛ ДЭДА
     { t: 9.6, x: 268, y: H * 0.645, label: 'НЕ СПИТ' },
     { t: 10.2, x: 812, y: H * 0.645, label: 'x777' },
     { t: 11.0, x: 540, y: H * 0.71, label: 'СТАТУС: СУПОВАР' },
+    { t: 11.55, x: 540, y: H * 0.815, label: 'ПИНГ 9999 МС' },
     { t: 12.0, x: 540, y: 230, label: 'СУПОВАР ВСЕЯ ИМПЕРИУМА' },
     { t: 13.0, x: 540, y: H * 0.775, label: 'ВАРИТСЯ 28 ЛЕТ' },
   ];
@@ -1062,6 +1178,7 @@ function S4(t) { // 14–20: МОНТАЖ
 
   // фон: вспышка цвета на срезе
   bgBase('#0d0e16', '#070810');
+  starfield3(t * 1.5, 26, 0.5);
   glowDot(CX, H * 0.45, 900, cur.glow, 0.25 + 0.2 * punch);
   if (idx % 2 === 0) sunburst(t * 2.2, 0.10, 20);
   // спидлайны
@@ -1373,6 +1490,16 @@ function S6(t) { // 26–32: АУТРО
     const p = clamp((t - c.t) / 0.35);
     const out = 1 - smooth(29.5, 29.95, t);
     if (p > 0 && out > 0) chip(c.x, c.y, c.label, { pop: p, alpha: out, size: 44 });
+  }
+  // смешная плашка-угроза
+  const warn = clamp((t - 28.75) / 0.35) * (1 - smooth(29.5, 29.95, t));
+  if (warn > 0) {
+    g.save();
+    g.globalAlpha = warn;
+    rounded(CX - 470, H * 0.79 - 36, 940, 72, 36, 'rgba(150,25,25,.88)', 'rgba(255,255,255,.2)', 2);
+    textFit('ЖМИ ЛАЙК ИЛИ СУП ОСТИНЕТ', CX, H * 0.79 + 3, 860, 44, '#ffd9c9', F_COND, '700');
+    g.restore();
+    g.globalAlpha = 1;
   }
 
   // финальный слэм
