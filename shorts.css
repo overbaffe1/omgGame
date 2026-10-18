@@ -20,6 +20,7 @@ body {
 }
 body.s2 { --accent: #9ad7ff; }
 body.s3 { --accent: #f0b56a; }
+body.s4 { --accent: #c9a2ff; }
 .top {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
@@ -225,6 +226,7 @@ pre {
 }
 .poster.p2 b { background: #9ad7ff; }
 .poster.p3 b { background: #f0b56a; }
+.poster.p4 b { background: #c9a2ff; }
 @media (max-width: 860px) {
   .wrap { grid-template-columns: 1fr; width: min(520px, calc(100% - 24px)); }
   .stage { position: static; }

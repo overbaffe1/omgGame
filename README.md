@@ -39,8 +39,21 @@ python3 -m http.server 8080
 | `shorts1.html` | Цитро доп-доп | `exports/citro-dopdop-ep01.mp4` |
 | `shorts2.html` | Сырко вжух-вжух | `exports/syrok-vzhuh-ep01.mp4` |
 | `shorts3.html` | Тапок шлёп-шлёп | `exports/tapok-shlep-ep01.mp4` |
+| `shorts4.html` | ДЭД великий суп | `exports/ded-sup-ep01.mp4` |
 
 Список: `shorts.html`.
+
+### Shorts 4 — «О великий суп наварили»
+
+Эдит по мему про гимн Ультрамаринов (Chaos Gate, 1998): хор пел «agitatis
+ultramarines», а вся Россия услышала «великий суп наварили». ДЭД (`@sleep9919`)
+варит этот суп: Discord-ревил, слэмы слов, монтаж ударов, killfeed и кастрюля.
+Кадры и партитура — процедурно, из одного файла [`ded-sup.html`](ded-sup.html)
+(там же живой плеер с перемоткой и записью WEBM). Аватар — из скриншота профиля
+`media/ded/card.png`, кроп печёт `tools/make_ded_assets.cjs`.
+Оффлайн-рендер в MP4 и обложки: `BODY51_DEPS=/tmp/body51-deps/node_modules node film/tools/render_ded_sup.cjs`
+(зависимости ставит [`film/tools/body51_deps.sh`](film/tools/body51_deps.sh),
+шрифты Montserrat и Oswald в `media/ded/fonts/` — лицензия OFL).
 
 ## Из чего собрано
 
