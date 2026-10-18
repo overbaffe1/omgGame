@@ -68,6 +68,7 @@ function srgb(c,br,em){const col=c.clone();if(col.convertLinearToSRGB)col.conver
   const r=Math.min(255,Math.round((col.r*br+em)*255)),g2=Math.min(255,Math.round((col.g*br+em)*255)),b=Math.min(255,Math.round((col.b*br+em)*255));
   return[r,g2,b]}
 const _ca=new THREE.Vector3(),_cb=new THREE.Vector3(),_cc=new THREE.Vector3(),_sa=new THREE.Vector3(),_sb=new THREE.Vector3(),_sc=new THREE.Vector3();
+const PGRAD={}; // кэш градиентов свечения точек
 const _e1=new THREE.Vector3(),_e2=new THREE.Vector3(),_nn=new THREE.Vector3();
 function texTri(ctx,img,ax,ay,bx,by,cx2,cy,u0,v0,u1,v1,u2,v2){
   const det=u0*(v1-v2)-u1*(v0-v2)+u2*(v0-v1);if(!det)return;
@@ -91,8 +92,9 @@ function raster(scene,camera){
     if(o.isHemisphereLight)hemi=o});
   const ambient=hemi?hemi.intensity*.8:.55;
   const fog=scene.fog;const fogC=fog?srgb(fog.color,1,0):null;
+  const bgC=scene.background?srgb(scene.background,1,0):[0,0,0];
   const fogF=(z)=>{if(!fog)return 0;const k=Math.max(0,(z-fog.near)/(fog.far-fog.near));return Math.min(.85,k*k)};
-  gx.fillStyle='#000';gx.fillRect(0,0,W,H);
+  gx.fillStyle=`rgb(${bgC[0]},${bgC[1]},${bgC[2]})`;gx.fillRect(0,0,W,H);
   gx.globalCompositeOperation='source-over';gx.globalAlpha=1;
   const opaque=[],alpha=[],add=[];
   const pushTri=(ax,ay,bx,by,cx2,cy,fill,z,mode)=>{
@@ -162,9 +164,9 @@ function raster(scene,camera){
         let cc=mcol;
         if(colA){cc=new THREE.Color(colA.getX(i)*mcol.r,colA.getY(i)*mcol.g,colA.getZ(i)*mcol.b)}
         const s=Math.max(1,size*fovScale/d);
-        const rgb=srgb(cc,1.5,0);
+        const rgb=srgb(cc,1.5,0);const r0=Math.min(255,rgb[0]),g0=Math.min(255,rgb[1]),b0=Math.min(255,rgb[2]);
         add.push({z:d,draw:()=>{gx.globalCompositeOperation='lighter';gx.globalAlpha=op*.9;
-          gx.fillStyle=`rgb(${Math.min(255,rgb[0])},${Math.min(255,rgb[1])},${Math.min(255,rgb[2])})`;
+          gx.fillStyle=`rgb(${r0},${g0},${b0})`;
           gx.beginPath();gx.arc(sx,sy,s*.5,0,7);gx.fill();
           gx.globalCompositeOperation='source-over';gx.globalAlpha=1}})}
       return}
@@ -198,7 +200,9 @@ function raster(scene,camera){
           if(colArr)cc=new THREE.Color(colArr[i*3],colArr[i*3+1],colArr[i*3+2]);
           const s=Math.max(1.5,sz/d);
           const rgb=srgb(cc,ambient+.5,0);
-          opaque.push({z:d,draw:()=>{gx.fillStyle=`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;gx.fillRect(sx-s/2,sy-s*.7,s,s*1.4)}})}
+          const hr=[Math.min(255,rgb[0]+65),Math.min(255,rgb[1]+55),Math.min(255,rgb[2]+45)];
+          opaque.push({z:d,draw:()=>{gx.fillStyle=`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;gx.fillRect(sx-s/2,sy-s*.7,s,s*1.4);
+            gx.fillStyle=`rgb(${hr[0]},${hr[1]},${hr[2]})`;const hs=Math.max(1.5,s*.42);gx.fillRect(sx-hs/2,sy-s*.92,hs,hs)}})}
         return}
       for(let i=0;i<cnt;i++){o.getMatrixAt(i,im);
         const mw=new THREE.Matrix4().multiplyMatrices(o.matrixWorld,im);
@@ -276,6 +280,20 @@ M3.render=()=>raster(M3.scene,M3.camera);
 
 // ---------- режимы ----------
 const argv=process.argv.slice(2);
+if(argv[0]==='qa'){
+  const Fq=window.MFILM;const ts=[];
+  for(let t=0;t<Fq.total;t+=2)ts.push(t);
+  for(const r of Fq.rounds){ts.push(r.t0+.1,r.t0+1,r.t1-.05)}
+  ts.sort((a,b)=>a-b);
+  let errs=0,dark=0,brightSum=0;
+  for(const t of ts){try{frame(t)}catch(e){errs++;console.log('ОШИБКА t='+t.toFixed(1),e.message)}
+    const d=gx.getImageData(0,0,1920,1080).data;let sm=0;
+    for(let i=0;i<d.length;i+=64)sm+=(d[i]+d[i+1]+d[i+2])/3;
+    const b=sm/(d.length/64);brightSum+=b;if(b<4)dark++;
+    if(t%30<2)console.log('t='+t.toFixed(0)+' яркость '+b.toFixed(1))}
+  console.log('=== QA: '+ts.length+' кадров, ошибок '+errs+', тёмных '+dark+', средняя яркость '+(brightSum/ts.length).toFixed(1));
+  process.exit(errs?1:0);
+}
 if(argv[0]==='bench'){
   // поддержка ctx.filter?
   const tc=createCanvas(64,64),tg=tc.getContext('2d');
@@ -303,7 +321,7 @@ if(argv[0]==='bench'){
     w1.on('exit',done);w2.on('exit',done)});
   if(code!==0){console.error('воркер упал');process.exit(1)}
   fs.writeFileSync("/tmp/mrender/list.txt","file 'chunk0.mp4'\nfile 'chunk1.mp4'\n");
-  const r=spawnSync(ffmpegPath,['-f','concat','-safe','0','-i','list.txt','-i','audio.wav',
+  const r=spawnSync(ffmpegPath,['-y','-f','concat','-safe','0','-i','list.txt','-i','audio.wav',
     '-c:v','copy','-c:a','aac','-b:a','192k','-movflags','+faststart','-shortest','/home/user/omgGame/film/misha.mp4'],
     {cwd:'/tmp/mrender',stdio:'inherit'});
   console.log('=== ГОТОВО:',r.status===0?'film/misha.mp4':'ОШИБКА МУКСА',r.status);
@@ -312,7 +330,7 @@ if(argv[0]==='bench'){
   const first=+argv[1],last=+argv[2],out=argv[3];
   const FPS=24;
   const ff=spawn(ffmpegPath,['-y','-v','error','-f','rawvideo','-pixel_format','rgba','-video_size','1920x1080',
-    '-framerate',String(FPS),'-i','pipe:0','-an','-c:v','libx264','-preset','veryfast','-crf','24','-maxrate','2.8M','-bufsize','5.6M','-g','48',
+    '-framerate',String(FPS),'-i','pipe:0','-an','-c:v','libx264','-preset','veryfast','-crf','23','-maxrate','3.2M','-bufsize','6.4M','-g','48',
     '-pix_fmt','yuv420p','-movflags','+faststart',out],{stdio:['pipe','inherit','inherit']});
   ff.stdin.on('error',()=>{});
   let i=first;

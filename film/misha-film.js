@@ -172,8 +172,8 @@ function overlay(r,tAbs){
   for(const b of beatAct('flash')){const a=(1-(lt-b.t)/b.d)*.9;
     g.globalAlpha=Math.max(0,a);g.fillStyle=b.c||'#fff';g.fillRect(0,0,W,H);g.globalAlpha=1}
   // ---- скоростные линии
-  const spd=(M3._shake||0)>0.22||(activeMove(r.mTrack,lt)&&false);
-  if(spd)drawSpeed(tAbs);
+  const spd=(M3._shake||0)>0.22;
+  if(spd)drawSpeed(tAbs,Math.min(1.6,M3._shake*2.2));
   // ---- финал: титры
   if(r.name==='ФИНАЛ'&&lt>6.2)drawCredits(r,lt);
   g.restore();
@@ -245,9 +245,10 @@ function drawSub(b,k){
   g.textAlign='center';g.fillText(b.text,x,y+2);
   g.restore();
 }
-function drawSpeed(t){
-  g.save();g.translate(CX,CY);g.globalAlpha=.3;
-  g.strokeStyle='#fff';g.lineWidth=3;
+function drawSpeed(t,amp){
+  amp=amp||1;
+  g.save();g.translate(CX,CY);g.globalAlpha=.22+.25*Math.min(1,amp);
+  g.strokeStyle='#fff';g.lineWidth=2.5+amp;
   for(let i=0;i<36;i++){const a=i/36*TAU+((i*37)%10)*.01;
     const r0=340+((i*53)%140),r1=r0+180+((i*91)%220);
     g.beginPath();g.moveTo(Math.cos(a)*r0,Math.sin(a)*r0);g.lineTo(Math.cos(a)*r1,Math.sin(a)*r1);g.stroke()}
@@ -378,12 +379,26 @@ function buildScore(ac,out){
 // ============================================================= КАДР
 function frame(t){
   const r=roundAt(t);
+  const lt=Math.min(t,r.t1-.001)-r.t0;
   runRound(r,Math.min(t,r.t1-.001));
   M3.render();
+  // ---- энергия удара: импакты пульсируют кадром
+  let hitE=0;
+  for(const b of r.beats){
+    if(lt>=b.t&&lt<=b.t+b.d){
+      if(b.k==='shake')hitE+=.7*b.amp*(1-(lt-b.t)/b.d);
+      else if(b.k==='flash')hitE+=.55*(1-(lt-b.t)/b.d);
+      else if(b.k==='banner'&&b.big)hitE+=.3*(1-(lt-b.t)/b.d)}}
+  hitE=Math.min(1.4,hitE);
+  const hype=clamp(F.rounds.indexOf(r)/11);
+  const boss=(r.name==='ДЕД'||r.name==='ГАЛАКТИКА'||r.name==='ЗЕМЛЯ');
+  // zoom-punch: кадр чуть наезжает на ударе
+  const zp=1+Math.min(.055,hitE*.032);
   g.save();g.setTransform(1,0,0,1,0,0);
-  g.drawImage(glc,0,0);
+  g.translate(CX,CY);g.scale(zp,zp);g.drawImage(glc,-CX,-CY);
   g.restore();
-  if(window.FX)FX.post(g,t,{bloom:.55,grain:.065,vignette:.5,leak:.1,ca:.9});
+  if(window.FX)FX.post(g,t,{bloom:.48+hitE*.5+hype*.06,grain:.06+hype*.025,
+    vignette:.46+hype*.15+(boss?.05:0)+hitE*.1,leak:.09+hype*.04,ca:.85+hitE*.75});
   overlay(r,Math.min(t,r.t1-.001));
 }
 
