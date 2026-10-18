@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>МИША ПРОТИВ ВСЕГО — процедурный боевичок</title>
+<style>
+  html,body{margin:0;height:100%;background:#07080d;display:flex;align-items:center;justify-content:center;
+    font-family:Manrope,system-ui,-apple-system,sans-serif;color:#eee;overflow:hidden}
+  #wrap{position:relative;width:min(100vw,177.78vh);aspect-ratio:16/9;box-shadow:0 0 80px #000c}
+  canvas{width:100%;height:100%;display:block;background:#07080d}
+  #hint{position:absolute;top:10px;left:14px;font-size:13px;opacity:.5;z-index:3;letter-spacing:.04em}
+  #hint b{color:#ffd24a;font-weight:800}
+  #hint a{color:#7ec8ff;text-decoration:none;pointer-events:auto}
+  #hint a:hover{text-decoration:underline;color:#bfe2ff}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="c" width="1920" height="1080"></canvas>
+  <div id="hint"><b>МИША ПРОТИВ ВСЕГО</b> · 5:02 · 10 раундов · от бактерии до галактики · <a href="misha.mp4" download>⬇ MP4</a></div>
+</div>
+<script src="vendor/three.min.js"></script>
+<script src="fx.js"></script>
+<script src="player.js"></script>
+<script src="misha3d.js"></script>
+<script src="misha-things.js"></script>
+<script src="misha-worlds.js"></script>
+<script src="misha-rounds.js"></script>
+<script src="misha-film.js"></script>
+</body>
+</html>
