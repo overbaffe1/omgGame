@@ -488,13 +488,13 @@ function renderScore(sr) {
   bell(27.3, 1174.66, 0.18); bell(27.85, 1318.51, 0.18);
   bell(28.4, 1174.66, 0.18); bell(28.95, 1567.98, 0.22);
   // ПАНЧЛАЙН «ОТ ДЕДА» — божественный хоральный аккорд
-  boom(31.25, 1.0); crash(31.25, 0.5);
-  bell(31.25, 587.33, 0.9);
-  choirSing(31.25, 220, 1.7, 'a', 0.42);
-  choirSing(31.25, 277.18, 1.7, 'o', 0.36);
-  choirSing(31.25, 329.63, 1.7, 'e', 0.3);
-  choirSing(31.25, 440, 1.5, 'i', 0.22);
-  strings(31.25, [220, 277.18, 329.63, 440], 1.8, 0.1);
+  boom(30.8, 1.0); crash(30.8, 0.5);
+  bell(30.8, 587.33, 0.9);
+  choirSing(30.8, 220, 1.7, 'a', 0.42);
+  choirSing(30.8, 277.18, 1.7, 'o', 0.36);
+  choirSing(30.8, 329.63, 1.7, 'e', 0.3);
+  choirSing(30.8, 440, 1.5, 'i', 0.22);
+  strings(30.8, [220, 277.18, 329.63, 440], 1.8, 0.1);
 
   // мастер: мягкий лимитер + фейды
   for (let i = 0; i < n; i++) {
@@ -1536,7 +1536,22 @@ function discordCard(t, x, y, s, rot = 0) {
 }
 
 // слэм-слово: короткие слова — огромные, всегда ровно и в кадре
+// ---- очередь текста: рисуется ПОСЛЕ камеры и НИКОГДА не выходит за рамки ----
+let TEXT_QUEUE = [];
 function slamWord(word, tIn, y, o = {}) {
+  TEXT_QUEUE.push({ kind: 'slam', word, tIn, y, o });
+}
+function blockSlam(lines, tIn, y, size, maxW, p, tint, tint2) {
+  TEXT_QUEUE.push({ kind: 'block', lines, tIn, y, size, maxW, p, tint, tint2 });
+}
+function drawTextQueue() {
+  for (const e of TEXT_QUEUE) {
+    if (e.kind === 'slam') drawSlamWord(e.word, e.tIn, e.y, e.o);
+    else drawBlockSlam(e.lines, e.tIn, e.y, e.size, e.maxW, e.p, e.tint, e.tint2);
+  }
+  TEXT_QUEUE = [];
+}
+function drawSlamWord(word, tIn, y, o = {}) {
   const { tint = '#ffc94a', tint2 = '#ff8a3c', size = 170, max = 720 } = o;
   const u = clamp(tIn / 0.32);
   // 3D-вылет из глубины: слово приближается к камере
@@ -1545,7 +1560,7 @@ function slamWord(word, tIn, y, o = {}) {
   // смешной отскок после прилёта
   if (tIn > 0.24) s *= 1 + 0.075 * Math.exp(-13 * (tIn - 0.24)) * Math.sin(30 * (tIn - 0.24));
   const want = Math.max(size, Math.min(max, W * 0.88 / Math.max(0.85, word.length * 0.52)));
-  const sizeF = fitFont(word, W * 0.94, want);
+  const sizeF = fitFont(word, W * 0.92, want);
   g.save();
   g.translate(CX, y + Math.sin(tIn * 5) * 6 * (1 - u));
   g.scale(s, s);
@@ -1566,6 +1581,24 @@ function slamWord(word, tIn, y, o = {}) {
   g.fillText(word, 0, 0);
   g.restore();
 }
+function drawBlockSlam(lines, tIn, y, size, maxW, p, tint = '#ffe08a', tint2 = '#ff8a3c') {
+  const lh = size * 1.18;
+  const y0 = y - (lines.length - 1) * lh / 2;
+  for (let i = 0; i < lines.length; i++) {
+    g.save();
+    g.translate(CX, y0 + i * lh);
+    g.scale(p, p);
+    const sF = fitFont(lines[i], Math.min(maxW || W * 0.92, W * 0.92), size);
+    strokeText(lines[i], 0, 0, sF, 'rgba(12,6,2,.95)', sF * 0.15);
+    const gr = g.createLinearGradient(0, -sF * 0.55, 0, sF * 0.55);
+    gr.addColorStop(0, '#fff6dd'); gr.addColorStop(1, tint2);
+    g.fillStyle = gr;
+    g.font = `900 ${sF}px ${F_DISP}`;
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(lines[i], 0, 0);
+    g.restore();
+  }
+}
 
 // ---- сцены ------------------------------------------------------------------
 function bgBase(top, bottom) {
@@ -1576,12 +1609,201 @@ function bgBase(top, bottom) {
 
 // ---- ПЕРСОНАЖИ --------------------------------------------------------------
 
+// главный ГГ: МИША-СКУФ, 120 КГ — медведь-скуф в майке с золотой цепью
+function mishaSkuf(x, y, s, t, walk = true) {
+  const wob = walk ? Math.sin(t * 4.2) : 0;
+  const bob = walk ? Math.abs(Math.sin(t * 2.1)) * 10 * s : 0;
+  g.save();
+  g.translate(x, y - bob);
+  g.rotate(wob * 0.03);
+  // тень
+  g.fillStyle = 'rgba(0,0,0,.35)';
+  g.beginPath(); g.ellipse(0, 158 * s, 130 * s, 26 * s, 0, 0, TAU); g.fill();
+  // ноги в кроссовках
+  const legSwing = walk ? Math.sin(t * 2.1) * 16 * s : 0;
+  for (const sgn of [-1, 1]) {
+    const lx = sgn * 54 * s;
+    const sw = sgn * legSwing;
+    rounded(lx - 27 * s + sw * 0.5, 60 * s, 54 * s, 92 * s, 18 * s, '#3a3a44');
+    rounded(lx - 40 * s + sw, 136 * s, 80 * s, 36 * s, 15 * s, '#e8e2d2');
+  }
+  // ПУЗО — 120 КГ В НАТЯНУТОЙ МАЙКЕ
+  const belly = g.createRadialGradient(-30 * s, 20 * s, 20 * s, 0, 40 * s, 175 * s);
+  belly.addColorStop(0, '#f6f2e8');
+  belly.addColorStop(1, '#d8cfc0');
+  g.fillStyle = belly;
+  g.beginPath();
+  g.ellipse(0, 35 * s, 158 * s, 148 * s, 0, 0, TAU);
+  g.fill();
+  g.strokeStyle = 'rgba(160,140,110,.5)';
+  g.lineWidth = 8 * s;
+  for (let i = -1; i <= 1; i++) {
+    g.beginPath();
+    g.moveTo(i * 62 * s, -45 * s);
+    g.quadraticCurveTo(i * 78 * s, 40 * s, i * 56 * s, 125 * s);
+    g.stroke();
+  }
+  // ЗОЛОТАЯ ЦЕПЬ
+  g.strokeStyle = '#f2c14e';
+  g.lineWidth = 13 * s;
+  g.beginPath();
+  g.moveTo(-98 * s, -58 * s);
+  g.quadraticCurveTo(0, 32 * s, 98 * s, -58 * s);
+  g.stroke();
+  for (let i = 0; i <= 8; i++) {
+    const px = lerp(-98 * s, 98 * s, i / 8);
+    const py = -58 * s + Math.sin(Math.PI * i / 8) * 88 * s;
+    g.fillStyle = '#ffe08a';
+    g.beginPath(); g.arc(px, py, 8 * s, 0, TAU); g.fill();
+  }
+  // руки
+  const armSwing = walk ? Math.sin(t * 2.1 + Math.PI) * 12 * s : 0;
+  g.fillStyle = '#eab78f';
+  g.beginPath(); g.ellipse(-152 * s, 0, 35 * s, 96 * s, 0.15, 0, TAU); g.fill();
+  g.beginPath(); g.ellipse(152 * s, 0, 35 * s, 96 * s, -0.15, 0, TAU); g.fill();
+  // квас в правой руке
+  rounded(138 * s + armSwing, -34 * s, 36 * s, 64 * s, 10 * s, '#8a5a2c');
+  g.fillStyle = '#c8a05a';
+  g.fillRect(138 * s + armSwing, -42 * s, 36 * s, 13 * s);
+  // ГОЛОВА
+  const hy = -178 * s;
+  for (const sgn of [-1, 1]) {
+    g.fillStyle = '#a8663a';
+    g.beginPath(); g.arc(sgn * 94 * s, hy - 64 * s, 39 * s, 0, TAU); g.fill();
+    g.fillStyle = '#e8b088';
+    g.beginPath(); g.arc(sgn * 94 * s, hy - 64 * s, 21 * s, 0, TAU); g.fill();
+  }
+  const hg = g.createRadialGradient(-30 * s, hy - 30 * s, 15 * s, 0, hy, 132 * s);
+  hg.addColorStop(0, '#c9854e');
+  hg.addColorStop(1, '#8a552c');
+  g.fillStyle = hg;
+  g.beginPath(); g.arc(0, hy, 120 * s, 0, TAU); g.fill();
+  // скуф-лысина
+  g.fillStyle = '#eab78f';
+  g.beginPath(); g.ellipse(0, hy - 82 * s, 80 * s, 44 * s, 0, 0, TAU); g.fill();
+  // светлая морда
+  g.fillStyle = '#f2d5ae';
+  g.beginPath(); g.ellipse(0, hy + 40 * s, 64 * s, 50 * s, 0, 0, TAU); g.fill();
+  g.fillStyle = '#3a2415';
+  g.beginPath(); g.ellipse(0, hy + 18 * s, 23 * s, 15 * s, 0, 0, TAU); g.fill();
+  // УСЫ СКУФА
+  g.fillStyle = '#4a3220';
+  g.beginPath(); g.ellipse(-36 * s, hy + 50 * s, 35 * s, 12 * s, -0.15, 0, TAU); g.fill();
+  g.beginPath(); g.ellipse(36 * s, hy + 50 * s, 35 * s, 12 * s, 0.15, 0, TAU); g.fill();
+  // двойной подбородок
+  g.fillStyle = '#f2d5ae';
+  g.beginPath(); g.ellipse(0, hy + 82 * s, 31 * s, 19 * s, 0, 0, TAU); g.fill();
+  // уставшие глаза с мешками
+  for (const sgn of [-1, 1]) {
+    g.fillStyle = '#fff';
+    g.beginPath(); g.ellipse(sgn * 43 * s, hy - 24 * s, 18 * s, 13 * s, 0, 0, TAU); g.fill();
+    g.fillStyle = '#2a1810';
+    g.beginPath(); g.arc(sgn * 43 * s, hy - 20 * s, 8 * s, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(120,80,50,.6)';
+    g.lineWidth = 4 * s;
+    g.beginPath();
+    g.arc(sgn * 43 * s, hy - 10 * s, 14 * s, 0.15 * Math.PI, 0.85 * Math.PI);
+    g.stroke();
+  }
+  g.strokeStyle = '#4a3220';
+  g.lineWidth = 9 * s;
+  g.lineCap = 'round';
+  g.beginPath(); g.moveTo(-64 * s, hy - 50 * s); g.lineTo(-25 * s, hy - 44 * s); g.stroke();
+  g.beginPath(); g.moveTo(64 * s, hy - 50 * s); g.lineTo(25 * s, hy - 44 * s); g.stroke();
+  g.restore();
+}
+
+// кошкодевочка — ходит (шагает) и мурчит
+function catgirl(x, y, s, t, seed = 0) {
+  const walk = t * 5 + seed * 3;
+  const bob = Math.abs(Math.sin(walk)) * 9 * s;
+  const cols = ['#f06a9a', '#9a6bff', '#4ab6ff', '#5bdf6e'];
+  const dress = cols[Math.abs(Math.floor(seed * 5)) % 4];
+  const hair = ['#f2c8e0', '#c8b2f2', '#f2e2b2'][Math.abs(Math.floor(seed * 7)) % 3];
+  g.save();
+  g.translate(x, y - bob);
+  // хвост
+  g.strokeStyle = hair;
+  g.lineWidth = 15 * s;
+  g.lineCap = 'round';
+  g.beginPath();
+  g.moveTo(-32 * s, 42 * s);
+  g.quadraticCurveTo(-100 * s, 18 * s + Math.sin(t * 3 + seed) * 20 * s, -72 * s, -62 * s);
+  g.stroke();
+  // ноги
+  const legSwing = Math.sin(walk) * 22 * s;
+  g.strokeStyle = '#f2c9a4';
+  g.lineWidth = 20 * s;
+  g.beginPath(); g.moveTo(-14 * s, 70 * s); g.lineTo(-14 * s + legSwing, 152 * s); g.stroke();
+  g.beginPath(); g.moveTo(14 * s, 70 * s); g.lineTo(14 * s - legSwing, 152 * s); g.stroke();
+  g.strokeStyle = '#3a2c4a';
+  g.lineWidth = 22 * s;
+  g.beginPath(); g.moveTo(-14 * s + legSwing * 0.8, 126 * s); g.lineTo(-14 * s + legSwing, 152 * s); g.stroke();
+  g.beginPath(); g.moveTo(14 * s - legSwing * 0.8, 126 * s); g.lineTo(14 * s - legSwing, 152 * s); g.stroke();
+  // юбка
+  g.fillStyle = dress;
+  g.beginPath();
+  g.moveTo(-44 * s, -12 * s);
+  g.lineTo(44 * s, -12 * s);
+  g.lineTo(60 * s, 80 * s);
+  g.lineTo(-60 * s, 80 * s);
+  g.closePath(); g.fill();
+  g.fillStyle = '#fff';
+  g.fillRect(-60 * s, 68 * s, 120 * s, 12 * s);
+  // торс
+  rounded(-38 * s, -78 * s, 76 * s, 72 * s, 24 * s, dress);
+  // руки
+  const armSwing = Math.sin(walk + Math.PI) * 18 * s;
+  g.strokeStyle = '#f2c9a4';
+  g.lineWidth = 16 * s;
+  g.beginPath(); g.moveTo(-34 * s, -58 * s); g.lineTo(-50 * s + armSwing, 6 * s); g.stroke();
+  g.beginPath(); g.moveTo(34 * s, -58 * s); g.lineTo(50 * s - armSwing, 6 * s); g.stroke();
+  // голова
+  ball3(0, -138 * s, 53 * s, '#ffe4c8', 'rgba(220,170,130,.6)');
+  // волосы
+  g.fillStyle = hair;
+  g.beginPath(); g.arc(0, -148 * s, 55 * s, Math.PI, TAU); g.fill();
+  g.beginPath(); g.ellipse(-49 * s, -118 * s, 15 * s, 35 * s, 0.3, 0, TAU); g.fill();
+  g.beginPath(); g.ellipse(49 * s, -118 * s, 15 * s, 35 * s, -0.3, 0, TAU); g.fill();
+  // ушки
+  for (const sgn of [-1, 1]) {
+    g.fillStyle = hair;
+    g.beginPath();
+    g.moveTo(sgn * 22 * s, -188 * s);
+    g.lineTo(sgn * 50 * s, -244 * s);
+    g.lineTo(sgn * 60 * s, -178 * s);
+    g.closePath(); g.fill();
+    g.fillStyle = '#f0a0c8';
+    g.beginPath();
+    g.moveTo(sgn * 30 * s, -189 * s);
+    g.lineTo(sgn * 47 * s, -225 * s);
+    g.lineTo(sgn * 53 * s, -183 * s);
+    g.closePath(); g.fill();
+  }
+  // глаза (мигают)
+  const blink = Math.sin(t * 2.4 + seed * 5) > 0.96 ? 0.15 : 1;
+  g.fillStyle = '#3a2c4a';
+  g.beginPath(); g.ellipse(-17 * s, -141 * s, 7 * s, 10 * s * blink, 0, 0, TAU); g.fill();
+  g.beginPath(); g.ellipse(17 * s, -141 * s, 7 * s, 10 * s * blink, 0, 0, TAU); g.fill();
+  // румянец
+  g.fillStyle = 'rgba(255,140,180,.5)';
+  g.beginPath(); g.ellipse(-29 * s, -122 * s, 10 * s, 6 * s, 0, 0, TAU); g.fill();
+  g.beginPath(); g.ellipse(29 * s, -122 * s, 10 * s, 6 * s, 0, 0, TAU); g.fill();
+  // :3
+  g.strokeStyle = '#3a2c4a';
+  g.lineWidth = 4 * s;
+  g.beginPath();
+  g.moveTo(-10 * s, -115 * s);
+  g.quadraticCurveTo(0, -107 * s, 10 * s, -115 * s);
+  g.stroke();
+  g.restore();
+}
+
 // легендарная мордочка бойкиссера :3
 function boykisser(x, y, r, t, rot = 0) {
   g.save();
   g.translate(x, y);
   g.rotate(rot + 0.05 * Math.sin(t * 1.2 + x * 0.01));
-  // ушки
   for (const sgn of [-1, 1]) {
     g.fillStyle = '#f6f3fb';
     g.beginPath();
@@ -1596,29 +1818,24 @@ function boykisser(x, y, r, t, rot = 0) {
     g.lineTo(sgn * r * 0.92, -r * 0.5);
     g.closePath(); g.fill();
   }
-  // голова
   const hg = g.createRadialGradient(-r * 0.3, -r * 0.35, r * 0.15, 0, 0, r * 1.1);
   hg.addColorStop(0, '#ffffff');
   hg.addColorStop(1, '#e8e2f2');
   g.fillStyle = hg;
   g.beginPath(); g.arc(0, 0, r, 0, TAU); g.fill();
-  // щёчки
   g.fillStyle = 'rgba(255,130,185,.5)';
   g.beginPath(); g.ellipse(-r * 0.6, r * 0.26, r * 0.2, r * 0.13, 0, 0, TAU); g.fill();
   g.beginPath(); g.ellipse(r * 0.6, r * 0.26, r * 0.2, r * 0.13, 0, 0, TAU); g.fill();
-  // глаза
   for (const dx of [-r * 0.33, r * 0.33]) {
     g.fillStyle = '#241826';
     g.beginPath(); g.ellipse(dx, -r * 0.12, r * 0.125, r * 0.185, 0, 0, TAU); g.fill();
     g.fillStyle = '#fff';
     g.beginPath(); g.arc(dx + r * 0.045, -r * 0.19, r * 0.05, 0, TAU); g.fill();
   }
-  // нос
   g.fillStyle = '#e88bb8';
   g.beginPath();
   g.moveTo(0, r * 0.08); g.lineTo(-r * 0.085, r * 0.185); g.lineTo(r * 0.085, r * 0.185);
   g.closePath(); g.fill();
-  // :3 — знаменитая улыбка
   g.strokeStyle = '#241826';
   g.lineWidth = r * 0.1;
   g.lineCap = 'round';
@@ -1630,32 +1847,27 @@ function boykisser(x, y, r, t, rot = 0) {
   g.restore();
 }
 
-// фурри-мишка: круглый, добрый, в радужном ошейнике
+// фурри-мишка в радужном ошейнике
 function furBear(x, y, r, t, seed = 0, rot = 0) {
   const hue = ['#c9854e', '#b5713f', '#d99a5e', '#a8663a'][Math.abs(Math.floor(seed * 7)) % 4];
   g.save();
   g.translate(x, y);
   g.rotate(rot + 0.06 * Math.sin(t * 1.35 + seed * 9));
-  // уши
   for (const sgn of [-1, 1]) {
     g.fillStyle = hue;
     g.beginPath(); g.arc(sgn * r * 0.74, -r * 0.7, r * 0.36, 0, TAU); g.fill();
     g.fillStyle = '#f0c8a0';
     g.beginPath(); g.arc(sgn * r * 0.74, -r * 0.7, r * 0.2, 0, TAU); g.fill();
   }
-  // голова
   const hg = g.createRadialGradient(-r * 0.25, -r * 0.3, r * 0.1, 0, 0, r * 1.1);
   hg.addColorStop(0, hue);
   hg.addColorStop(1, '#8a552c');
   g.fillStyle = hg;
   g.beginPath(); g.arc(0, 0, r, 0, TAU); g.fill();
-  // морда
   g.fillStyle = '#f2d5ae';
   g.beginPath(); g.ellipse(0, r * 0.28, r * 0.46, r * 0.36, 0, 0, TAU); g.fill();
-  // нос
   g.fillStyle = '#3a2415';
   g.beginPath(); g.ellipse(0, r * 0.16, r * 0.14, r * 0.1, 0, 0, TAU); g.fill();
-  // улыбка
   g.strokeStyle = '#3a2415';
   g.lineWidth = r * 0.07;
   g.lineCap = 'round';
@@ -1665,14 +1877,12 @@ function furBear(x, y, r, t, seed = 0, rot = 0) {
   g.moveTo(0, r * 0.26);
   g.quadraticCurveTo(r * 0.16, r * 0.44, r * 0.3, r * 0.34);
   g.stroke();
-  // глаза с бликом
   for (const dx of [-r * 0.36, r * 0.36]) {
     g.fillStyle = '#2a1810';
     g.beginPath(); g.arc(dx, -r * 0.18, r * 0.12, 0, TAU); g.fill();
     g.fillStyle = '#fff';
     g.beginPath(); g.arc(dx + r * 0.045, -r * 0.22, r * 0.05, 0, TAU); g.fill();
   }
-  // радужный ошейник
   const cols = ['#ff5b5b', '#ffb84a', '#ffe94a', '#5bdf6e', '#4ab6ff', '#b06bff'];
   for (let i = 0; i < 6; i++) {
     g.strokeStyle = cols[i];
@@ -1684,7 +1894,7 @@ function furBear(x, y, r, t, seed = 0, rot = 0) {
   g.restore();
 }
 
-// череп для некроманта
+// череп
 function skullGlyph(x, y, r, alpha = 1) {
   g.save();
   g.globalAlpha = alpha;
@@ -1714,11 +1924,10 @@ function greenFlame(x, y, r, t) {
   glowDot(x, y - r * 0.4, r * 2.3, '70,255,120', 0.45);
 }
 
-// ДРЕВНЕЕ ЗЛО — некромант с посохом
+// ДРЕВНЕЕ ЗЛО — некромант
 function necromancer(x, y, s, t) {
   const yy = y + Math.sin(t * 1.1) * 12 * s;
   glowDot(x, yy - 100 * s, 640 * s, '70,255,130', 0.2 + 0.1 * Math.sin(t * 3.1));
-  // плащ
   g.fillStyle = '#140a22';
   g.beginPath();
   g.moveTo(x - 78 * s, yy - 190 * s);
@@ -1727,7 +1936,6 @@ function necromancer(x, y, s, t) {
   g.quadraticCurveTo(x + 310 * s, yy + 110 * s, x + 78 * s, yy - 190 * s);
   g.closePath();
   g.fill();
-  // складки плаща
   g.strokeStyle = 'rgba(90,40,140,.55)';
   g.lineWidth = 12 * s;
   for (let i = -2; i <= 2; i++) {
@@ -1736,7 +1944,6 @@ function necromancer(x, y, s, t) {
     g.quadraticCurveTo(x + i * 70 * s, yy + 120 * s, x + i * 88 * s, yy + 370 * s);
     g.stroke();
   }
-  // капюшон
   g.fillStyle = '#241238';
   g.beginPath();
   g.moveTo(x - 130 * s, yy - 140 * s);
@@ -1745,17 +1952,14 @@ function necromancer(x, y, s, t) {
   g.quadraticCurveTo(x + 65 * s, yy - 250 * s, x, yy - 240 * s);
   g.quadraticCurveTo(x - 65 * s, yy - 250 * s, x - 130 * s, yy - 140 * s);
   g.fill();
-  // тьма в капюшоне
   g.fillStyle = '#05020a';
   g.beginPath(); g.ellipse(x, yy - 235 * s, 95 * s, 85 * s, 0, 0, TAU); g.fill();
-  // ГЛАЗА — зелёный огонь
   const pulse = 0.7 + 0.3 * Math.sin(t * 6.2);
   glowDot(x - 36 * s, yy - 238 * s, 78 * s, '90,255,140', pulse);
   glowDot(x + 36 * s, yy - 238 * s, 78 * s, '90,255,140', pulse);
   g.fillStyle = '#c8ffdc';
   g.beginPath(); g.ellipse(x - 36 * s, yy - 235 * s, 18 * s, 11 * s, -0.16, 0, TAU); g.fill();
   g.beginPath(); g.ellipse(x + 36 * s, yy - 235 * s, 18 * s, 11 * s, 0.16, 0, TAU); g.fill();
-  // посох с черепом
   g.strokeStyle = '#4a2c66';
   g.lineWidth = 18 * s;
   g.lineCap = 'round';
@@ -1765,14 +1969,12 @@ function necromancer(x, y, s, t) {
   g.stroke();
   skullGlyph(x - 118 * s, yy - 335 * s, 58 * s);
   greenFlame(x - 118 * s, yy - 430 * s, 62 * s, t);
-  // второе пламя на плече
   greenFlame(x + 150 * s, yy - 120 * s, 40 * s, t + 3);
 }
 
-// КОССПЛЕЙ ХОУМЛЕНДЕРА — с лазерными глазами
+// КОССПЛЕЙ ХОУМЛЕНДЕРА с лазерными глазами
 function homelander(x, y, s, t, laser = 0) {
   const yy = y + Math.sin(t * 1.15) * 10 * s;
-  // плащ
   g.fillStyle = '#c8202e';
   g.beginPath();
   g.moveTo(x - 210 * s, yy - 110 * s);
@@ -1783,7 +1985,6 @@ function homelander(x, y, s, t, laser = 0) {
   g.fill();
   g.fillStyle = '#f0ece2';
   g.fillRect(x - 42 * s, yy - 90 * s, 84 * s, 620 * s);
-  // торс — синий костюм
   const bg = g.createLinearGradient(x, yy - 100 * s, x, yy + 320 * s);
   bg.addColorStop(0, '#2b4c9e');
   bg.addColorStop(1, '#16264f');
@@ -1795,18 +1996,13 @@ function homelander(x, y, s, t, laser = 0) {
   g.lineTo(x - 155 * s, yy + 340 * s);
   g.closePath();
   g.fill();
-  // золотые погоны
   g.fillStyle = '#e8c04c';
   g.beginPath(); g.ellipse(x - 165 * s, yy - 55 * s, 72 * s, 36 * s, -0.25, 0, TAU); g.fill();
   g.beginPath(); g.ellipse(x + 165 * s, yy - 55 * s, 72 * s, 36 * s, 0.25, 0, TAU); g.fill();
-  // звезда на груди
   starPath(x, yy + 70 * s, 55 * s);
-  // шея
   g.fillStyle = '#eab78f';
   g.fillRect(x - 38 * s, yy - 210 * s, 76 * s, 70 * s);
-  // голова
   ball3(x, yy - 285 * s, 112 * s, '#f2c9a4', 'rgba(190,130,90,.75)');
-  // волосы — белокурые, зализанные
   g.fillStyle = '#e8d089';
   g.beginPath();
   g.arc(x, yy - 315 * s, 112 * s, Math.PI * 1.02, Math.PI * 1.98);
@@ -1821,19 +2017,16 @@ function homelander(x, y, s, t, laser = 0) {
   g.quadraticCurveTo(x + 130 * s, yy - 250 * s, x + 96 * s, yy - 235 * s);
   g.quadraticCurveTo(x + 118 * s, yy - 280 * s, x + 84 * s, yy - 320 * s);
   g.closePath(); g.fill();
-  // хохолок
   g.beginPath();
   g.moveTo(x - 30 * s, yy - 420 * s);
   g.quadraticCurveTo(x + 10 * s, yy - 475 * s, x + 55 * s, yy - 415 * s);
   g.quadraticCurveTo(x + 18 * s, yy - 435 * s, x - 30 * s, yy - 420 * s);
   g.closePath(); g.fill();
-  // брови
   g.strokeStyle = '#8a6a35';
   g.lineWidth = 12 * s;
   g.lineCap = 'round';
   g.beginPath(); g.moveTo(x - 72 * s, yy - 330 * s); g.lineTo(x - 22 * s, yy - 340 * s); g.stroke();
   g.beginPath(); g.moveTo(x + 72 * s, yy - 330 * s); g.lineTo(x + 22 * s, yy - 340 * s); g.stroke();
-  // ГЛАЗА + ЛАЗЕРЫ
   const eyeY = yy - 300 * s;
   if (laser > 0.01) {
     for (const sgn of [-1, 1]) {
@@ -1861,7 +2054,6 @@ function homelander(x, y, s, t, laser = 0) {
       g.beginPath(); g.arc(ex, eyeY, 7 * s, 0, TAU); g.fill();
     }
   }
-  // рот
   g.strokeStyle = '#a06a4c';
   g.lineWidth = 8 * s;
   g.beginPath();
@@ -1881,7 +2073,7 @@ function starPath(x, y, r) {
   g.closePath(); g.fill();
 }
 
-// ПОДДЕЛЬНОЕ УДОСТОВЕРЕНИЕ ФУРРИ БОЙКИССЕРА
+// ПОДДЕЛЬНОЕ УДОСТОВЕРЕНИЕ
 function idCard(x, y, w, t, flip = 0) {
   const fx = Math.cos(flip);
   const h = w * 1.42;
@@ -1890,29 +2082,23 @@ function idCard(x, y, w, t, flip = 0) {
   g.rotate(0.05 * Math.sin(t * 1.1));
   g.scale(Math.max(0.06, Math.abs(fx)), 1);
   const front = fx >= 0;
-  // корпус
   const cg = g.createLinearGradient(0, -h / 2, 0, h / 2);
   cg.addColorStop(0, '#f6f2e6');
   cg.addColorStop(1, '#d8d0bc');
   rounded(-w / 2, -h / 2, w, h, w * 0.06, cg);
   if (front) {
-    // шапка
     rounded(-w / 2, -h / 2, w, h * 0.16, w * 0.06, '#241a34');
     text('УДОСТОВЕРЕНИЕ', 0, -h / 2 + h * 0.1, w * 0.11, '#ffd98a', F_DISP, '900');
-    // фото — мини-бойкиссер
     rounded(-w * 0.38, -h * 0.22, w * 0.34, h * 0.3, w * 0.03, '#1c1428');
     boykisser(-w * 0.21, -h * 0.07, w * 0.13, t, 0);
-    // строки
     text('ФУРРИ', w * 0.12, -h * 0.19, w * 0.075, '#2a2034', F_DISP, '900');
     text('БОЙКИССЕР', w * 0.12, -h * 0.1, w * 0.075, '#2a2034', F_DISP, '900');
     text('класс: МИША', w * 0.12, -h * 0.005, w * 0.062, '#5a4a66', F_CONDM);
     text('№ 322-ФУР', w * 0.12, h * 0.075, w * 0.062, '#5a4a66', F_CONDM);
     text('выдан: ОБЩЕСТВО ФУРРИ', 0, h * 0.27, w * 0.052, '#6a5a76', F_CONDM);
-    // голографический круг
     glowDot(w * 0.28, h * 0.26, w * 0.2, '120,220,255', 0.5);
     g.fillStyle = 'rgba(150,220,255,.4)';
     g.beginPath(); g.arc(w * 0.28, h * 0.26, w * 0.09, 0, TAU); g.fill();
-    // ПЕЧАТЬ — ПОДДЕЛЬНОЕ
     g.save();
     g.translate(-w * 0.12, h * 0.34);
     g.rotate(-0.32);
@@ -1922,157 +2108,157 @@ function idCard(x, y, w, t, flip = 0) {
     text('ПОДДЕЛЬНОЕ', 0, 0, w * 0.075, '#e62832', F_DISP, '900');
     g.restore();
   } else {
-    // оборот
     g.fillStyle = '#241a34';
     g.fillRect(-w / 2, -h * 0.18, w, h * 0.16);
     text('ФУРРИ МИШИ', 0, h * 0.12, w * 0.14, '#3a2c52', F_DISP, '900');
-    text('по всему ПСКОВГУ', 0, h * 0.24, w * 0.075, '#6a5a76', F_CONDM);
-    text('подделка • 322 • подделка', 0, h * 0.38, w * 0.055, '#8a7a96', F_CONDM);
+    text('по всему ПСКОВГУ', 0, h * 0.24, w * 0.068, '#6a5a76', F_CONDM);
+    text('подделка • 322 • подделка', 0, h * 0.38, w * 0.05, '#8a7a96', F_CONDM);
     boykisser(0, -h * 0.33, w * 0.13, t, 0.15);
   }
   g.restore();
 }
 
 // ---- СЦЕНЫ -----------------------------------------------------------------
-function S1(t) { // 0–4: КОЛД ОПЕН — ГОРЕМ ФУРРИФЕМБОЕВ
+function S1(t) { // 0–4: ГОРЕМ ФУРРИФЕМБОЕВ — входит МИША-СКУФ
   bgBase('#140826', '#05030a');
   const glow = g.createRadialGradient(CX, H * 0.42, 40, CX, H * 0.42, W * 1.1);
   glow.addColorStop(0, 'rgba(150,70,255,.22)');
   glow.addColorStop(1, 'rgba(150,70,255,0)');
   g.fillStyle = glow; g.fillRect(0, 0, W, H);
-  sunburst(t, 0.06, 12);
+  sunburst(t, 0.07, 12);
   starfield3(t, 26, 0.55);
+  // ГЛАВНЫЙ ГГ — МИША-СКУФ шагает
+  mishaSkuf(CX, H * 0.62, 1.18, t, true);
   // летающие бойкиссеры
-  boykisser(CX - 270, H * 0.22 + Math.sin(t * 1.1) * 40, 130, t, -0.12);
-  boykisser(CX + 280, H * 0.62 + Math.sin(t * 0.9 + 2) * 50, 150, t, 0.14);
-  boykisser(CX - 60, H * 0.82 + Math.sin(t * 1.3 + 1) * 30, 95, t, 0.06);
-  furBear(CX + 90, H * 0.36 + Math.sin(t * 1.2 + 3) * 35, 85, t, 1, 0.1);
-  // слэм 1
+  boykisser(CX - 300, H * 0.22 + Math.sin(t * 1.1) * 40, 120, t, -0.12);
+  boykisser(CX + 310, H * 0.3 + Math.sin(t * 0.9 + 2) * 50, 135, t, 0.14);
+  catgirl(CX - 330, H * 0.82, 1.0, t, 2);
+  catgirl(CX + 330, H * 0.84, 1.0, t, 5);
+  // слэмы
   if (t < 2.85) {
     const l3 = smooth(1.95, 2.06, t);
     if (l3 > 0) {
       g.save(); g.globalAlpha = l3;
-      slamWord('ГОРЕМ', t - 1.95, H * 0.42, { size: 200, max: 620 });
+      slamWord('ГОРЕМ', t - 1.95, H * 0.32, { size: 210, max: 640 });
       g.restore(); g.globalAlpha = 1;
     }
-    shockwave(t, 1.95, CX, H * 0.42, W * 1.1, '190,120,255');
-    explode(t, 1.95, CX, H * 0.42, 480, '160,90,255');
+    shockwave(t, 1.95, CX, H * 0.32, W * 1.1, '190,120,255');
+    explode(t, 1.95, CX, H * 0.32, 540, '160,90,255');
   } else {
-    slamWord('ФУРРИФЕМБОЕВ', t - 2.85, H * 0.42, { size: 150, max: 480 });
-    shockwave(t, 2.85, CX, H * 0.42, W * 1.05, '255,120,220');
-    explode(t, 2.85, CX, H * 0.42, 520, '255,90,200');
-    lightning(t, 2.88, CX - 320, -60, CX + 100, H * 0.48, 5, '255,140,230');
+    slamWord('ФУРРИФЕМБОЕВ', t - 2.85, H * 0.32, { size: 155, max: 500 });
+    shockwave(t, 2.85, CX, H * 0.32, W * 1.05, '255,120,220');
+    explode(t, 2.85, CX, H * 0.32, 580, '255,90,200');
+    lightning(t, 2.88, CX - 320, -60, CX + 100, H * 0.4, 5, '255,140,230');
+    lightning(t, 2.98, CX + 340, -60, CX - 80, H * 0.42, 7, '255,140,230');
   }
-  speedlines(t, 0.3 + hitEnv(t, [1.95, 2.85], 8) * 0.8, '200,130,255');
+  speedlines(t, 0.45 + hitEnv(t, [1.95, 2.85], 8) * 1.0, '200,130,255');
   vignette(0.62);
 }
 
 function S2(t) { // 4–8: ФУРРИ БОЙКИССЕР + УДОСТОВЕРЕНИЕ ПОДДЕЛЬНОЕ
   const u = t - 4;
   bgBase('#1a0f2e', '#07060d');
-  sunburst(t * 1.4, 0.14, 16);
+  sunburst(t * 1.4, 0.15, 16);
   starfield3(t, 22, 0.55);
-  // РЕВИЛ БОЙКИССЕРА — большой сверху
+  // бойкиссер-ревил
   const bs = 1 + 0.05 * Math.sin(t * 2.1);
-  boykisser(CX, H * 0.2 + Math.sin(t * 1.15) * 18, 195 * bs, t, -0.04 + 0.03 * Math.sin(t));
-  // ПОДДЕЛЬНОЕ УДОСТОВЕРЕНИЕ — переворачивается на бите
+  boykisser(CX, H * 0.19 + Math.sin(t * 1.15) * 16, 185 * bs, t, -0.04 + 0.03 * Math.sin(t));
+  // МИША держит своё удостоверение
+  mishaSkuf(CX, H * 0.78, 0.95, t, false);
   const flip = u * 0.85 + Math.sin(t * 0.9) * 0.06;
-  idCard(CX, H * 0.665, 500, t, flip);
-  // текущее слово
+  idCard(CX, H * 0.47, 460, t, flip);
+  // слово
   let cur = WORD_SLAMS[0];
   for (let i = 0; i < WORD_SLAMS.length; i++) {
     if (t >= WORD_SLAMS[i].t) cur = WORD_SLAMS[i];
   }
-  slamWord(cur.word, t - cur.t, H * 0.42);
-  // ударные волны + двойной пунч перед дропом
-  WORD_SLAMS.forEach(w => shockwave(t, w.t, CX, H * 0.42, W * 0.95, '255,205,120'));
-  WORD_SLAMS.forEach(w => splatBurst(t, w.t, CX, H * 0.42, '255,190,90'));
-  shockwave(t, 7.05, CX, H * 0.42, W * 1.18, '255,235,190');
-  shockwave(t, 7.2, CX, H * 0.42, W * 1.05, '255,180,80');
-  splatBurst(t, 7.05, CX, H * 0.42, '255,230,170');
-  // армагеддон
-  speedlines(t, 0.35 + hitEnv(t, KICKS, 9) * 0.85, '255,200,120');
-  WORD_SLAMS.forEach(w => explode(t, w.t, CX, H * 0.42, 330, '255,170,70'));
-  explode(t, 7.05, CX, H * 0.42, 640, '255,210,110');
-  lightning(t, 7.05, CX - 320, -60, CX + 120, H * 0.5, 3);
-  soupRain(t, 12, 0.55);
-  // мигающая рамка в такт
+  slamWord(cur.word, t - cur.t, H * 0.36);
+  WORD_SLAMS.forEach(w => shockwave(t, w.t, CX, H * 0.36, W * 0.95, '255,205,120'));
+  WORD_SLAMS.forEach(w => splatBurst(t, w.t, CX, H * 0.36, '255,190,90'));
+  shockwave(t, 7.05, CX, H * 0.36, W * 1.18, '255,235,190');
+  shockwave(t, 7.2, CX, H * 0.36, W * 1.05, '255,180,80');
+  splatBurst(t, 7.05, CX, H * 0.36, '255,230,170');
+  // ЖЁСТЧЕ
+  speedlines(t, 0.5 + hitEnv(t, KICKS, 9) * 1.05, '255,200,120');
+  WORD_SLAMS.forEach(w => explode(t, w.t, CX, H * 0.36, 420, '255,170,70'));
+  explode(t, 7.05, CX, H * 0.36, 720, '255,210,110');
+  lightning(t, 7.05, CX - 320, -60, CX + 120, H * 0.45, 3);
+  lightning(t, 5.02, CX + 300, -60, CX - 100, H * 0.42, 4, '255,150,220');
+  lightning(t, 6.02, CX - 280, -60, CX + 80, H * 0.42, 6);
+  soupRain(t, 16, 0.6);
   const beatPhase = fract(t / BEAT);
   if (beatPhase < 0.12 && t > 4.2) {
-    g.strokeStyle = `rgba(255,200,120,${0.25 * (1 - beatPhase / 0.12)})`;
-    g.lineWidth = 14;
+    g.strokeStyle = `rgba(255,200,120,${0.3 * (1 - beatPhase / 0.12)})`;
+    g.lineWidth = 16;
     g.strokeRect(24, 24, W - 48, H - 48);
-  }
-  // пред-дроп ямка
-  const gap = smooth(7.78, 7.95, t);
-  if (gap > 0) {
-    g.fillStyle = `rgba(0,0,0,${gap})`;
-    g.fillRect(0, 0, W, H);
   }
   vignette(0.55);
 }
 
 function S3(t) { // 8–14: ФУРРИ МИШИ и ОБЩЕСТВО ФУРРИ
   bgBase('#241436', '#0c0716');
-  sunburst(t * 1.1, 0.11, 14);
-  // толпа мишек и бойкиссеров
-  for (let i = 0; i < 7; i++) {
-    const bx = 90 + i * 160 + (hash(i * 7.7) - 0.5) * 60;
-    const by = H * 0.3 + (hash(i * 3.3) - 0.5) * 220 + Math.sin(t * 1.6 + i * 1.3) * 26;
-    const br = 78 + hash(i * 5.5) * 42;
-    if (i % 3 === 2) boykisser(bx, by, br, t, (hash(i * 2.2) - 0.5) * 0.3);
-    else furBear(bx, by, br, t, i, (hash(i * 4.4) - 0.5) * 0.25);
+  sunburst(t * 1.1, 0.12, 14);
+  // толпа мишек
+  for (let i = 0; i < 6; i++) {
+    const bx = 110 + i * 175 + (hash(i * 7.7) - 0.5) * 50;
+    const by = H * 0.28 + (hash(i * 3.3) - 0.5) * 200 + Math.sin(t * 1.6 + i * 1.3) * 24;
+    furBear(bx, by, 82 + hash(i * 5.5) * 38, t, i, (hash(i * 4.4) - 0.5) * 0.25);
   }
-  // великое удостоверение по центру
-  idCard(CX, H * 0.47, 480, t, Math.sin(t * 0.55) * 0.35);
-  // слэмы сверху/снизу как в дэд-эдите
+  // кошкодевочки ходят вокруг ГГ
+  catgirl(CX - 300, H * 0.68, 1.15, t, 1);
+  catgirl(CX + 310, H * 0.7, 1.15, t, 4);
+  // ГЛАВНЫЙ ГГ — МИША-СКУФ в центре
+  mishaSkuf(CX, H * 0.52, 1.35, t, true);
+  // слэмы
   const SL = [
-    { t: 8.2, w: 'ФУРРИ МИШИ', y: H * 0.80, s: 340, m: 560 },
-    { t: 9.3, w: 'ОБЩЕСТВО', y: H * 0.155, s: 170, m: 360 },
-    { t: 10.4, w: 'ФУРРИ', y: H * 0.80, s: 380, m: 640 },
-    { t: 11.2, w: 'МИШИ', y: H * 0.155, s: 165, m: 340 },
-    { t: 12.1, w: 'ОБЩЕСТВО ФУРРИ', y: H * 0.80, s: 300, m: 560 },
-    { t: 13.0, w: 'ФУРРИ МИШИ', y: H * 0.155, s: 150, m: 330 },
+    { t: 8.2, w: 'ФУРРИ МИШИ', y: H * 0.82, s: 340, m: 560 },
+    { t: 9.3, w: 'ОБЩЕСТВО', y: H * 0.145, s: 175, m: 360 },
+    { t: 10.4, w: 'ФУРРИ', y: H * 0.82, s: 380, m: 640 },
+    { t: 11.2, w: 'МИШИ', y: H * 0.145, s: 165, m: 340 },
+    { t: 12.1, w: 'ОБЩЕСТВО ФУРРИ', y: H * 0.82, s: 300, m: 560 },
+    { t: 13.0, w: 'ФУРРИ МИШИ', y: H * 0.145, s: 150, m: 330 },
   ];
   for (const s of SL) {
     if (t >= s.t && t < s.t + 1.05) {
       slamWord(s.w, t - s.t, s.y, { size: s.s, max: s.m });
     }
     shockwave(t, s.t, CX, s.y, W * 0.9, '255,190,110');
-    explode(t, s.t, CX, s.y, 300, '255,160,70');
+    explode(t, s.t, CX, s.y, 380, '255,160,70');
   }
-  speedlines(t, 0.3 + hitEnv(t, KICKS, 9) * 0.75, '255,200,130');
-  soupRain(t, 14, 0.6);
-  lightning(t, 8.05, CX - 350, -60, CX + 80, H * 0.5, 9);
-  lightning(t, 10.42, CX + 350, -60, CX - 80, H * 0.5, 11);
-  lightning(t, 13.02, CX - 300, -60, CX + 140, H * 0.45, 13);
+  speedlines(t, 0.45 + hitEnv(t, KICKS, 9) * 1.0, '255,200,130');
+  soupRain(t, 18, 0.65);
+  lightning(t, 8.05, CX - 350, -60, CX + 80, H * 0.45, 9);
+  lightning(t, 10.42, CX + 350, -60, CX - 80, H * 0.45, 11);
+  lightning(t, 12.12, CX - 320, -60, CX + 100, H * 0.42, 12);
+  lightning(t, 13.02, CX + 300, -60, CX - 140, H * 0.4, 13);
   vignette(0.52);
 }
 
-function S4(t) { // 14–20: ПАРАД ПО ВСЕМУ ПСКОВГУ В МУДЛ
+function S4(t) { // 14–20: ПАРАД — МИША и кошкодевочки идут по ПСКОВГУ
   bgBase('#101426', '#060810');
-  // небо-смена цвета по врезкам
   const ci = Math.min(CUTS.length - 1, Math.max(0, Math.floor(t - 14)));
   const cw = g.createLinearGradient(0, 0, 0, H);
   cw.addColorStop(0, CUTS[ci].tint + '22');
   cw.addColorStop(1, 'transparent');
   g.fillStyle = cw; g.fillRect(0, 0, W, H);
   starfield3(t, 18, 0.4);
-  // ПСКОВ: силуэт города с луковками
-  pskovSky(t, H * 0.52);
-  // ПАРАД — мишки и бойкиссеры шагают
-  for (let i = 0; i < 6; i++) {
-    const march = fract(t * 0.14 + i / 6);
-    const px = W * 1.15 - march * W * 1.35;
-    const py = H * 0.7 + Math.abs(Math.sin(t * 3.4 + i)) * 26;
-    const pr = 92 + hash(i * 3.3) * 34;
-    if (i % 2) furBear(px, py, pr, t, i + 4, -0.06);
-    else boykisser(px, py, pr, t, 0.08);
+  pskovSky(t, H * 0.5);
+  // ПАРАД: кошкодевочки шагают, МИША-СКУФ во главе
+  const march = fract(t * 0.1);
+  const shift = -march * 260;
+  catgirl(CX - 430 + shift, H * 0.66, 1.25, t, 1);
+  catgirl(CX - 250 + shift, H * 0.68, 1.3, t, 2);
+  mishaSkuf(CX + 30 + shift, H * 0.66, 1.35, t, true);
+  catgirl(CX + 280 + shift, H * 0.68, 1.3, t, 4);
+  catgirl(CX + 460 + shift, H * 0.66, 1.25, t, 5);
+  // медвежата сзади
+  for (let i = 0; i < 3; i++) {
+    furBear(CX - 380 + i * 260 + shift * 1.3, H * 0.5 + Math.abs(Math.sin(t * 3 + i)) * 18, 88, t, i + 3, -0.05);
   }
   // летающие удостоверения
   for (let i = 0; i < 3; i++) {
     const fx = (hash(i * 5.5) - 0.5) * 700;
-    const fy = H * 0.3 + (hash(i * 7.7) - 0.5) * 400 + Math.sin(t * 1.4 + i * 2) * 40;
+    const fy = H * 0.26 + (hash(i * 7.7) - 0.5) * 320 + Math.sin(t * 1.4 + i * 2) * 40;
     idCard(CX + fx, fy, 190, t, t * 1.2 + i * 2);
   }
   // слэмы-врезки
@@ -2080,23 +2266,22 @@ function S4(t) { // 14–20: ПАРАД ПО ВСЕМУ ПСКОВГУ В МУД
   for (let i = 0; i < CUTS.length; i++) {
     if (t >= CUTS[i].t) cur = CUTS[i];
   }
-  slamWord(cur.cap, t - cur.t, H * 0.82, {
-    size: cur.cap.length > 7 ? 120 : 168,
-    max: cur.cap.length > 7 ? 300 : 420,
+  slamWord(cur.cap, t - cur.t, H * 0.85, {
+    size: cur.cap.length > 7 ? 130 : 175,
+    max: cur.cap.length > 7 ? 320 : 440,
     tint: cur.tint, tint2: cur.tint,
   });
-  splatBurst(t, cur.t, CX, H * 0.82, cur.glow);
-  CUTS.forEach(c => explode(t, c.t, CX + (hash(c.t) - 0.5) * 300, H * 0.55, 380, cur.glow));
-  speedlines(t, 0.5 + hitEnv(t, KICKS, 9) * 0.9, '160,200,255');
-  soupRain(t, 16, 0.65);
-  lightning(t, 16.02, CX + 350, -60, CX - 60, H * 0.5, 15, '120,180,255');
-  lightning(t, 18.02, CX - 350, -60, CX + 60, H * 0.5, 17, '120,180,255');
+  splatBurst(t, cur.t, CX, H * 0.85, cur.glow);
+  CUTS.forEach(c => explode(t, c.t, CX + (hash(c.t) - 0.5) * 300, H * 0.5, 460, cur.glow));
+  speedlines(t, 0.65 + hitEnv(t, KICKS, 9) * 1.1, '160,200,255');
+  soupRain(t, 20, 0.7);
+  lightning(t, 16.02, CX + 350, -60, CX - 60, H * 0.45, 15, '120,180,255');
+  lightning(t, 18.02, CX - 350, -60, CX + 60, H * 0.45, 17, '120,180,255');
   vignette(0.52);
 }
 
 function pskovSky(t, yBase) {
   g.fillStyle = 'rgba(16,10,28,.92)';
-  // домики
   for (let i = 0; i < 7; i++) {
     const bx = i * 170 - 40;
     const bh = 120 + hash(i * 3.3) * 160;
@@ -2107,7 +2292,6 @@ function pskovSky(t, yBase) {
     g.lineTo(bx + 160, yBase - bh);
     g.closePath(); g.fill();
   }
-  // церкви с луковками
   for (const cx of [200, 640, 930]) {
     g.fillRect(cx - 55, yBase - 300, 110, 320);
     onionDome(cx, yBase - 300, 46);
@@ -2125,47 +2309,50 @@ function onionDome(x, y, r) {
   g.fillRect(x - r * 0.3, y - r * 2.55, r * 0.6, r * 0.14);
 }
 
-function S5(t) { // 20–26: ДРЕВНЕЕ ЗЛО — НЕКОМАНТ
+function S5(t) { // 20–26: ДРЕВНЕЕ ЗЛО — МИША против НЕКОМАНТА
   bgBase('#0c0418', '#040208');
   const glow = g.createRadialGradient(CX, H * 0.42, 40, CX, H * 0.42, W * 1.15);
   glow.addColorStop(0, 'rgba(60,255,120,.16)');
   glow.addColorStop(1, 'rgba(60,255,120,0)');
   g.fillStyle = glow; g.fillRect(0, 0, W, H);
-  // портал тьмы за некромантом
-  darkPortal(t, CX, H * 0.3, 300);
+  darkPortal(t, CX, H * 0.28, 290);
   // НЕКОМАНТ
-  necromancer(CX, H * 0.52, 1.05, t);
-  // черепа вокруг
-  for (let i = 0; i < 8; i++) {
+  necromancer(CX, H * 0.48, 1.05, t);
+  // МИША-СКУФ внизу — не боится!
+  mishaSkuf(CX - 200, H * 0.82, 1.15, t, false);
+  catgirl(CX + 250, H * 0.84, 1.1, t, 3);
+  // черепа
+  for (let i = 0; i < 9; i++) {
     const sx = 80 + hash(i * 7.7) * (W - 160);
-    const sy = H * 0.12 + hash(i * 3.3) * H * 0.75 + Math.sin(t * 1.2 + i) * 30;
-    skullGlyph(sx, sy, 34 + hash(i * 5.5) * 30, 0.85);
+    const sy = H * 0.12 + hash(i * 3.3) * H * 0.7 + Math.sin(t * 1.2 + i) * 30;
+    skullGlyph(sx, sy, 32 + hash(i * 5.5) * 30, 0.85);
   }
   // слова-CHANT
   let cur = null;
   for (const c of CHANT) if (t >= c.t && t < c.t + 1) cur = c;
-  if (cur) slamWord(cur.word, t - cur.t, H * 0.44, { size: 180, max: 620, tint: '#8aff9a', tint2: '#1fae4e' });
-  CHANT.forEach(c => explode(t, c.t, CX, H * 0.44, 360, '90,255,130'));
-  // блок в 23.95 — ДРЕВНЕЕ ЗЛО
+  if (cur) slamWord(cur.word, t - cur.t, H * 0.42, { size: 185, max: 640, tint: '#8aff9a', tint2: '#1fae4e' });
+  CHANT.forEach(c => explode(t, c.t, CX, H * 0.42, 420, '90,255,130'));
+  // блок 23.95
   if (t >= 23.95 && t < 25.0) {
     const p = easeOutBack(clamp((t - 23.95) / 0.3));
-    blockSlam(['ДРЕВНЕЕ ЗЛО', 'НЕКОМАНТ!'], t - 23.95, H * 0.545, 140, 190, p, '#b8ffc8', '#2ea85a');
+    blockSlam(['ДРЕВНЕЕ ЗЛО', 'НЕКОМАНТ!'], t - 23.95, H * 0.55, 155, W * 0.9, p, '#b8ffc8', '#2ea85a');
   }
-  shockwave(t, 23.95, CX, H * 0.545, W * 1.15, '120,255,150');
-  explode(t, 23.95, CX, H * 0.5, 700, '80,255,120');
-  lightning(t, 24.0, CX - 380, -80, CX + 80, H * 0.5, 21, '120,255,150');
-  lightning(t, 22.02, CX + 350, -80, CX - 80, H * 0.48, 19, '120,255,150');
+  shockwave(t, 23.95, CX, H * 0.55, W * 1.15, '120,255,150');
+  explode(t, 23.95, CX, H * 0.5, 780, '80,255,120');
+  lightning(t, 24.0, CX - 380, -80, CX + 80, H * 0.45, 21, '120,255,150');
+  lightning(t, 22.02, CX + 350, -80, CX - 80, H * 0.45, 19, '120,255,150');
+  lightning(t, 20.02, CX - 300, -80, CX + 140, H * 0.42, 18, '120,255,150');
   // С 25-й — ПОЛНЫЙ КОШМАР
   if (t >= 25) {
-    soupRain(t, 26, 0.8);
-    greenFlame(CX - 320, H * 0.85, 130, t);
-    greenFlame(CX + 320, H * 0.88, 150, t + 2);
-    explode(t, 25.0, CX, H * 0.4, 560, '80,255,120');
-    explode(t, 25.5, CX - 200, H * 0.55, 460, '100,255,140');
-    lightning(t, 25.0, CX - 420, -80, CX + 60, H * 0.5, 23, '120,255,150');
-    lightning(t, 25.5, CX + 400, -80, CX - 80, H * 0.55, 25, '120,255,150');
+    soupRain(t, 30, 0.85);
+    greenFlame(CX - 320, H * 0.85, 140, t);
+    greenFlame(CX + 320, H * 0.88, 160, t + 2);
+    explode(t, 25.0, CX, H * 0.4, 620, '80,255,120');
+    explode(t, 25.5, CX - 200, H * 0.55, 520, '100,255,140');
+    lightning(t, 25.0, CX - 420, -80, CX + 60, H * 0.45, 23, '120,255,150');
+    lightning(t, 25.5, CX + 400, -80, CX - 80, H * 0.5, 25, '120,255,150');
   }
-  speedlines(t, 0.4 + hitEnv(t, KICKS, 9) * 0.85, '110,255,150');
+  speedlines(t, 0.55 + hitEnv(t, KICKS, 9) * 1.05, '110,255,150');
   vignette(0.55);
 }
 
@@ -2197,8 +2384,8 @@ function darkPortal(t, x, y, r) {
   g.beginPath(); g.arc(x, y, r * 1.02, 0, TAU); g.stroke();
 }
 
-function S6(t) { // 26–32: КОССПЛЕЙ ХОУМЛЕНДЕРА + КОНЦОВКА ОТ ДЕДА
-  if (t < 31.25) {
+function S6(t) { // 26–32: ХОУМЛЕНДЕР + ДОЛГАЯ КОНЦОВКА ОТ ДЭДА
+  if (t < 30.8) {
     bgBase('#181029', '#07060d');
     // патриотичные лучи
     g.save();
@@ -2207,7 +2394,7 @@ function S6(t) { // 26–32: КОССПЛЕЙ ХОУМЛЕНДЕРА + КОНЦ�
       g.save();
       g.rotate(i * 0.19);
       const rg = g.createLinearGradient(0, 0, 0, H);
-      rg.addColorStop(0, `rgba(255,80,80,${0.1 + 0.04 * Math.sin(t * 2 + i)})`);
+      rg.addColorStop(0, `rgba(255,80,80,${0.12 + 0.05 * Math.sin(t * 2 + i)})`);
       rg.addColorStop(1, 'rgba(255,80,80,0)');
       g.fillStyle = rg;
       g.beginPath();
@@ -2217,112 +2404,107 @@ function S6(t) { // 26–32: КОССПЛЕЙ ХОУМЛЕНДЕРА + КОНЦ�
       g.restore();
     }
     g.restore();
-    // ХОУМЛЕНДЕР
+    // ХОУМЛЕНДЕР сверху
     const laser = smooth(26.7, 27.1, t);
-    homelander(CX, H * 0.42, 1.12, t, laser);
-    // красный налёт от лазеров
+    homelander(CX, H * 0.36, 1.05, t, laser);
+    // МИША-СКУФ внизу — смотрит на Хоумлендера
+    mishaSkuf(CX, H * 0.84, 1.1, t, false);
     if (laser > 0) {
-      const rt = g.createRadialGradient(CX, H * 0.3, 100, CX, H * 0.3, W * 1.3);
-      rt.addColorStop(0, `rgba(255,50,30,${0.16 * laser})`);
+      const rt = g.createRadialGradient(CX, H * 0.28, 100, CX, H * 0.28, W * 1.3);
+      rt.addColorStop(0, `rgba(255,50,30,${0.18 * laser})`);
       rt.addColorStop(1, 'rgba(255,50,30,0)');
       g.fillStyle = rt; g.fillRect(0, 0, W, H);
     }
-    explode(t, 26.0, CX, H * 0.42, 780, '255,90,70');
-    lightning(t, 26.05, CX - 380, -80, CX + 120, H * 0.45, 27, '255,140,120');
+    explode(t, 26.0, CX, H * 0.36, 820, '255,90,70');
+    lightning(t, 26.05, CX - 380, -80, CX + 120, H * 0.4, 27, '255,140,120');
+    lightning(t, 28.55, CX + 380, -80, CX - 120, H * 0.42, 28, '255,140,120');
     // слэмы
     if (t < 27.65) {
-      if (t >= 27.0) slamWord('КОСПЛЕЙ', t - 27.0, H * 0.62, { size: 150, max: 320 });
-    } else if (t < 29.55) {
-      slamWord('ХОУМЛЕНДЕРА', t - 27.7, H * 0.62, { size: 175, max: 500 });
+      if (t >= 27.0) slamWord('КОСПЛЕЙ', t - 27.0, H * 0.58, { size: 155, max: 330 });
+    } else if (t < 29.25) {
+      slamWord('ХОУМЛЕНДЕРА', t - 27.7, H * 0.58, { size: 180, max: 520 });
     }
-    shockwave(t, 27.0, CX, H * 0.62, W * 1.0, '255,120,90');
-    shockwave(t, 27.7, CX, H * 0.62, W * 1.15, '255,140,100');
-    if (t >= 29.55 && t < 30.0) slamWord('ОН ВСКРЫЛСЯ', t - 29.55, H * 0.5, { size: 170, max: 420 });
-    if (t >= 29.55) {
-      explode(t, 29.55, CX, H * 0.5, 520, '255,170,90');
-      shockwave(t, 29.55, CX, H * 0.5, W * 1.05, '255,200,130');
+    shockwave(t, 27.0, CX, H * 0.58, W * 1.0, '255,120,90');
+    shockwave(t, 27.7, CX, H * 0.58, W * 1.15, '255,140,100');
+    if (t >= 29.25 && t < 30.0) slamWord('ОН ВСКРЫЛСЯ', t - 29.25, H * 0.5, { size: 175, max: 440 });
+    if (t >= 29.25) {
+      explode(t, 29.25, CX, H * 0.5, 560, '255,170,90');
+      shockwave(t, 29.25, CX, H * 0.5, W * 1.05, '255,200,130');
+      lightning(t, 29.28, CX - 360, -80, CX + 80, H * 0.45, 29, '255,150,120');
     }
     // ФИНАЛЬНЫЙ СЛЭМ — ПРИЛОЖИЛ К ОБВИНЕНИЮ
     const f = t - FINAL_SLAM;
     if (f >= 0) {
       g.fillStyle = `rgba(6,5,10,${clamp(f * 3.2)})`;
       g.fillRect(-260, -260, W + 520, H + 520);
-      explode(t, FINAL_SLAM, CX, H * 0.5, 880, '255,120,80');
-      explode(t, FINAL_SLAM + 0.14, CX - 280, H * 0.36, 520, '255,90,70');
-      explode(t, FINAL_SLAM + 0.28, CX + 300, H * 0.6, 520, '255,140,90');
-      lightning(t, FINAL_SLAM + 0.05, CX - 420, -80, CX + 100, H * 0.5, 31, '255,150,120');
-      lightning(t, FINAL_SLAM + 0.35, CX + 400, -80, CX - 100, H * 0.52, 33, '255,150,120');
-      lightning(t, FINAL_SLAM + 0.7, CX - 200, H + 60, CX + 60, H * 0.55, 35, '255,150,120');
+      explode(t, FINAL_SLAM, CX, H * 0.5, 900, '255,120,80');
+      explode(t, FINAL_SLAM + 0.14, CX - 280, H * 0.36, 560, '255,90,70');
+      explode(t, FINAL_SLAM + 0.28, CX + 300, H * 0.6, 560, '255,140,90');
+      lightning(t, FINAL_SLAM + 0.05, CX - 420, -80, CX + 100, H * 0.45, 31, '255,150,120');
+      lightning(t, FINAL_SLAM + 0.35, CX + 400, -80, CX - 100, H * 0.48, 33, '255,150,120');
       const p = easeOutBack(clamp(f / 0.32));
-      blockSlam(['ПРИЛОЖИЛ', 'К ОБВИНЕНИЮ'], f, H * 0.55, 150, 500, p, '#ffe08a', '#ff8a3c');
-      const wr = easeOutCubic(clamp(f / 0.85)) * 1500;
-      g.strokeStyle = `rgba(255,190,120,${(1 - clamp(f / 0.85)) * 0.85})`;
-      g.lineWidth = 24 * (1 - clamp(f / 0.85) * 0.6);
+      blockSlam(['ПРИЛОЖИЛ', 'К ОБВИНЕНИЮ'], f, H * 0.55, 165, W * 0.9, p, '#ffe08a', '#ff8a3c');
+      const wr = easeOutCubic(clamp(f / 0.7)) * 1500;
+      g.strokeStyle = `rgba(255,190,120,${(1 - clamp(f / 0.7)) * 0.85})`;
+      g.lineWidth = 24 * (1 - clamp(f / 0.7) * 0.6);
       g.beginPath(); g.ellipse(CX, H * 0.5, wr, wr * 0.4, 0, 0, TAU); g.stroke();
     }
-    speedlines(t, 0.5 + hitEnv(t, KICKS, 9) * 0.9, '255,140,110');
-    soupRain(t, 16, 0.7);
+    speedlines(t, 0.65 + hitEnv(t, KICKS, 9) * 1.1, '255,140,110');
+    soupRain(t, 18, 0.7);
     vignette(0.55);
   } else {
-    // ===== ПАНЧЛАЙН: ВО ВСЁМ ВИНОВАТ ДЭД =====
-    const pu = clamp((t - 31.25) / 0.22);
-    bgBase('#241208', '#0a0506');
-    const glow = g.createRadialGradient(CX, H * 0.36, 40, CX, H * 0.36, W * 1.15);
-    glow.addColorStop(0, 'rgba(255,170,60,.2)');
-    glow.addColorStop(1, 'rgba(255,170,60,0)');
-    g.fillStyle = glow; g.fillRect(0, 0, W, H);
-    // ударная волна панчлайна
-    const wr = easeOutCubic(clamp((t - 31.25) / 0.7)) * 1400;
-    g.strokeStyle = `rgba(255,220,150,${(1 - clamp((t - 31.25) / 0.7)) * 0.8})`;
+    // ===== ДОЛГИЙ ПАНЧЛАЙН: ВО ВСЁМ ВИНОВАТ ДЭД =====
+    const pt = t - 30.8;
+    bgBase('#2a1608', '#0c0606');
+    // золотые божественные лучи
+    g.save();
+    g.translate(CX, H * 0.33);
+    for (let i = -5; i <= 5; i++) {
+      g.save();
+      g.rotate(i * 0.22 + Math.sin(t * 0.5) * 0.015);
+      const rg = g.createLinearGradient(0, -120, 0, H * 0.75);
+      rg.addColorStop(0, 'rgba(255,215,130,.24)');
+      rg.addColorStop(1, 'rgba(255,215,130,0)');
+      g.fillStyle = rg;
+      g.beginPath();
+      g.moveTo(-32, -120); g.lineTo(32, -120);
+      g.lineTo(135, H * 0.75); g.lineTo(-135, H * 0.75);
+      g.closePath(); g.fill();
+      g.restore();
+    }
+    g.restore();
+    // ударная волна
+    const wr = easeOutCubic(clamp(pt / 0.7)) * 1500;
+    g.strokeStyle = `rgba(255,220,150,${(1 - clamp(pt / 0.7)) * 0.85})`;
     g.lineWidth = 22;
-    g.beginPath(); g.arc(CX, H * 0.36, wr, 0, TAU); g.stroke();
-    explode(t, 31.25, CX, H * 0.36, 520, '255,190,80');
-    // САМ ДЭД
-    const fs = 200 * easeOutBack(clamp((t - 31.25) / 0.35)) * (1 + 0.02 * Math.sin(t * 3));
-    faceCircle(CX, H * 0.36, fs, {
-      glow: '255,180,80', ring: '#241208', ring2: '#ffd98a', ringW: 16,
-      rot: -0.05 + 0.02 * Math.sin(t * 1.2), glasses: 1, dot: 0.4,
+    g.beginPath(); g.arc(CX, H * 0.33, wr, 0, TAU); g.stroke();
+    explode(t, 30.8, CX, H * 0.33, 420, '255,190,80');
+    // САМ ДЭД — большой, с медленным зумом
+    const fs = (218 + 20 * smooth(30.8, 32, t)) * easeOutBack(clamp(pt / 0.3));
+    faceCircle(CX, H * 0.33, fs, {
+      glow: '255,180,80', ring: '#2a1608', ring2: '#ffd98a', ringW: 18,
+      rot: -0.05 + 0.015 * Math.sin(t * 1.1), glasses: 1, dot: 0.45,
     });
-    chefHat(CX, H * 0.36, fs, t);
-    medal(CX - fs * 1.05, H * 0.36 + fs * 0.85, 74, t, 1);
+    chefHat(CX, H * 0.33, fs, t);
+    medal(CX - fs * 1.12, H * 0.33 + fs * 0.9, 80, t, 1);
+    embers(t, 22, 0.75);
     // текст-панчлайн
-    const p = easeOutBack(clamp((t - 31.25) / 0.32));
-    blockSlam(['ЧТО ПО ПРИЧИНЕ', 'ОТ ДЕДА'], t - 31.25, H * 0.7, 130, 460, p, '#ffe08a', '#ff8a3c');
-    shockwave(t, 31.25, CX, H * 0.7, W * 1.1, '255,210,130');
-    // финальная лёгкая тьма — панчлайн остаётся
-    const endDark = 0.22 * smooth(31.88, 32.0, t);
+    const p = easeOutBack(clamp(pt / 0.34));
+    blockSlam(['ЧТО ПО ПРИЧИНЕ', 'ОТ ДЕДА'], pt, H * 0.72, 155, W * 0.9, p, '#ffe08a', '#ff8a3c');
+    shockwave(t, 30.8, CX, H * 0.72, W * 1.05, '255,210,130');
+    const endDark = 0.2 * smooth(31.9, 32.0, t);
     if (endDark > 0) {
       g.fillStyle = `rgba(6,5,10,${endDark})`;
       g.fillRect(-260, -260, W + 520, H + 520);
     }
-    vignette(0.58);
-  }
-}
-
-// блочный слэм в две строки (как «О ВЕЛИКИЙ СУП / НАВАРИЛИ!»)
-function blockSlam(lines, tIn, y, size, maxW, p, tint = '#ffe08a', tint2 = '#ff8a3c') {
-  const lh = size * 1.18;
-  const y0 = y - (lines.length - 1) * lh / 2;
-  for (let i = 0; i < lines.length; i++) {
-    g.save();
-    g.translate(CX, y0 + i * lh);
-    g.scale(p, p);
-    const sF = fitFont(lines[i], W * 0.94, size);
-    strokeText(lines[i], 0, 0, sF, 'rgba(12,6,2,.95)', sF * 0.15);
-    const gr = g.createLinearGradient(0, -sF * 0.55, 0, sF * 0.55);
-    gr.addColorStop(0, '#fff6dd'); gr.addColorStop(1, tint2);
-    g.fillStyle = gr;
-    g.font = `900 ${sF}px ${F_DISP}`;
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillText(lines[i], 0, 0);
-    g.restore();
+    vignette(0.52);
   }
 }
 
 function shake(t) {
   const kick = hitEnv(t, KICKS, 10);
   const boom = hitEnv(t, BOOMS, 6);
-  const a = kick * 18 + boom * 38;
+  const a = kick * 24 + boom * 48;
   return {
     x: (hash2(Math.floor(t * 60), 1) - 0.5) * a,
     y: (hash2(Math.floor(t * 60), 2) - 0.5) * a,
@@ -2353,11 +2535,12 @@ function postFor9(t) {
 
 function frame(t) {
   g.__t = t;
+  TEXT_QUEUE = [];
   const sh = shake(t);
-  // ПОСТОЯННОЕ движение камеры + вип-панч на ударных моментах
+  // движение камеры — картинку качает, но текст (см. ниже) от камеры не зависит
   const whip = hitEnv(t, [...WORD_SLAMS.map(w => w.t), ...CUTS.map(c => c.t), 8, 20, 23.95, 26, FINAL_SLAM], 42);
-  const camX = Math.sin(t * 0.9) * 16 + Math.sin(t * 2.3) * 7 + (hash2(Math.floor(t * 2.7), 9) - 0.5) * whip * 320;
-  const camY = Math.cos(t * 1.15) * 13 + (hash2(Math.floor(t * 2.7), 10) - 0.5) * whip * 140;
+  const camX = Math.sin(t * 0.9) * 11 + Math.sin(t * 2.3) * 5 + (hash2(Math.floor(t * 2.7), 9) - 0.5) * whip * 120;
+  const camY = Math.cos(t * 1.15) * 8 + (hash2(Math.floor(t * 2.7), 10) - 0.5) * whip * 55;
   const camR = Math.sin(t * 0.55) * 0.013 + sh.r;
   const camS = sh.s * (1 + 0.02 * Math.sin(t * 1.7));
   g.save();
@@ -2373,22 +2556,31 @@ function frame(t) {
   else S6(t);
   g.restore();
 
+  // ТЕКСТ ПОСЛЕ КАМЕРЫ — строго по центру, никогда не выходит за рамки
+  drawTextQueue();
+  // пред-дроп ямка — гасит и текст тоже (только в окне 7.78–7.98)
+  const gap = smooth(7.78, 7.92, t) * (1 - smooth(7.92, 7.98, t));
+  if (gap > 0) {
+    g.fillStyle = `rgba(0,0,0,${gap})`;
+    g.fillRect(0, 0, W, H);
+  }
+
   // вспышки врезок
   const cutFlash = hitEnv(t, [...WORD_SLAMS.map(w => w.t), ...CUTS.map(c => c.t), 8, 20, FINAL_SLAM], 26);
   if (cutFlash > 0.01) {
     g.fillStyle = `rgba(255,255,255,${cutFlash * 0.62})`;
     g.fillRect(0, 0, W, H);
   }
-  // ЭПИЛЕПСИЯ: строб на каждый кик — короткий и острый
+  // ЭПИЛЕПСИЯ: строб на каждый кик — жёсткий, но короткий
   const kickFlash = hitEnv(t, KICKS, 58);
-  if (t > 3.9 && t < 30.3 && kickFlash > 0.02) {
-    g.fillStyle = `rgba(255,255,255,${kickFlash * 0.22})`;
+  if (t > 3.9 && t < 30.2 && kickFlash > 0.02) {
+    g.fillStyle = `rgba(255,255,255,${kickFlash * 0.3})`;
     g.fillRect(0, 0, W, H);
-    g.fillStyle = `rgba(255,210,120,${kickFlash * 0.1})`;
+    g.fillStyle = `rgba(255,205,110,${kickFlash * 0.13})`;
     g.fillRect(0, 0, W, H);
   }
   // глитч-полосы на бумах — армагеддон
-  glitchBands(t, hitEnv(t, BOOMS, 16) * 1.15);
+  glitchBands(t, hitEnv(t, BOOMS, 16) * 1.25);
   if (window.FX) FX.post(g, t, postFor(t));
   else vignette(0.5);
 }
