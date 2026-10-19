@@ -295,7 +295,9 @@ function renderScore(sr) {
     return (noise((t0 + x) * 6151) * 0.62 + Math.sin(2 * Math.PI * (320 + 1750 * u) * x) * 0.22) * env * gain;
   });
   for (const c of CUTS) whoosh(c.t, 0.5);
+  for (const c of CUTS) boom(c.t, 0.5);   // каждый срез — удар
   whoosh(8, 0.6); whoosh(20, 0.65); whoosh(26, 0.5);
+  boom(26, 0.7);
 
   // ---- комедийные вставки (лайт, чтобы не спорить с оркестром) ----
   const boing = (t0, gain = 0.3) => {
@@ -640,9 +642,16 @@ function ingredients(t) {
     const y = lerp(-60, 1232, a * a);
     const zc = (1 - a) * 320 - 120; // кусочки приближаются к камере, падая
     if (i % 2) {
+      // огненный хвост метеора
+      g.strokeStyle = 'rgba(255,160,60,.55)';
+      g.lineWidth = 11;
+      g.beginPath(); g.moveTo(x + side * 70, y - 200); g.lineTo(x, y); g.stroke();
       // ультрамарин — вращающийся 3D-куб
       cube3(x, y, 58, t * 2.4 + i, t * 1.7 + i * 0.6, '#6f9dff', '#2c4fd0', '#1c36a8', zc, '90,140,255');
     } else {
+      g.strokeStyle = 'rgba(120,200,255,.5)';
+      g.lineWidth = 9;
+      g.beginPath(); g.moveTo(x + side * 60, y - 180); g.lineTo(x, y); g.stroke();
       // вода — шар-капля с бликом
       const [px, py, s] = p3(0, 0, zc, x, y);
       glowDot(px, py, 56 * s, '120,200,255', 0.38);
@@ -752,6 +761,109 @@ function splatBurst(t, t0, x0, y0, hue = '255,180,80') {
     const d = v * u * (1 - u * 0.35);
     const [px, py, s] = p3(Math.cos(a) * d, Math.sin(a) * d * 1.35, z + 300, x0, y0);
     ball3(px, py, s * (16 + hash(i * 4.2 + t0) * 22) * (1 - u * 0.55), `rgba(${hue},.95)`, `rgba(${hue},.25)`);
+  }
+}
+
+// бегущие линии скорости — аниме-удар
+function speedlines(t, intensity = 1, col = '255,220,150') {
+  for (let i = 0; i < 30; i++) {
+    const a = hash(i * 3.3) * TAU;
+    const ph = fract(t * (0.9 + hash(i * 7.7) * 1.8) + hash(i * 5.5));
+    const r0 = lerp(W * 1.15, 100, ph);
+    const r1 = r0 + 240 + hash(i * 9.9) * 420;
+    const alpha = intensity * (1 - ph) * 0.4 * (0.35 + hash(i * 4.2));
+    g.strokeStyle = `rgba(${col},${clamp(alpha)})`;
+    g.lineWidth = 3 + hash(i * 6.6) * 11;
+    g.beginPath();
+    g.moveTo(CX + Math.cos(a) * r0, H * 0.5 + Math.sin(a) * r0);
+    g.lineTo(CX + Math.cos(a) * r1, H * 0.5 + Math.sin(a) * r1);
+    g.stroke();
+  }
+}
+// взрыв — вспышка + осколки
+function explode(t, t0, x, y, size = 420, hue = '255,150,50') {
+  const u = (t - t0) / 0.62;
+  if (u <= 0 || u >= 1) return;
+  const e = easeOutCubic(u);
+  const r = size * (0.25 + e * 0.9);
+  const bg = g.createRadialGradient(x, y, 0, x, y, r);
+  bg.addColorStop(0, `rgba(255,255,240,${(1 - u) * 0.95})`);
+  bg.addColorStop(0.35, `rgba(${hue},${(1 - u) * 0.75})`);
+  bg.addColorStop(1, `rgba(${hue},0)`);
+  g.fillStyle = bg;
+  g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+  for (let i = 0; i < 14; i++) {
+    const a = hash(i * 3.1 + t0) * TAU;
+    const d = (260 + hash(i * 8.8) * 720) * e;
+    const [px, py, s] = p3(Math.cos(a) * d, Math.sin(a) * d, (1 - u) * 320, x, y);
+    ball3(px, py, s * 15 * (1 - u * 0.6), 'rgba(255,235,190,.95)', 'rgba(255,110,30,.5)');
+  }
+}
+// молния
+function lightning(t, t0, x0, y0, x1, y1, seed = 1, color = '255,240,200') {
+  const u = (t - t0) / 0.24;
+  if (u <= 0 || u >= 1) return;
+  g.save();
+  g.strokeStyle = `rgba(${color},${(1 - u) * 0.95})`;
+  g.lineWidth = 12 * (1 - u * 0.5);
+  g.shadowColor = `rgba(${color},.9)`; g.shadowBlur = 36;
+  g.beginPath();
+  const segs = 10;
+  for (let i = 0; i <= segs; i++) {
+    const p = i / segs;
+    const jx = (hash(i * 7.7 + seed) - 0.5) * 130 * Math.sin(Math.PI * p);
+    const jy = (hash(i * 3.3 + seed) - 0.5) * 70;
+    const px = lerp(x0, x1, p) + jx, py = lerp(y0, y1, p) + jy;
+    i ? g.lineTo(px, py) : g.moveTo(px, py);
+  }
+  g.stroke();
+  g.restore();
+}
+// суповая волна всплёска снизу
+function soupWave(t, t0, y = H + 40, dur = 1.15) {
+  const u = (t - t0) / dur;
+  if (u <= 0 || u >= 1) return;
+  const e = easeOutCubic(u);
+  for (let k = 0; k < 3; k++) {
+    const yy = y - e * (240 + k * 150);
+    const alpha = (1 - u) * (0.8 - k * 0.18);
+    g.fillStyle = `rgba(255,${175 - k * 22},60,${alpha})`;
+    g.beginPath();
+    g.moveTo(-40, y + 80);
+    for (let x = -40; x <= W + 40; x += 26) {
+      const hump = Math.sin(x * 0.008 + t * 3.2 + k * 2.1) * (70 + k * 34) * (1 - u * 0.35);
+      g.lineTo(x, yy + hump);
+    }
+    g.lineTo(W + 40, y + 80);
+    g.closePath();
+    g.fill();
+  }
+  splatBurst(t, t0, CX, y - 220 * e, '255,190,90');
+}
+// дождь из супа с хвостами
+function soupRain(t, n = 18, alpha = 0.8) {
+  for (let i = 0; i < n; i++) {
+    const sp = 0.6 + hash(i * 2.2) * 1.5;
+    const y = ((hash(i * 5.5) * (H + 300) + t * 680 * sp) % (H + 300)) - 150;
+    const x = hash(i * 3.1) * W;
+    const len = 34 + sp * 56;
+    g.strokeStyle = `rgba(255,190,90,${alpha * 0.45})`;
+    g.lineWidth = 3 + hash(i) * 4;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x - 8, y - len); g.stroke();
+    ball3(x, y, 5 + hash(i * 7) * 5, 'rgba(255,215,150,.95)', 'rgba(255,140,50,.5)');
+  }
+}
+// глитч-полосы на ударах
+function glitchBands(t, amt) {
+  if (amt <= 0.04) return;
+  for (let i = 0; i < 5; i++) {
+    const gy = hash(i * 3.3 + Math.floor(t * 20)) * H;
+    const gh = 8 + hash(i * 7.7 + Math.floor(t * 20)) * 30;
+    const off = (hash(i * 5.5 + Math.floor(t * 20)) - 0.5) * 150 * amt;
+    g.fillStyle = i % 2 ? `rgba(255,80,80,${amt * 0.24})` : `rgba(80,180,255,${amt * 0.24})`;
+    g.fillRect(off, gy, W, gh);
+    g.fillStyle = `rgba(255,255,255,${amt * 0.1})`;
+    g.fillRect(-off * 0.6, gy + gh + 4, W, gh * 0.4);
   }
 }
 
@@ -1068,6 +1180,12 @@ function S2(t) { // 4–8: СЛОВА-СЛЭМЫ
   shockwave(t, 7.05, CX, H * 0.42, W * 1.18, '255,235,190');
   shockwave(t, 7.2, CX, H * 0.42, W * 1.05, '255,180,80');
   splatBurst(t, 7.05, CX, H * 0.42, '255,230,170');
+  // АРМАГЕДДОН: спидлайны, взрывы, молния, суп-дождь
+  speedlines(t, 0.35 + hitEnv(t, KICKS, 9) * 0.85, '255,200,120');
+  WORD_SLAMS.forEach(w => explode(t, w.t, CX, H * 0.42, 330, '255,170,70'));
+  explode(t, 7.05, CX, H * 0.42, 640, '255,210,110');
+  lightning(t, 7.05, CX - 320, -60, CX + 120, H * 0.5, 3);
+  soupRain(t, 12, 0.55);
   // мигающая рамка в такт
   const beatPhase = fract(t / BEAT);
   if (beatPhase < 0.12 && t > 4.2) {
@@ -1131,6 +1249,9 @@ function S3(t) { // 8–14: РЕВИЛ ДЭДА
   }
   SLAMS3.forEach(w => shockwave(t, w.t, CX, w.y, W * 0.88, '255,205,120'));
   SLAMS3.forEach(w => splatBurst(t, w.t, CX, w.y, '255,200,100'));
+  SLAMS3.forEach(w => explode(t, w.t, CX, w.y, 300, '255,170,70'));
+  speedlines(t, 0.3 + kick * 0.85, '120,180,255');
+  soupRain(t, 12, 0.5);
   // RGB-сдвиг на снейры
   vignette(0.5);
 }
@@ -1196,6 +1317,10 @@ function S4(t) { // 14–20: МОНТАЖ
   });
   if (idx === 2) chefHat(CX + (idx % 2 ? 40 : -40) * punch, fy, r, t);
 
+  // АРМАГЕДДОН на срез
+  speedlines(t, 0.45 + punch * 1.1, cur.glow);
+  explode(t, cur.t, CX, H * 0.45, 430, cur.glow);
+  soupRain(t, 12, 0.55);
   // ЗОЛОТОЙ слэм-слово на каждый срез — только главный текст
   slamWord(cur.cap, tIn, H * 0.82, {
     size: idx === 5 ? 120 : 168,
@@ -1322,6 +1447,14 @@ function S5(t) { // 20–26: ВЕЛИКИЙ СУП
   }
   g.restore();
   embers(t, 34, 0.65);
+  // БОЛЬШЕ СУПА: дождь, волны, взрывы, молнии
+  soupRain(t, 22, 0.85);
+  explode(t, 20, CX, H * 0.5, 720, '255,180,70');
+  explode(t, 23.95, CX, H * 0.63, 640, '255,200,100');
+  CHANT.forEach(w => explode(t, w.t, CX, H * 0.495, 330));
+  lightning(t, 20, CX - 340, -80, CX - 80, H * 0.42, 5);
+  lightning(t, 23.95, CX + 300, -80, CX + 60, H * 0.45, 8);
+  soupWave(t, 23.95, H + 40, 1.25);
 
   // чаша на огне, с половником
   const bowlIn = easeOutCubic(clamp(u / 0.6));
@@ -1391,6 +1524,10 @@ function S6(t) { // 26–32: АУТРО
   embers(t, 22, 0.75);
   steam(t, CX - 260, H * 0.95, 300, 5, 0.12);
   steam(t, CX + 260, H * 0.98, 300, 5, 0.12);
+  // армагеддон-подложка
+  speedlines(t, 0.5 + hitEnv(t, KICKS, 9) * 0.9);
+  soupRain(t, 18, 0.7);
+  explode(t, 27.0, CX, H * 0.62, 500);
 
   // дэд-суповар в очках и колпаке
   const pop = easeOutBack(clamp(u / 0.6));
@@ -1421,6 +1558,13 @@ function S6(t) { // 26–32: АУТРО
     const p = easeOutBack(clamp(f / 0.32));
     g.fillStyle = `rgba(6,5,10,${clamp(f * 3.2)})`;
     g.fillRect(0, 0, W, H);
+    // ФИНАЛЬНЫЙ АРМАГЕДДОН
+    soupWave(t, FINAL_SLAM, H + 40, 1.4);
+    explode(t, FINAL_SLAM, CX, H * 0.46, 860, '255,210,110');
+    explode(t, FINAL_SLAM + 0.12, CX - 280, H * 0.33, 540);
+    explode(t, FINAL_SLAM + 0.24, CX + 300, H * 0.58, 540);
+    lightning(t, FINAL_SLAM, CX - 420, -80, CX + 100, H * 0.5, 11);
+    lightning(t, FINAL_SLAM + 0.1, CX + 400, -80, CX - 120, H * 0.55, 13);
     // ударная волна — двойное кольцо
     const wr = easeOutCubic(clamp(f / 0.8)) * 1500;
     g.strokeStyle = `rgba(255,210,130,${(1 - clamp(f / 0.8)) * 0.9})`;
@@ -1457,12 +1601,12 @@ function S6(t) { // 26–32: АУТРО
 function shake(t) {
   const kick = hitEnv(t, KICKS, 10);
   const boom = hitEnv(t, BOOMS, 6);
-  const a = kick * 12 + boom * 22;
+  const a = kick * 18 + boom * 38;
   return {
     x: (hash2(Math.floor(t * 60), 1) - 0.5) * a,
     y: (hash2(Math.floor(t * 60), 2) - 0.5) * a,
-    s: 1 + 0.012 * kick + 0.02 * boom,
-    r: (hash2(Math.floor(t * 60), 3) - 0.5) * 0.006 * (kick + boom),
+    s: 1 + 0.032 * kick + 0.055 * boom,
+    r: (hash2(Math.floor(t * 60), 3) - 0.5) * 0.009 * (kick + boom),
   };
 }
 
@@ -1479,10 +1623,16 @@ function postFor(t) {
 function frame(t) {
   g.__t = t;
   const sh = shake(t);
+  // ПОСТОЯННОЕ движение камеры + вип-панч на ударных моментах
+  const whip = hitEnv(t, [...WORD_SLAMS.map(w => w.t), ...CUTS.map(c => c.t), 8, 20, 23.95, 26, FINAL_SLAM], 42);
+  const camX = Math.sin(t * 0.9) * 16 + Math.sin(t * 2.3) * 7 + (hash2(Math.floor(t * 2.7), 9) - 0.5) * whip * 320;
+  const camY = Math.cos(t * 1.15) * 13 + (hash2(Math.floor(t * 2.7), 10) - 0.5) * whip * 140;
+  const camR = Math.sin(t * 0.55) * 0.013 + sh.r;
+  const camS = sh.s * (1 + 0.02 * Math.sin(t * 1.7));
   g.save();
-  g.translate(W / 2 + sh.x, H / 2 + sh.y);
-  g.rotate(sh.r);
-  g.scale(sh.s, sh.s);
+  g.translate(W / 2 + sh.x + camX, H / 2 + sh.y + camY);
+  g.rotate(camR);
+  g.scale(camS, camS);
   g.translate(-W / 2, -H / 2);
   if (t < 4) S1(t);
   else if (t < 8) S2(t);
@@ -1495,9 +1645,19 @@ function frame(t) {
   // вспышки врезок
   const cutFlash = hitEnv(t, [...WORD_SLAMS.map(w => w.t), ...CUTS.map(c => c.t), 8, 20, FINAL_SLAM], 26);
   if (cutFlash > 0.01) {
-    g.fillStyle = `rgba(255,255,255,${cutFlash * 0.5})`;
+    g.fillStyle = `rgba(255,255,255,${cutFlash * 0.62})`;
     g.fillRect(0, 0, W, H);
   }
+  // ЭПИЛЕПСИЯ: строб на каждый кик
+  const kickFlash = hitEnv(t, KICKS, 30);
+  if (t > 3.9 && t < 30.3 && kickFlash > 0.02) {
+    g.fillStyle = `rgba(255,255,255,${kickFlash * 0.34})`;
+    g.fillRect(0, 0, W, H);
+    g.fillStyle = `rgba(255,210,120,${kickFlash * 0.14})`;
+    g.fillRect(0, 0, W, H);
+  }
+  // глитч-полосы на бумах — армагеддон
+  glitchBands(t, hitEnv(t, BOOMS, 16) * 1.15);
   if (window.FX) FX.post(g, t, postFor(t));
   else vignette(0.5);
 }
