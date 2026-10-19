@@ -89,11 +89,11 @@ const CHANT = [
   { t: 23.0, word: 'НАВАРИЛИ' },
 ];
 const CUTS = [
-  { t: 14.0, cap: 'ИМБА', tint: '#ff3b4e', glow: '255,60,80' },
-  { t: 15.0, cap: 'ЛЕГЕНДА', tint: '#37d1ff', glow: '70,200,255' },
-  { t: 16.0, cap: 'СУПОВАР', tint: '#ffc94a', glow: '255,190,70' },
-  { t: 17.0, cap: 'СУП Х9999', tint: '#9a6bff', glow: '150,100,255' },
-  { t: 18.0, cap: 'VICTORY', tint: '#4af0b0', glow: '70,240,180' },
+  { t: 14.0, cap: 'О', tint: '#ff3b4e', glow: '255,60,80' },
+  { t: 15.0, cap: 'ВЕЛИКИЙ', tint: '#37d1ff', glow: '70,200,255' },
+  { t: 16.0, cap: 'СУП', tint: '#ffc94a', glow: '255,190,70' },
+  { t: 17.0, cap: 'НАВАРИЛИ', tint: '#9a6bff', glow: '150,100,255' },
+  { t: 18.0, cap: 'СУП Х9999', tint: '#4af0b0', glow: '70,240,180' },
   { t: 19.0, cap: 'СМОТРИ В ГЛАЗА', tint: '#ffffff', glow: '255,255,255' },
 ];
 const FINAL_SLAM = 30.0;
@@ -349,7 +349,7 @@ function renderScore(sr) {
     boom(w.t, 0.95);
     kick(w.t, 1);
     choir(w.t, [73.42, 110, 146.83, 174.61], 0.85, 0.2); // Dm-стаккато
-    choirSing(w.t, SLAM_NOTES[i], 0.8, SLAM_VOWELS[i], 0.5);
+    choirSing(w.t, SLAM_NOTES[i], 0.8, SLAM_VOWELS[i], 0.62);
     brass(w.t, SLAM_NOTES[i], 0.5, 0.3);
     timpani(w.t, 82 + i * 2, 0.75);
     if (i === 3) bell(w.t, 293.66, 0.55);
@@ -386,6 +386,24 @@ function renderScore(sr) {
     });
     for (let i = 0; i < 8; i++) hat(t + i * 0.25, i === 7, 0.34 + (i % 2) * 0.12, i % 2 ? 0.35 : -0.3);
   }
+  // 8–14: хор выкрикивает «ДЭД ВАРИТ О ВЕЛИКИЙ СУП НАВАРИЛИ» — пли!
+  const S3S = [
+    [8, 174.61, 'e', 0.58], [9, 220, 'a', 0.58], [10, 146.83, 'o', 0.64],
+    [11, 174.61, 'e', 0.58], [12, 220, 'u', 0.64], [13, 293.66, 'a', 0.68],
+  ];
+  S3S.forEach(([tt, f, v, g0]) => {
+    choirSing(tt, f, 0.85, v, g0);
+    brass(tt, f, 0.45, 0.3);
+    timpani(tt, 84 + (tt - 8) * 1.5, 0.62);
+    crash(tt, tt === 8 ? 0.42 : 0.22);
+  });
+  // 14–20: второй круг гимна на срезах монтажа
+  const S4S = [[14, 146.83, 'o'], [15, 174.61, 'e'], [16, 220, 'u'], [17, 293.66, 'a'], [18, 220, 'u'], [19, 174.61, 'e']];
+  S4S.forEach(([tt, f, v], i) => {
+    choirSing(tt, f, 0.8, v, 0.58);
+    brass(tt, f, 0.4, 0.26);
+    if (i < 5) timpani(tt, 86, 0.5);
+  });
 
   // 20–26: климакс — слова гимна
   CHANT.forEach((w, i) => {
@@ -398,15 +416,15 @@ function renderScore(sr) {
     brass(w.t, [146.83, 174.61, 220, 293.66][i], 0.7, 0.28);
   });
   // хор поёт «О великий суп наварили» по слогам
-  choirSing(20.0, 146.83, 0.95, 'o', 0.62);                 // О
-  choirSing(21.0, 174.61, 0.26, 'e', 0.55);                 // ве-
-  choirSing(21.28, 220, 0.24, 'i', 0.55);                   // -ли-
-  choirSing(21.54, 196, 0.4, 'i', 0.55);                    // -кий
-  choirSing(22.0, 220, 0.95, 'u', 0.62);                    // СУП
-  choirSing(23.0, 293.66, 0.26, 'a', 0.55);                 // на-
-  choirSing(23.28, 220, 0.24, 'a', 0.55);                   // -ва-
-  choirSing(23.54, 174.61, 0.24, 'i', 0.55);                // -ри-
-  choirSing(23.8, 146.83, 0.55, 'i', 0.55);                 // -ли
+  choirSing(20.0, 146.83, 0.95, 'o', 0.72);                 // О
+  choirSing(21.0, 174.61, 0.26, 'e', 0.65);                 // ве-
+  choirSing(21.28, 220, 0.24, 'i', 0.65);                   // -ли-
+  choirSing(21.54, 196, 0.4, 'i', 0.65);                    // -кий
+  choirSing(22.0, 220, 0.95, 'u', 0.72);                    // СУП
+  choirSing(23.0, 293.66, 0.26, 'a', 0.65);                 // на-
+  choirSing(23.28, 220, 0.24, 'a', 0.65);                   // -ва-
+  choirSing(23.54, 174.61, 0.24, 'i', 0.65);                // -ри-
+  choirSing(23.8, 146.83, 0.55, 'i', 0.65);                 // -ли
   for (let t = 20; t < 26; t += 2) {
     kick(t, 1); kick(t + 0.75, 0.9); kick(t + 1.0, 0.8); kick(t + 1.5, 1);
     snare(t + 0.5, 0.95); snare(t + 1.5, 1);
@@ -444,6 +462,9 @@ function renderScore(sr) {
   bell(26, 293.66, 0.6); bell(28, 220, 0.5);
   timpani(26, 82, 0.7); timpani(28, 84, 0.45);
   boom(27.0, 0.85); crash(27.0, 0.28);                 // золотой слэм «СУП СВАРЕН.»
+  choirSing(27.0, 220, 0.95, 'u', 0.6);                // «СУП»
+  choirSing(27.5, 220, 1.5, 'a', 0.52);                // «СВАРЕН»
+  choirSing(27.52, 293.66, 1.5, 'a', 0.4);
   [74, 77, 81, 79, 77, 74].forEach((m, i) => cowbell(28 + i * 0.25, 440 * Math.pow(2, (m - 69) / 12), 0.18, -0.2 + i * 0.08));
   // финальный слэм — всё разом
   boom(FINAL_SLAM, 1.15);
@@ -1083,20 +1104,33 @@ function S3(t) { // 8–14: РЕВИЛ ДЭДА
   g.restore();
   glowDot(CX, H * 0.42, 700, '80,120,255', 0.22);
   embers(t, 18, 0.5);
-  // карточка с панчем на кик (чуть-чуть живая, но не косая)
+  // карточка с мощным панчем на кик + ползучий зум (жёстко в кадре)
   const kick = hitEnv(t, KICKS, 9);
-  const s = lerp(1.55, 1.05, easeOutCubic(clamp(u / 0.7))) * (1 + 0.045 * kick);
+  let s = lerp(1.55, 1.02, easeOutCubic(clamp(u / 0.7))) * (1 + 0.09 * kick) * (1 + u * 0.012);
+  s = Math.min(1.12, s);
   const rot = Math.sin(t * 1.1) * 0.006 + (hash(Math.floor(t * 4)) - 0.5) * 0.008 * kick;
   discordCard(t, CX, H * 0.42, s, rot);
-  // золотой слэм «ДЭД» на дроп
-  const dedA = 1 - smooth(8.85, 9.12, t);
-  if (dedA > 0) {
+  // БЫСТРЫЕ золотые слэмы: гимн по словам, чистые зоны сверху/снизу
+  const SLAMS3 = [
+    { t: 8.0, word: 'ДЭД', y: H * 0.80, size: 340, max: 560 },
+    { t: 9.0, word: 'ВАРИТ', y: H * 0.155, size: 170, max: 360 },
+    { t: 10.0, word: 'О', y: H * 0.80, size: 380, max: 640 },
+    { t: 11.0, word: 'ВЕЛИКИЙ', y: H * 0.155, size: 165, max: 340 },
+    { t: 12.0, word: 'СУП', y: H * 0.80, size: 300, max: 560 },
+    { t: 13.0, word: 'НАВАРИЛИ', y: H * 0.155, size: 150, max: 330 },
+  ];
+  let cur3 = SLAMS3[0];
+  for (const w of SLAMS3) if (t >= w.t) cur3 = w;
+  const fade3 = 1 - smooth(cur3.t + 0.86, cur3.t + 0.99, t);
+  if (fade3 > 0) {
     g.save();
-    g.globalAlpha = dedA;
-    slamWord('ДЭД', t - 8, H * 0.80, { size: 340, max: 520 });
+    g.globalAlpha = fade3;
+    slamWord(cur3.word, t - cur3.t, cur3.y, { size: cur3.size, max: cur3.max, tint: '#ffe08a', tint2: '#ff9c3c' });
     g.restore();
     g.globalAlpha = 1;
   }
+  SLAMS3.forEach(w => shockwave(t, w.t, CX, w.y, W * 0.88, '255,205,120'));
+  SLAMS3.forEach(w => splatBurst(t, w.t, CX, w.y, '255,200,100'));
   // RGB-сдвиг на снейры
   vignette(0.5);
 }
@@ -1368,12 +1402,15 @@ function S6(t) { // 26–32: АУТРО
   chefHat(CX, H * 0.40, r, t);
   medal(CX, H * 0.40, r, t, (t - 27.6) / 0.45);
 
-  // ЗОЛОТОЙ слэм «СУП СВАРЕН.» на кик 27.0
-  const capA = smooth(26.98, 27.1, t) * (1 - smooth(29.5, 29.9, t));
+  // ЗОЛОТОЙ слэм «СУП СВАРЕН.» на кик 27.0 — ещё крупнее и с эффектами
+  const capA = smooth(26.98, 27.1, t) * (1 - smooth(29.55, 29.95, t));
   if (capA > 0 && t < 30) {
+    shockwave(t, 27.0, CX, H * 0.62, W * 1.15, '255,220,145');
+    shockwave(t, 27.14, CX, H * 0.62, W * 0.95, '255,185,95');
+    splatBurst(t, 27.0, CX, H * 0.62, '255,205,110');
     g.save();
     g.globalAlpha = capA;
-    slamWord('СУП СВАРЕН.', t - 27.0, H * 0.62, { size: 150, max: 380, tint: '#ffe08a', tint2: '#ff9c3c' });
+    slamWord('СУП СВАРЕН.', t - 27.0, H * 0.62, { size: 175, max: 500, tint: '#ffe08a', tint2: '#ff9c3c' });
     g.restore();
     g.globalAlpha = 1;
   }
@@ -1431,12 +1468,12 @@ function shake(t) {
 
 function postFor(t) {
   const kick = hitEnv(t, KICKS, 9);
-  if (t < 4) return { bloom: 0.35, grain: 0.10, vignette: 0.55, leak: 0.05, ca: 0.5, warm: 0 };
-  if (t < 8) return { bloom: 0.5, grain: 0.10, vignette: 0.5, leak: 0.10, ca: 0.8 + kick, warm: 0.08 };
-  if (t < 14) return { bloom: 0.55, grain: 0.09, vignette: 0.45, leak: 0.12, ca: 1 + kick * 1.5, warm: 0.05 };
-  if (t < 20) return { bloom: 0.62, grain: 0.11, vignette: 0.45, leak: 0.14, ca: 1.4 + kick * 2, warm: 0.06 };
-  if (t < 26) return { bloom: 0.88, grain: 0.08, vignette: 0.42, leak: 0.16, ca: 1 + kick, warm: 0.14 };
-  return { bloom: 0.55, grain: 0.09, vignette: 0.5, leak: 0.12, ca: 0.9, warm: 0.1 };
+  if (t < 4) return { bloom: 0.5, grain: 0.10, vignette: 0.5, leak: 0.06, ca: 1.2 + kick * 2, warm: 0 };
+  if (t < 8) return { bloom: 0.68, grain: 0.10, vignette: 0.48, leak: 0.12, ca: 1.8 + kick * 3, warm: 0.08 };
+  if (t < 14) return { bloom: 0.75, grain: 0.09, vignette: 0.44, leak: 0.14, ca: 2.2 + kick * 3.5, warm: 0.05 };
+  if (t < 20) return { bloom: 0.82, grain: 0.11, vignette: 0.42, leak: 0.16, ca: 2.4 + kick * 4, warm: 0.06 };
+  if (t < 26) return { bloom: 0.95, grain: 0.08, vignette: 0.4, leak: 0.18, ca: 2 + kick * 3, warm: 0.16 };
+  return { bloom: 0.72, grain: 0.09, vignette: 0.48, leak: 0.13, ca: 1.8 + kick * 2.5, warm: 0.1 };
 }
 
 function frame(t) {
@@ -1491,6 +1528,21 @@ function boot(av, cd) {
 (async () => {
   const load = src => new Promise((res, rej) => {
     const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = rej;
+    i.src = src;
+  });
+  try {
+    const [av, cd] = await Promise.all([load('media/ded/face.png'), load('media/ded/card.png')]);
+    boot(av, cd);
+  } catch (e) {
+    boot(null, null);
+  }
+})();
+</script>
+</body>
+</html>
+   const i = new Image();
     i.onload = () => res(i);
     i.onerror = rej;
     i.src = src;
