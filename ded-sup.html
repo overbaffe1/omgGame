@@ -867,6 +867,70 @@ function glitchBands(t, amt) {
   }
 }
 
+// скелет-пловец в супе
+function soupSkeleton(x, y, s, t, seed) {
+  const bob = Math.sin(t * 1.6 + seed) * 9 * s;
+  const tilt = Math.sin(t * 1.1 + seed * 2) * 0.18;
+  g.save();
+  g.translate(x + Math.sin(t * 0.45 + seed) * 34 * s, y + bob);
+  g.rotate(tilt);
+  // череп
+  g.fillStyle = '#f2ead8';
+  g.beginPath(); g.arc(0, -26 * s, 20 * s, 0, TAU); g.fill();
+  g.fillStyle = '#1a1208';
+  g.beginPath(); g.arc(-7 * s, -30 * s, 4.6 * s, 0, TAU); g.fill();
+  g.beginPath(); g.arc(7 * s, -30 * s, 4.6 * s, 0, TAU); g.fill();
+  g.fillRect(-2 * s, -24 * s, 4 * s, 5 * s);
+  g.fillRect(-8 * s, -13 * s, 16 * s, 3 * s);
+  // рёбра
+  g.strokeStyle = '#e8dfc8';
+  g.lineWidth = 3.2 * s;
+  for (let i = 0; i < 3; i++) {
+    g.beginPath();
+    g.arc(0, (0 + i * 8) * s, 13 * s, 0.25, Math.PI - 0.25);
+    g.stroke();
+  }
+  // машет рукой-костью
+  g.beginPath();
+  g.moveTo(12 * s, 2 * s);
+  g.lineTo(27 * s, (-12 + Math.sin(t * 3.2 + seed) * 9) * s);
+  g.stroke();
+  g.restore();
+}
+// дед-пловец с колпаком
+function soupDed(x, y, s, t, seed) {
+  const bob = Math.sin(t * 1.25 + seed) * 10 * s;
+  const tilt = Math.sin(t * 0.85 + seed) * 0.22;
+  g.save();
+  g.translate(x + Math.sin(t * 0.38 + seed) * 40 * s, y + bob);
+  g.rotate(tilt);
+  // голова
+  const hg = g.createRadialGradient(-5 * s, -30 * s, 3, 0, -24 * s, 27 * s);
+  hg.addColorStop(0, '#ffe0c0'); hg.addColorStop(1, '#d9a077');
+  g.fillStyle = hg;
+  g.beginPath(); g.arc(0, -24 * s, 20 * s, 0, TAU); g.fill();
+  // борода
+  g.fillStyle = '#e8e2d2';
+  g.beginPath(); g.ellipse(0, -9 * s, 14 * s, 13 * s, 0, 0, TAU); g.fill();
+  // глаза-щёлки
+  g.strokeStyle = '#5a4330';
+  g.lineWidth = 2.4 * s;
+  g.beginPath(); g.moveTo(-10 * s, -29 * s); g.lineTo(-3 * s, -29 * s); g.stroke();
+  g.beginPath(); g.moveTo(3 * s, -29 * s); g.lineTo(10 * s, -29 * s); g.stroke();
+  // плавающий колпак
+  g.fillStyle = '#fff';
+  g.beginPath(); g.arc(0, -42 * s, 13 * s, Math.PI, 0); g.fill();
+  g.fillRect(-13 * s, -45 * s, 26 * s, 6 * s);
+  // машет половником
+  g.strokeStyle = '#c98a2e';
+  g.lineWidth = 3.4 * s;
+  g.beginPath();
+  g.moveTo(13 * s, 0);
+  g.lineTo(30 * s, (-16 + Math.sin(t * 2.8 + seed) * 10) * s);
+  g.stroke();
+  g.restore();
+}
+
 // медаль за великий суповарство — крутится как настоящая монета
 function medal(x, y, r, t, pop) {  const s = easeOutBack(clamp(pop));
   if (s <= 0) return;
@@ -1367,11 +1431,13 @@ function bowl(x, y, s, t) {
   g.bezierCurveTo(x - 350 * s, y + bh * 1.35, x + 350 * s, y + bh * 1.35, x + 360 * s, y);
   g.closePath();
   g.fill();
-  // поверхность супа
+  // поверхность супа — РАСПЛАВЛЕННАЯ ЛАВА
+  glowDot(x, y, 520 * s, '255,110,25', 0.28 + 0.14 * Math.sin(t * 4.6));
   const sg = g.createRadialGradient(x - 60 * s, y - 20 * s, 20, x, y, 380 * s);
-  sg.addColorStop(0, '#ffd98a');
-  sg.addColorStop(0.45, '#ff9c3c');
-  sg.addColorStop(1, '#c25c12');
+  sg.addColorStop(0, '#fff3c8');
+  sg.addColorStop(0.35, '#ffb347');
+  sg.addColorStop(0.7, '#ff7a1c');
+  sg.addColorStop(1, '#c23c08');
   g.fillStyle = sg;
   g.beginPath();
   g.ellipse(x, y, 360 * s, 92 * s, 0, 0, TAU);
@@ -1397,6 +1463,36 @@ function bowl(x, y, s, t) {
     g.stroke();
   }
   g.restore();
+  // кипящая лава: пузыри растут и лопаются
+  g.save();
+  g.beginPath();
+  g.ellipse(x, y, 355 * s, 88 * s, 0, 0, TAU);
+  g.clip();
+  for (let i = 0; i < 18; i++) {
+    const period = 1.0 + hash(i * 3.3) * 1.5;
+    const ph = fract(t / period + hash(i * 7.7));
+    const bx = x + (hash(i * 5.5) - 0.5) * 620 * s;
+    const by = y + (hash(i * 9.9) - 0.5) * 120 * s;
+    const br = (16 + hash(i * 4.2) * 38) * s * Math.min(1, ph * 2.4);
+    if (ph < 0.72) {
+      const bg2 = g.createRadialGradient(bx - br * 0.3, by - br * 0.3, br * 0.1, bx, by, br);
+      bg2.addColorStop(0, 'rgba(255,246,200,.95)');
+      bg2.addColorStop(0.6, 'rgba(255,150,40,.8)');
+      bg2.addColorStop(1, 'rgba(255,80,10,.35)');
+      g.fillStyle = bg2;
+      g.beginPath(); g.arc(bx, by, br, 0, TAU); g.fill();
+    } else {
+      const pp = (ph - 0.72) / 0.28;
+      g.strokeStyle = `rgba(255,225,160,${(1 - pp) * 0.85})`;
+      g.lineWidth = 5 * s;
+      g.beginPath(); g.ellipse(bx, by, br * (1 + pp * 1.8), br * 0.38 * (1 + pp * 1.3), 0, 0, TAU); g.stroke();
+    }
+  }
+  g.restore();
+  // пловцы в супе: скелеты и деды!
+  soupSkeleton(x - 185 * s, y + 6 * s, 1.0 * s, t, 1.2);
+  soupDed(x + 55 * s, y + 24 * s, 1.05 * s, t, 3.7);
+  soupSkeleton(x + 235 * s, y - 8 * s, 0.85 * s, t, 5.1);
   // край
   g.lineWidth = 14 * s;
   g.strokeStyle = '#e8a44e';
@@ -1446,7 +1542,7 @@ function S5(t) { // 20–26: ВЕЛИКИЙ СУП
     g.closePath(); g.fill();
   }
   g.restore();
-  embers(t, 34, 0.65);
+  embers(t, 44, 0.7);
   // БОЛЬШЕ СУПА: дождь, волны, взрывы, молнии
   soupRain(t, 22, 0.85);
   explode(t, 20, CX, H * 0.5, 720, '255,180,70');
@@ -1528,6 +1624,8 @@ function S6(t) { // 26–32: АУТРО
   speedlines(t, 0.5 + hitEnv(t, KICKS, 9) * 0.9);
   soupRain(t, 18, 0.7);
   explode(t, 27.0, CX, H * 0.62, 500);
+  // ЛАВОВАЯ ЧАША внизу — суп бурлит, скелеты и деды плавают
+  bowl(CX, H * 0.865, 0.52, t);
 
   // дэд-суповар в очках и колпаке
   const pop = easeOutBack(clamp(u / 0.6));
@@ -1552,46 +1650,59 @@ function S6(t) { // 26–32: АУТРО
     g.globalAlpha = 1;
   }
 
-  // финальный слэм
+  // финальный слэм — ПЛАВНЫЙ ИДЕАЛЬНЫЙ ФИНАЛ
   const f = t - FINAL_SLAM;
-  if (f >= 0 && f < 1.15) {
+  if (f >= 0) {
     const p = easeOutBack(clamp(f / 0.32));
     g.fillStyle = `rgba(6,5,10,${clamp(f * 3.2)})`;
-    g.fillRect(0, 0, W, H);
-    // ФИНАЛЬНЫЙ АРМАГЕДДОН
-    soupWave(t, FINAL_SLAM, H + 40, 1.4);
-    explode(t, FINAL_SLAM, CX, H * 0.46, 860, '255,210,110');
-    explode(t, FINAL_SLAM + 0.12, CX - 280, H * 0.33, 540);
-    explode(t, FINAL_SLAM + 0.24, CX + 300, H * 0.58, 540);
-    lightning(t, FINAL_SLAM, CX - 420, -80, CX + 100, H * 0.5, 11);
-    lightning(t, FINAL_SLAM + 0.1, CX + 400, -80, CX - 120, H * 0.55, 13);
-    // ударная волна — двойное кольцо
-    const wr = easeOutCubic(clamp(f / 0.8)) * 1500;
-    g.strokeStyle = `rgba(255,210,130,${(1 - clamp(f / 0.8)) * 0.9})`;
-    g.lineWidth = 26 * (1 - clamp(f / 0.8) * 0.6);
-    g.beginPath(); g.arc(CX, H * 0.46, wr, 0, TAU); g.stroke();
-    g.strokeStyle = `rgba(255,245,220,${(1 - clamp((f - 0.1) / 0.85)) * 0.5})`;
-    g.lineWidth = 10;
-    g.beginPath(); g.arc(CX, H * 0.46, wr * 0.82, 0, TAU); g.stroke();
-    const sF = fitFont('НАВАРИЛИ.', W * 0.94, 210);
-    g.save();
-    g.translate(CX, H * 0.46);
-    g.scale(p, p);
-    strokeText('НАВАРИЛИ.', 0, 0, sF, 'rgba(10,6,2,.95)', sF * 0.16);
-    const gr = g.createLinearGradient(0, -110, 0, 110);
-    gr.addColorStop(0, '#fff6dd'); gr.addColorStop(1, '#ff9c2e');
-    g.fillStyle = gr;
-    g.font = `900 ${sF}px ${F_DISP}`;
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillText('НАВАРИЛИ.', 0, 0);
-    g.restore();
-  }
-  if (f >= 1.15) {
-    const fade = 1 - smooth(2.0, 2.9, f);
-    embers(t, 24, fade);
-    if (f > 2.6) {
-      g.fillStyle = `rgba(0,0,0,${clamp((f - 2.6) / 0.3)})`;
-      g.fillRect(0, 0, W, H);
+    g.fillRect(-260, -260, W + 520, H + 520);
+    // лавовое свечение снизу — суп не остывает
+    const lg = g.createLinearGradient(0, H * 0.62, 0, H);
+    lg.addColorStop(0, 'rgba(255,110,20,0)');
+    lg.addColorStop(1, `rgba(255,110,20,${0.4 + 0.12 * Math.sin(t * 4.2)})`);
+    g.fillStyle = lg;
+    g.fillRect(-260, H * 0.62, W + 520, H * 0.5);
+    // ФИНАЛЬНЫЙ АРМАГЕДДОН (первые 1.3 секунды)
+    if (f < 1.3) {
+      soupWave(t, FINAL_SLAM, H + 40, 1.4);
+      explode(t, FINAL_SLAM, CX, H * 0.46, 860, '255,210,110');
+      explode(t, FINAL_SLAM + 0.12, CX - 280, H * 0.33, 540);
+      explode(t, FINAL_SLAM + 0.24, CX + 300, H * 0.58, 540);
+      lightning(t, FINAL_SLAM, CX - 420, -80, CX + 100, H * 0.5, 11);
+      lightning(t, FINAL_SLAM + 0.1, CX + 400, -80, CX - 120, H * 0.55, 13);
+      const wr = easeOutCubic(clamp(f / 0.8)) * 1500;
+      g.strokeStyle = `rgba(255,210,130,${(1 - clamp(f / 0.8)) * 0.9})`;
+      g.lineWidth = 26 * (1 - clamp(f / 0.8) * 0.6);
+      g.beginPath(); g.arc(CX, H * 0.46, wr, 0, TAU); g.stroke();
+      g.strokeStyle = `rgba(255,245,220,${(1 - clamp((f - 0.1) / 0.85)) * 0.5})`;
+      g.lineWidth = 10;
+      g.beginPath(); g.arc(CX, H * 0.46, wr * 0.82, 0, TAU); g.stroke();
+    }
+    embers(t, 26, 0.8);
+    // «НАВАРИЛИ.» держится и мягко уплывает вдаль
+    const txtA = 1 - smooth(31.15, 31.72, t);
+    const txtS = p * (1 + 0.06 * smooth(31.0, 31.72, t));
+    if (txtA > 0) {
+      const sF = fitFont('НАВАРИЛИ.', W * 0.94, 210);
+      g.save();
+      g.globalAlpha = txtA;
+      g.translate(CX, H * 0.46);
+      g.scale(txtS, txtS);
+      strokeText('НАВАРИЛИ.', 0, 0, sF, 'rgba(10,6,2,.95)', sF * 0.16);
+      const gr = g.createLinearGradient(0, -110, 0, 110);
+      gr.addColorStop(0, '#fff6dd'); gr.addColorStop(1, '#ff9c2e');
+      g.fillStyle = gr;
+      g.font = `900 ${sF}px ${F_DISP}`;
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('НАВАРИЛИ.', 0, 0);
+      g.restore();
+      g.globalAlpha = 1;
+    }
+    // мягкий уход в чёрное — без рывков
+    const endFade = smooth(31.52, 31.98, t);
+    if (endFade > 0) {
+      g.fillStyle = `rgba(0,0,0,${endFade})`;
+      g.fillRect(-260, -260, W + 520, H + 520);
     }
   }
   vignette(0.58);
@@ -1648,12 +1759,12 @@ function frame(t) {
     g.fillStyle = `rgba(255,255,255,${cutFlash * 0.62})`;
     g.fillRect(0, 0, W, H);
   }
-  // ЭПИЛЕПСИЯ: строб на каждый кик
-  const kickFlash = hitEnv(t, KICKS, 30);
+  // ЭПИЛЕПСИЯ: строб на каждый кик — короткий и острый
+  const kickFlash = hitEnv(t, KICKS, 58);
   if (t > 3.9 && t < 30.3 && kickFlash > 0.02) {
-    g.fillStyle = `rgba(255,255,255,${kickFlash * 0.34})`;
+    g.fillStyle = `rgba(255,255,255,${kickFlash * 0.22})`;
     g.fillRect(0, 0, W, H);
-    g.fillStyle = `rgba(255,210,120,${kickFlash * 0.14})`;
+    g.fillStyle = `rgba(255,210,120,${kickFlash * 0.1})`;
     g.fillRect(0, 0, W, H);
   }
   // глитч-полосы на бумах — армагеддон
