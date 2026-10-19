@@ -484,6 +484,14 @@ function renderScore(sr) {
   sub808(FINAL_SLAM, 36.71, 2.2, 1);
   riser(28.9, 1.1, 0.45);
   bell(31.0, 293.66, 0.35);
+  // БОГ — божественный хоральный аккорд
+  bell(31.18, 587.33, 0.9);
+  choirSing(31.18, 220, 1.7, 'a', 0.42);
+  choirSing(31.18, 277.18, 1.7, 'o', 0.36);
+  choirSing(31.18, 329.63, 1.7, 'e', 0.3);
+  choirSing(31.18, 440, 1.5, 'i', 0.22);
+  strings(31.18, [220, 277.18, 329.63, 440], 1.8, 0.1);
+  crash(31.18, 0.3);
 
   // мастер: мягкий лимитер + фейды
   for (let i = 0; i < n; i++) {
@@ -800,23 +808,69 @@ function explode(t, t0, x, y, size = 420, hue = '255,150,50') {
   }
 }
 // молния
-function lightning(t, t0, x0, y0, x1, y1, seed = 1, color = '255,240,200') {
-  const u = (t - t0) / 0.24;
-  if (u <= 0 || u >= 1) return;
-  g.save();
-  g.strokeStyle = `rgba(${color},${(1 - u) * 0.95})`;
-  g.lineWidth = 12 * (1 - u * 0.5);
-  g.shadowColor = `rgba(${color},.9)`; g.shadowBlur = 36;
-  g.beginPath();
-  const segs = 10;
-  for (let i = 0; i <= segs; i++) {
-    const p = i / segs;
-    const jx = (hash(i * 7.7 + seed) - 0.5) * 130 * Math.sin(Math.PI * p);
-    const jy = (hash(i * 3.3 + seed) - 0.5) * 70;
-    const px = lerp(x0, x1, p) + jx, py = lerp(y0, y1, p) + jy;
-    i ? g.lineTo(px, py) : g.moveTo(px, py);
+// СУПОВАЯ МОЛНИЯ — раскалённая струя супа с каплями и брызгами удара
+function lightning(t, t0, x0, y0, x1, y1, seed = 1, color = '255,225,140') {
+  const life = 0.3;
+  const dt = t - t0;
+  if (dt < 0 || dt > life) return;
+  const a = 1 - dt / life;
+  const pts = [];
+  const N = 10;
+  for (let i = 0; i <= N; i++) {
+    const p = i / N;
+    pts.push([
+      lerp(x0, x1, p) + (hash(i * 7.7 + seed) - 0.5) * 150 * Math.sin(Math.PI * p),
+      lerp(y0, y1, p) + (hash(i * 3.3 + seed) - 0.5) * 70
+    ]);
   }
-  g.stroke();
+  const path = () => {
+    g.beginPath();
+    pts.forEach(([px, py], i) => i ? g.lineTo(px, py) : g.moveTo(px, py));
+    g.stroke();
+  };
+  g.save();
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  // широкое суп-свечение
+  g.strokeStyle = `rgba(255,160,40,${0.34 * a})`;
+  g.lineWidth = 34; path();
+  // золотая сердцевина
+  g.strokeStyle = `rgba(${color},${0.92 * a})`;
+  g.lineWidth = 13; path();
+  // белое раскалённое ядро
+  g.strokeStyle = `rgba(255,250,225,${0.95 * a})`;
+  g.lineWidth = 5; path();
+  // ответвления
+  for (let b = 0; b < 3; b++) {
+    const i0 = 2 + b * 2;
+    const [bx, by] = pts[i0];
+    g.strokeStyle = `rgba(255,215,130,${0.7 * a})`;
+    g.lineWidth = 6;
+    g.beginPath();
+    g.moveTo(bx, by);
+    for (let k = 1; k <= 4; k++) {
+      g.lineTo(bx + (hash(b * 9 + k * 3.3 + seed) - 0.5) * 170 * k * 0.4,
+               by + (hash(b * 4 + k * 7.7) - 0.35) * 120 * k * 0.4);
+    }
+    g.stroke();
+  }
+  // суп-капли скатываются с молнии
+  for (let i = 0; i < 7; i++) {
+    const seg = 1 + Math.floor(hash(i * 3.3 + seed) * (N - 1));
+    const [bx, by] = pts[seg];
+    const dripY = by + hash(i * 7.7 + t0) * 380 * (dt / life);
+    ball3(bx + (hash(i * 4.4) - 0.5) * 70, dripY, 11 * a + 4, 'rgba(255,222,150,.92)', 'rgba(255,110,20,.55)');
+  }
+  // брызги и кольцо в точке удара
+  const hit = dt / life;
+  for (let i = 0; i < 9; i++) {
+    const ang = (i / 9) * TAU + hash(seed * 3 + t0);
+    const rr = (26 + hash(i * 5.5 + t0) * 130) * hit;
+    ball3(x1 + Math.cos(ang) * rr, y1 + Math.sin(ang) * rr * 0.55, 10 * a + 3, 'rgba(255,228,160,.9)', 'rgba(255,120,25,.5)');
+  }
+  g.strokeStyle = `rgba(255,212,132,${0.72 * a})`;
+  g.lineWidth = 7;
+  g.beginPath(); g.ellipse(x1, y1, 60 + hit * 170, 22 + hit * 58, 0, 0, TAU); g.stroke();
+  glowDot(x1, y1, 240 + hit * 380, '255,170,60', 0.5 * a);
   g.restore();
 }
 // суповая волна всплёска снизу
@@ -1010,20 +1064,46 @@ function soupVolcano(x, yBase, s, t) {
   soupGeyser(t, gT, x + (hash(gT * 1.7) - 0.5) * 170 * s, cy, 0.95, 0.95 * s);
   soupGeyser(t, gT + 0.25, x + (hash(gT * 2.3 + 9) - 0.5) * 220 * s, cy, 0.85, 0.7 * s);
 }
-// ЧЁРНАЯ СУПНАЯ ДЫРА — ха-ха
+// ЧЁРНАЯ СУПНАЯ ДЫРА — ха-ха (премиум: линзирование, фотонное кольцо, джеты)
 function soupBlackHole(t, x, y, r, grow = 1) {
+  const R = r * grow;
   const spin = t * 1.5;
-  // аккреционный диск — закручивающиеся спирали супа
+  const pulse = 0.78 + 0.22 * Math.sin(t * 5.2);
+  // 1. гравитационные пульсации — расходящиеся кольца
+  for (let k = 0; k < 3; k++) {
+    const ph = fract(t * 0.33 + k / 3);
+    const rr = R * (1.18 + ph * 1.55);
+    g.strokeStyle = `rgba(255,195,105,${(1 - ph) * 0.24})`;
+    g.lineWidth = 7;
+    g.beginPath(); g.ellipse(x, y, rr, rr * 0.55, 0, 0, TAU); g.stroke();
+  }
+  // 2. джеты — два раскалённых столба из полюсов
+  const jetL = R * 2.3;
+  for (const dir of [-1, 1]) {
+    const jg = g.createLinearGradient(x, y, x, y + dir * jetL);
+    jg.addColorStop(0, `rgba(255,235,190,${0.62 * pulse})`);
+    jg.addColorStop(0.7, `rgba(255,180,80,${0.3 * pulse})`);
+    jg.addColorStop(1, 'rgba(255,150,50,0)');
+    g.fillStyle = jg;
+    g.beginPath();
+    g.moveTo(x - R * 0.12, y);
+    g.lineTo(x - R * 0.42, y + dir * jetL);
+    g.lineTo(x + R * 0.42, y + dir * jetL);
+    g.lineTo(x + R * 0.12, y);
+    g.closePath(); g.fill();
+  }
+  // 3. аккреционный диск — спирали, внутренний край белёсый
   g.save();
   g.translate(x, y);
-  for (let k = 0; k < 6; k++) {
-    const a0 = spin * (1 + k * 0.12) + k * 1.05;
-    g.strokeStyle = `rgba(255,${200 - k * 18},${90 + k * 8},${0.55 - k * 0.06})`;
-    g.lineWidth = (16 - k * 1.8) * grow;
+  for (let k = 0; k < 8; k++) {
+    const a0 = spin * (1 + k * 0.1) + k * 0.85;
+    const inner = k / 8;
+    g.strokeStyle = `rgba(255,${238 - inner * 95},${165 - inner * 95},${0.66 - inner * 0.36})`;
+    g.lineWidth = (18 - k * 1.6) * grow;
     g.beginPath();
-    for (let i = 0; i <= 30; i++) {
-      const a = a0 + i * 0.19;
-      const rr = r * (1.12 + i * 0.055) * grow;
+    for (let i = 0; i <= 36; i++) {
+      const a = a0 + i * 0.16;
+      const rr = R * (1.07 + i * 0.052) * (1 + k * 0.022);
       const px = Math.cos(a) * rr;
       const py = Math.sin(a) * rr * 0.42;
       i ? g.lineTo(px, py) : g.moveTo(px, py);
@@ -1031,27 +1111,211 @@ function soupBlackHole(t, x, y, r, grow = 1) {
     g.stroke();
   }
   g.restore();
-  // горизонт событий
-  const bg = g.createRadialGradient(x, y, r * 0.2, x, y, r * 1.05);
+  // 4. гравитационное линзирование — дуги сверху и снизу
+  g.strokeStyle = `rgba(255,214,148,${0.52 * pulse})`;
+  g.lineWidth = 13 * grow;
+  g.beginPath(); g.arc(x, y, R * 1.3, Math.PI * 1.1, Math.PI * 1.9); g.stroke();
+  g.beginPath(); g.arc(x, y, R * 1.3, Math.PI * 0.1, Math.PI * 0.9); g.stroke();
+  g.strokeStyle = `rgba(255,235,185,${0.35 * pulse})`;
+  g.lineWidth = 6 * grow;
+  g.beginPath(); g.arc(x, y, R * 1.52, Math.PI * 1.16, Math.PI * 1.84); g.stroke();
+  // 5. горизонт событий — мягкий край
+  const bg = g.createRadialGradient(x, y, R * 0.2, x, y, R * 1.06);
   bg.addColorStop(0, '#000');
-  bg.addColorStop(0.78, '#000');
-  bg.addColorStop(0.93, 'rgba(40,15,0,.9)');
+  bg.addColorStop(0.82, '#020104');
+  bg.addColorStop(0.94, 'rgba(45,18,2,.92)');
   bg.addColorStop(1, 'rgba(255,150,40,0)');
   g.fillStyle = bg;
-  g.beginPath(); g.arc(x, y, r * 1.05 * grow, 0, TAU); g.fill();
-  // золотой ореол
-  g.strokeStyle = 'rgba(255,190,90,.85)';
-  g.lineWidth = 7 * grow;
-  g.beginPath(); g.arc(x, y, r * 1.02 * grow, 0, TAU); g.stroke();
-  // втянутые искры — спираль внутрь
-  for (let i = 0; i < 16; i++) {
+  g.beginPath(); g.arc(x, y, R * 1.06, 0, TAU); g.fill();
+  // 6. ФОТОННОЕ КОЛЬЦО — яркое и живое
+  g.strokeStyle = `rgba(255,248,225,${0.92 * pulse})`;
+  g.lineWidth = 5.5 * grow;
+  g.beginPath(); g.arc(x, y, R * 1.018, 0, TAU); g.stroke();
+  g.strokeStyle = `rgba(255,200,110,${0.5 * pulse})`;
+  g.lineWidth = 16 * grow;
+  g.beginPath(); g.arc(x, y, R * 1.03, 0, TAU); g.stroke();
+  // 7. втянутые искры — спиральные хвосты
+  for (let i = 0; i < 20; i++) {
     const sp = 0.5 + hash(i * 2.2) * 1.2;
     const ph = fract(t * 0.22 * sp + hash(i * 5.5));
-    const a = hash(i * 3.3) * TAU + ph * 7.2;
-    const rr = r * (2.6 - ph * 1.75) * grow;
-    const px = x + Math.cos(a) * rr;
-    const py = y + Math.sin(a) * rr * 0.55;
-    ball3(px, py, (3 + hash(i * 7.7) * 7) * (0.5 + ph), 'rgba(255,230,170,.95)', 'rgba(255,120,30,.5)');
+    const a0 = hash(i * 3.3) * TAU + ph * 7.2;
+    const rr0 = R * (2.6 - ph * 1.72);
+    g.strokeStyle = `rgba(255,228,165,${(0.15 + ph * 0.55) * 0.8})`;
+    g.lineWidth = (2 + ph * 5) * grow;
+    g.beginPath();
+    for (let k = 0; k <= 4; k++) {
+      const a = a0 + k * 0.22;
+      const rr = rr0 + k * R * 0.09;
+      const px = x + Math.cos(a) * rr;
+      const py = y + Math.sin(a) * rr * 0.55;
+      k ? g.lineTo(px, py) : g.moveTo(px, py);
+    }
+    g.stroke();
+    ball3(x + Math.cos(a0) * rr0, y + Math.sin(a0) * rr0 * 0.55,
+      (3 + hash(i * 7.7) * 8) * (0.5 + ph), 'rgba(255,235,175,.95)', 'rgba(255,120,30,.5)');
+  }
+}
+
+// СУПНОЙ МЛЕЧНЫЙ ПУТЬ — река из супа по небу
+function soupMilkyWay(t, t0, x, y) {
+  const u = clamp((t - t0) / 0.7);
+  const spread = 0.35 + u * 0.65;
+  // центральное свечение-туманность
+  const bg = g.createRadialGradient(x, y, 30, x, y, 660 * spread + 60);
+  bg.addColorStop(0, `rgba(255,242,205,${0.5 * u})`);
+  bg.addColorStop(0.45, `rgba(255,192,112,${0.22 * u})`);
+  bg.addColorStop(1, 'rgba(255,160,80,0)');
+  g.fillStyle = bg;
+  g.fillRect(x - 780, y - 430, 1560, 860);
+  // рукава — закручивающиеся полосы супа
+  for (let k = 0; k < 3; k++) {
+    for (let i = 0; i <= 42; i++) {
+      const p = i / 42;
+      const a = p * 2.7 + k * 2.1 + t * 0.22;
+      const rr = 80 + p * 640 * spread;
+      const px = x + Math.cos(a) * rr;
+      const py = y + Math.sin(a) * rr * 0.36;
+      const sz = (1 - p) * 26 + 5;
+      glowDot(px, py, sz * 2.6, '255,216,150', 0.17 * (1 - p * 0.6) * u);
+      ball3(px, py, sz, `rgba(255,236,192,${0.8 * u})`, 'rgba(255,150,60,.35)');
+    }
+  }
+  // звёзды-капли с мерцанием
+  for (let i = 0; i < 52; i++) {
+    const px = x + (hash(i * 7.7) - 0.5) * 1420 * spread;
+    const py = y + (hash(i * 3.3) - 0.5) * 640 * spread * 0.55;
+    const tw = 0.5 + 0.5 * Math.sin(t * 3.1 + i * 2.2);
+    ball3(px, py, (2 + hash(i * 1.1) * 7) * (0.6 + tw * 0.6) * u,
+      `rgba(255,247,222,${0.95 * u})`, 'rgba(255,180,90,.4)');
+  }
+}
+// БОГ СУПА — в белом одеянии, смотрит сверху вниз на деда
+function soupGod(t, x, y, s) {
+  const bob = Math.sin(t * 1.2) * 14 * s;
+  const yy = y + bob;
+  // суп-облако под ногами
+  const cloud = (cx, cy, rx, ry, a) => {
+    const cg = g.createRadialGradient(cx, cy, 6, cx, cy, rx);
+    cg.addColorStop(0, `rgba(255,247,228,${a})`);
+    cg.addColorStop(1, 'rgba(255,230,180,0)');
+    g.fillStyle = cg;
+    g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, TAU); g.fill();
+  };
+  cloud(x, yy + 322 * s, 330 * s, 88 * s, 0.85);
+  cloud(x - 225 * s, yy + 342 * s, 195 * s, 62 * s, 0.6);
+  cloud(x + 235 * s, yy + 338 * s, 195 * s, 62 * s, 0.6);
+  // БЕЛОЕ ОДЕЯНИЕ — колокол с волнистым подолом
+  g.fillStyle = '#f6f2ff';
+  g.beginPath();
+  g.moveTo(x - 118 * s, yy - 155 * s);
+  g.quadraticCurveTo(x - 305 * s, yy + 55 * s, x - 262 * s, yy + 298 * s);
+  for (let i = 0; i <= 6; i++) {
+    const px = x - 262 * s + i * (524 / 6) * s;
+    const py = yy + 298 * s + (i % 2 ? 18 * s : -6 * s);
+    g.lineTo(px, py);
+  }
+  g.quadraticCurveTo(x + 305 * s, yy + 55 * s, x + 118 * s, yy - 155 * s);
+  g.closePath();
+  g.fill();
+  // складки ткани
+  g.strokeStyle = 'rgba(192,186,228,.55)';
+  g.lineWidth = 12 * s;
+  for (let i = -2; i <= 2; i++) {
+    g.beginPath();
+    g.moveTo(x + i * 62 * s, yy - 125 * s);
+    g.quadraticCurveTo(x + i * 78 * s, yy + 80 * s, x + i * 96 * s, yy + 282 * s);
+    g.stroke();
+  }
+  // золотой пояс
+  g.fillStyle = '#e8b34c';
+  g.fillRect(x - 132 * s, yy - 62 * s, 264 * s, 26 * s);
+  // ПРАВАЯ РУКА — поднята с золотой ПОЛОВНИКОЙ
+  g.strokeStyle = '#f6f2ff';
+  g.lineWidth = 72 * s;
+  g.lineCap = 'round';
+  g.beginPath();
+  g.moveTo(x + 108 * s, yy - 85 * s);
+  g.quadraticCurveTo(x + 238 * s, yy - 165 * s, x + 262 * s, yy - 285 * s);
+  g.stroke();
+  ball3(x + 266 * s, yy - 305 * s, 34 * s, '#ffe8d2', 'rgba(220,170,120,.6)');
+  g.strokeStyle = '#f2c14e';
+  g.lineWidth = 15 * s;
+  g.beginPath(); g.moveTo(x + 266 * s, yy - 315 * s); g.lineTo(x + 302 * s, yy - 505 * s); g.stroke();
+  g.fillStyle = '#f2c14e';
+  g.beginPath(); g.ellipse(x + 312 * s, yy - 538 * s, 64 * s, 42 * s, -0.35, 0, TAU); g.fill();
+  ball3(x + 312 * s, yy - 538 * s, 42 * s, 'rgba(255,202,92,.95)', 'rgba(255,140,30,.6)');
+  // суп капает с половницы
+  const drip = fract(t * 0.7);
+  ball3(x + 300 * s + drip * 26 * s, yy - 505 * s + drip * 190 * s, 17 * s * (1 - drip * 0.35), 'rgba(255,216,132,.95)', 'rgba(255,150,40,.6)');
+  ball3(x + 292 * s + drip * 44 * s, yy - 430 * s + drip * 330 * s, 11 * s, 'rgba(255,216,132,.85)', 'rgba(255,150,40,.5)');
+  // ЛЕВАЯ РУКА — показывает ВНИЗ на деда
+  g.strokeStyle = '#f6f2ff';
+  g.lineWidth = 68 * s;
+  g.beginPath();
+  g.moveTo(x - 108 * s, yy - 85 * s);
+  g.quadraticCurveTo(x - 212 * s, yy + 18 * s, x - 168 * s, yy + 162 * s);
+  g.stroke();
+  ball3(x - 162 * s, yy + 182 * s, 32 * s, '#ffe8d2', 'rgba(220,170,120,.6)');
+  g.strokeStyle = '#ffe8d2';
+  g.lineWidth = 23 * s;
+  g.beginPath(); g.moveTo(x - 160 * s, yy + 202 * s); g.lineTo(x - 152 * s, yy + 272 * s); g.stroke();
+  // ГОЛОВА
+  const hy = yy - 305 * s;
+  g.fillStyle = '#f2eefc';
+  g.beginPath(); g.ellipse(x, hy - 42 * s, 132 * s, 108 * s, 0, 0, TAU); g.fill();
+  ball3(x, hy + 18 * s, 96 * s, '#ffe4c8', 'rgba(230,180,130,.7)');
+  // борода — седая, длинная (с контуром, чтобы читалась на одеянии)
+  g.fillStyle = '#e9e3f6';
+  g.strokeStyle = 'rgba(172,160,214,.55)';
+  g.lineWidth = 5 * s;
+  g.beginPath();
+  g.moveTo(x - 96 * s, hy + 28 * s);
+  g.quadraticCurveTo(x - 82 * s, hy + 195 * s, x, hy + 218 * s);
+  g.quadraticCurveTo(x + 82 * s, hy + 195 * s, x + 96 * s, hy + 28 * s);
+  g.quadraticCurveTo(x + 62 * s, hy + 112 * s, x, hy + 108 * s);
+  g.quadraticCurveTo(x - 62 * s, hy + 112 * s, x - 96 * s, hy + 28 * s);
+  g.fill();
+  g.stroke();
+  // ГЛАЗА СМОТРЯТ ВНИЗ — на деда
+  g.fillStyle = '#fff';
+  g.beginPath(); g.ellipse(x - 37 * s, hy + 20 * s, 27 * s, 18 * s, 0, 0, TAU); g.fill();
+  g.beginPath(); g.ellipse(x + 37 * s, hy + 20 * s, 27 * s, 18 * s, 0, 0, TAU); g.fill();
+  g.fillStyle = '#4a2c18';
+  g.beginPath(); g.arc(x - 35 * s, hy + 31 * s, 10.5 * s, 0, TAU); g.fill();
+  g.beginPath(); g.arc(x + 39 * s, hy + 31 * s, 10.5 * s, 0, TAU); g.fill();
+  // добрая улыбка
+  g.strokeStyle = '#b07040';
+  g.lineWidth = 7 * s;
+  g.beginPath();
+  g.arc(x, hy + 76 * s, 37 * s, 0.15 * Math.PI, 0.85 * Math.PI);
+  g.stroke();
+  // НИМБ — МИСКА СУПА (ха-ха!) с паром
+  const hbY = hy - 178 * s;
+  glowDot(x, hbY, 195 * s, '255,222,142', 0.5 + 0.15 * Math.sin(t * 4));
+  g.fillStyle = '#f2c14e';
+  g.beginPath(); g.ellipse(x, hbY + 28 * s, 108 * s, 35 * s, 0, 0, TAU); g.fill();
+  const sg = g.createRadialGradient(x, hbY, 6, x, hbY, 100 * s);
+  sg.addColorStop(0, '#fff3c8'); sg.addColorStop(1, '#ff9c2e');
+  g.fillStyle = sg;
+  g.beginPath(); g.ellipse(x, hbY, 102 * s, 30 * s, 0, 0, TAU); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,.75)';
+  g.lineWidth = 8 * s;
+  for (let i = -1; i <= 1; i++) {
+    g.beginPath();
+    for (let k = 0; k <= 10; k++) {
+      const px = x + i * 56 * s + Math.sin(t * 2 + k * 0.6 + i) * 14 * s;
+      const py = hbY - 22 * s - k * 16 * s;
+      k ? g.lineTo(px, py) : g.moveTo(px, py);
+    }
+    g.stroke();
+  }
+  // капли благодати падают к деду
+  for (let i = 0; i < 10; i++) {
+    const ph = fract(t * 0.5 + hash(i * 4.4));
+    const px = x + (hash(i * 7.7) - 0.5) * 500 * s;
+    const py = yy + 120 * s + ph * 720 * s;
+    ball3(px, py, (10 + hash(i * 3.3) * 14) * s * (1 - ph * 0.5),
+      'rgba(255,225,150,.85)', 'rgba(255,150,40,.5)');
   }
 }
 
@@ -1762,9 +2026,14 @@ function S6(t) { // 26–32: АУТРО
   explode(t, 27.0, CX, H * 0.62, 500);
   // ВУЛКАН ИЗ СУПА внизу — кипит, извергается, пловцы в кратере
   soupVolcano(CX, H + 70, 1.02, t);
-  if (t >= 26.95) soupBlackHole(t, CX, H * 0.105, 165, clamp((t - 26.95) / 1.3));
+  // супная дыра над поваром — растёт и крутится (премиум-версия)
+  if (t >= 26.95) soupBlackHole(t, CX, H * 0.115, 215, clamp((t - 26.95) / 1.4) * (0.94 + 0.06 * Math.sin(t * 3)));
   explode(t, 26.0, CX, H * 0.5, 820);
   lightning(t, 26.0, CX - 380, -80, CX + 120, H * 0.48, 27);
+  // суп-молнии в последние секунды аутро
+  lightning(t, 28.55, CX + 420, -80, CX - 60, H * 0.5, 29);
+  lightning(t, 29.15, CX - 400, -80, CX + 80, H * 0.52, 31);
+  lightning(t, 29.65, CX + 300, -80, CX - 140, H * 0.46, 33);
 
   // дэд-суповар в очках и колпаке
   const pop = easeOutBack(clamp(u / 0.6));
@@ -1801,39 +2070,49 @@ function S6(t) { // 26–32: АУТРО
     lg.addColorStop(1, `rgba(255,110,20,${0.4 + 0.12 * Math.sin(t * 4.2)})`);
     g.fillStyle = lg;
     g.fillRect(-260, H * 0.62, W + 520, H * 0.5);
-    // ГИГАНТСКАЯ СУПНАЯ ДЫРА — всё поглощает!
-    const holeGrow = (1 + 0.32 * smooth(30.0, 31.2, t)) * (1 - 0.42 * smooth(31.5, 31.98, t));
-    soupBlackHole(t, CX, H * 0.46, 292, holeGrow);
-    // извержение вулкана прямо в дыру
-    soupGeyser(t, 30.0, CX, H + 40, 1.7, 1.8);
-    soupGeyser(t, 30.55, CX - 330, H + 60, 1.35, 1.35);
-    soupGeyser(t, 30.95, CX + 350, H + 60, 1.35, 1.35);
-    soupGeyser(t, 31.35, CX - 150, H + 50, 1.25, 1.15);
-    // ФИНАЛЬНЫЙ АРМАГЕДДОН (первые 1.3 секунды)
+    // ===== АКТ 1: ГИГАНТСКАЯ СУПНАЯ ДЫРА — видна целиком =====
+    const collapse = smooth(30.95, 31.3, t);
+    const holeGrow = (1 + 0.34 * smooth(30.0, 30.95, t)) * (1 - 0.9 * collapse);
+    // ФИНАЛЬНЫЙ АРМАГЕДДОН — всё горит ПОД дырой
     if (f < 1.3) {
       soupWave(t, FINAL_SLAM, H + 40, 1.4);
-      explode(t, FINAL_SLAM, CX, H * 0.46, 860, '255,210,110');
-      explode(t, FINAL_SLAM + 0.12, CX - 280, H * 0.33, 540);
-      explode(t, FINAL_SLAM + 0.24, CX + 300, H * 0.58, 540);
-      lightning(t, FINAL_SLAM, CX - 420, -80, CX + 100, H * 0.5, 11);
-      lightning(t, FINAL_SLAM + 0.1, CX + 400, -80, CX - 120, H * 0.55, 13);
+      explode(t, FINAL_SLAM, CX, H * 0.42, 860, '255,210,110');
+      explode(t, FINAL_SLAM + 0.12, CX - 280, H * 0.30, 540);
+      explode(t, FINAL_SLAM + 0.24, CX + 300, H * 0.56, 540);
       const wr = easeOutCubic(clamp(f / 0.8)) * 1500;
       g.strokeStyle = `rgba(255,210,130,${(1 - clamp(f / 0.8)) * 0.9})`;
       g.lineWidth = 26 * (1 - clamp(f / 0.8) * 0.6);
-      g.beginPath(); g.arc(CX, H * 0.46, wr, 0, TAU); g.stroke();
+      g.beginPath(); g.arc(CX, H * 0.42, wr, 0, TAU); g.stroke();
       g.strokeStyle = `rgba(255,245,220,${(1 - clamp((f - 0.1) / 0.85)) * 0.5})`;
       g.lineWidth = 10;
-      g.beginPath(); g.arc(CX, H * 0.46, wr * 0.82, 0, TAU); g.stroke();
+      g.beginPath(); g.arc(CX, H * 0.42, wr * 0.82, 0, TAU); g.stroke();
+    }
+    // извержение вулкана — струи уходят ВНУТРЬ дыры
+    soupGeyser(t, 30.0, CX, H + 40, 1.7, 1.8);
+    soupGeyser(t, 30.55, CX - 330, H + 60, 1.35, 1.35);
+    soupGeyser(t, 30.95, CX + 350, H + 60, 1.35, 1.35);
+    // сама дыра — тёмный горизонт поглощает свет
+    if (collapse < 0.97) {
+      soupBlackHole(t, CX, H * 0.42, 302, holeGrow);
+    }
+    // суп-молнии вокруг дыры
+    lightning(t, FINAL_SLAM + 0.1, CX - 420, -80, CX + 100, H * 0.34, 11);
+    lightning(t, FINAL_SLAM + 0.38, CX + 400, -80, CX - 120, H * 0.36, 13);
+    lightning(t, FINAL_SLAM + 0.66, CX - 300, H + 60, CX - 40, H * 0.62, 15);
+    lightning(t, FINAL_SLAM + 0.94, CX + 320, H + 60, CX + 60, H * 0.58, 17);
+    // вспышка схлопывания дыры
+    if (collapse > 0 && collapse < 1) {
+      glowDot(CX, H * 0.42, 500 + (1 - collapse) * 950, '255,235,190', collapse * (1 - collapse) * 3.2);
     }
     embers(t, 26, 0.8);
-    // «НАВАРИЛИ.» держится и мягко уплывает вдаль
-    const txtA = 1 - smooth(31.15, 31.72, t);
-    const txtS = p * (1 + 0.06 * smooth(31.0, 31.72, t));
+    // «НАВАРИЛИ.» — внизу, чтобы дыра была видна целиком
+    const txtA = 1 - smooth(30.92, 31.22, t);
+    const txtS = p * (1 + 0.04 * smooth(30.9, 31.22, t));
     if (txtA > 0) {
       const sF = fitFont('НАВАРИЛИ.', W * 0.94, 210);
       g.save();
       g.globalAlpha = txtA;
-      g.translate(CX, H * 0.46);
+      g.translate(CX, H * 0.855 + (1 - txtA) * 280);
       g.scale(txtS, txtS);
       strokeText('НАВАРИЛИ.', 0, 0, sF, 'rgba(10,6,2,.95)', sF * 0.16);
       const gr = g.createLinearGradient(0, -110, 0, 110);
@@ -1845,10 +2124,37 @@ function S6(t) { // 26–32: АУТРО
       g.restore();
       g.globalAlpha = 1;
     }
-    // мягкий уход в чёрное — без рывков
-    const endFade = smooth(31.52, 31.98, t);
-    if (endFade > 0) {
-      g.fillStyle = `rgba(0,0,0,${endFade})`;
+    // ===== АКТ 2: СУПНОЙ МЛЕЧНЫЙ ПУТЬ расцветает =====
+    if (t > 31.0) soupMilkyWay(t, 31.0, CX, H * 0.34);
+    // ===== АКТ 3: БОГ В БЕЛОМ ОДЕЯНИИ смотрит вниз на деда =====
+    if (t > 31.18) {
+      // божественные лучи сверху
+      g.save();
+      g.translate(CX, H * 0.05);
+      for (let i = -4; i <= 4; i++) {
+        g.save();
+        g.rotate(i * 0.16 + Math.sin(t * 0.7) * 0.02);
+        const rg = g.createLinearGradient(0, 0, 0, H * 0.95);
+        rg.addColorStop(0, 'rgba(255,238,190,.3)');
+        rg.addColorStop(1, 'rgba(255,238,190,0)');
+        g.fillStyle = rg;
+        g.beginPath();
+        g.moveTo(-38, 0); g.lineTo(38, 0);
+        g.lineTo(155, H * 0.95); g.lineTo(-155, H * 0.95);
+        g.closePath(); g.fill();
+        g.restore();
+      }
+      g.restore();
+      const gu = smooth(31.18, 31.72, t);
+      // маленький дэд снизу смотрит ВВЕРХ
+      faceCircle(CX, H * 0.845, 168, gu, -0.12, 1, 1.06);
+      // сам Бог — в белом, с половником и суповым нимбом
+      soupGod(t, CX, H * 0.435, 1.28 * (0.82 + 0.18 * gu));
+    }
+    // финальная лёгкая тьма — сцена остаётся видимой
+    const endDark = 0.24 * smooth(31.88, 32.0, t);
+    if (endDark > 0) {
+      g.fillStyle = `rgba(6,5,10,${endDark})`;
       g.fillRect(-260, -260, W + 520, H + 520);
     }
   }
