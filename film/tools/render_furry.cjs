@@ -24,7 +24,7 @@ const ffmpeg = process.env.FFMPEG_BIN || requireDeps('@ffmpeg-installer/ffmpeg')
 
 const repo = path.resolve(__dirname, '..', '..');
 const fps = Number(process.env.DED_FPS || 30);
-const crf = String(process.env.DED_CRF || 19);
+const crf = String(process.env.DED_CRF || 18);
 const outMp4 = path.join(repo, 'exports', 'furry-ep01.mp4');
 
 // ---- шрифты (те же файлы, что в @font-face браузерной страницы) -------------
