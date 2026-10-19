@@ -92,7 +92,7 @@ const CUTS = [
   { t: 14.0, cap: 'ИМБА', tint: '#ff3b4e', glow: '255,60,80' },
   { t: 15.0, cap: 'ЛЕГЕНДА', tint: '#37d1ff', glow: '70,200,255' },
   { t: 16.0, cap: 'СУПОВАР', tint: '#ffc94a', glow: '255,190,70' },
-  { t: 17.0, cap: 'РЕЦЕПТ', tint: '#9a6bff', glow: '150,100,255' },
+  { t: 17.0, cap: 'СУП Х9999', tint: '#9a6bff', glow: '150,100,255' },
   { t: 18.0, cap: 'VICTORY', tint: '#4af0b0', glow: '70,240,180' },
   { t: 19.0, cap: 'СМОТРИ В ГЛАЗА', tint: '#ffffff', glow: '255,255,255' },
 ];
@@ -335,14 +335,12 @@ function renderScore(sr) {
   [20.35, 21.05, 21.7, 22.3, 22.85, 23.25].forEach((tt, i) => (i % 2 ? squeak : boing)(tt, 0.15)); // ингредиенты
   squeak(26.35, 0.22);                                          // очки падают
   boing(27.6, 0.26);                                            // медаль
-  boing(28.0, 0.2);                                             // теги
-  boing(28.75, 0.22);                                           // плашка-угроза
 
   // ---- раскладка партитуры ----
   // 0–4: дрон + сердце + ризер
   choir(0, [73.42, 110, 146.83], 4.2, 0.11);          // D2 A2 D3
   kick(0.0, 0.35); kick(0.42, 0.28);
-  kick(2.0, 0.35); kick(2.42, 0.28);
+  boom(2.0, 0.75); kick(2.0, 0.55); kick(2.42, 0.28);  // золотой слэм «А МЫ УСЛЫШАЛИ»
   riser(2.2, 1.8, 0.5);
   // 4–8: слэмы слов — хор выкрикивает слова, оркестр бьёт
   const SLAM_VOWELS = ['o', 'e', 'u', 'a'];
@@ -445,6 +443,7 @@ function renderScore(sr) {
   sub808(28, 36.71, 1.8, 0.7);
   bell(26, 293.66, 0.6); bell(28, 220, 0.5);
   timpani(26, 82, 0.7); timpani(28, 84, 0.45);
+  boom(27.0, 0.85); crash(27.0, 0.28);                 // золотой слэм «СУП СВАРЕН.»
   [74, 77, 81, 79, 77, 74].forEach((m, i) => cowbell(28 + i * 0.25, 440 * Math.pow(2, (m - 69) / 12), 0.18, -0.2 + i * 0.08));
   // финальный слэм — всё разом
   boom(FINAL_SLAM, 1.15);
@@ -954,9 +953,11 @@ function slamWord(word, tIn, y, o = {}) {
   const u = clamp(tIn / 0.32);
   // 3D-вылет из глубины: слово приближается к камере
   const zp = easeOutCubic(clamp(tIn / 0.28));
-  const s = 1500 / (1500 + (1 - zp) * 2400);
-  const want = Math.max(size, Math.min(max, W * 0.88 / Math.max(0.85, word.length * 0.58)));
-  const sizeF = fitFont(word, W * 0.9 / 1.28, want);
+  let s = 1500 / (1500 + (1 - zp) * 2400);
+  // смешной отскок после прилёта
+  if (tIn > 0.24) s *= 1 + 0.075 * Math.exp(-13 * (tIn - 0.24)) * Math.sin(30 * (tIn - 0.24));
+  const want = Math.max(size, Math.min(max, W * 0.88 / Math.max(0.85, word.length * 0.52)));
+  const sizeF = fitFont(word, W * 0.94, want);
   g.save();
   g.translate(CX, y + Math.sin(tIn * 5) * 6 * (1 - u));
   g.scale(s, s);
@@ -1015,43 +1016,15 @@ function S1(t) { // 0–4: ЛЕГЕНДА
     g.fillRect(-30, 195, 150, 44);
     g.restore();
   }
-  // тексты
-  const l1 = smooth(0.35, 0.9, t), l2 = smooth(1.7, 2.3, t), l3 = smooth(2.9, 3.4, t);
-  if (l1 > 0) {
-    g.globalAlpha = l1;
-    text('ЛЕГЕНДА ГЛАСИТ', CX, H * 0.68, 74, '#cfd6ea', F_COND, '700');
-  }
-  if (l2 > 0) {
-    g.globalAlpha = l2;
-    text('В 1998-М ХОР ЗАПЕЛ ОДНО,', CX, H * 0.745, 54, '#8f97b2', F_CONDM, '500');
-  }
+  // ТОЛЬКО золотой текст — слэм на кик 2.0
+  const l3 = smooth(1.98, 2.1, t);
   if (l3 > 0) {
-    g.globalAlpha = l3;
-    const s3 = fitFont('А МЫ УСЛЫШАЛИ — СУП.', W * 0.9, 84);
-    const pulseS = 1 + 0.03 * Math.sin(t * 6);
     g.save();
-    g.translate(CX, H * 0.83); g.scale(pulseS, pulseS);
-    strokeText('А МЫ УСЛЫШАЛИ — СУП.', 0, 0, s3, '#0b0d14', s3 * 0.19);
-    const gr = g.createLinearGradient(0, -50, 0, 50);
-    gr.addColorStop(0, '#fff3d8'); gr.addColorStop(1, '#ffb84e');
-    g.fillStyle = gr;
-    g.font = `900 ${s3}px ${F_DISP}`;
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillText('А МЫ УСЛЫШАЛИ — СУП.', 0, 0);
+    g.globalAlpha = l3;
+    slamWord('А МЫ УСЛЫШАЛИ — СУП.', t - 2.0, H * 0.83, { size: 120, max: 260 });
     g.restore();
     g.globalAlpha = 1;
   }
-  // субтитры-перевод
-  const sub = smooth(2.2, 2.7, t);
-  if (sub > 0) {
-    g.globalAlpha = sub * 0.85;
-    rounded(CX - 400, H * 0.875 - 37, 800, 74, 37, 'rgba(8,10,18,.72)', 'rgba(255,255,255,.12)', 2);
-    text('«agitatis ultramarines»  →  [о великий суп]', CX, H * 0.875, 38, '#c9d2ff', F_CONDM, '500');
-    g.globalAlpha = 1;
-  }
-  // новости: LIVE и бегущая строка
-  if (t > 0.6) liveBug(t);
-  ticker(t, H * 0.945, 'СРОЧНО · ДЭД СВАРИЛ ВЕЛИКИЙ СУП · УЧЁНЫЕ В ШОКЕ · УЛЬТРАМАРИНЫ НЕ НАЙДЕНЫ · СУП ×9999');
   vignette(0.62);
 }
 
@@ -1074,10 +1047,6 @@ function S2(t) { // 4–8: СЛОВА-СЛЭМЫ
   shockwave(t, 7.05, CX, H * 0.42, W * 1.18, '255,235,190');
   shockwave(t, 7.2, CX, H * 0.42, W * 1.05, '255,180,80');
   splatBurst(t, 7.05, CX, H * 0.42, '255,230,170');
-  // нижняя строка-подсказка
-  const hints = ['ага, поехали', 'батя варит!', 'именно суп', 'вот это да!'];
-  const idx = WORD_SLAMS.indexOf(cur);
-  textFit(hints[idx], CX, H * 0.72, W * 0.8, 56, '#a9b0c8', F_CONDM, '500');
   // мигающая рамка в такт
   const beatPhase = fract(t / BEAT);
   if (beatPhase < 0.12 && t > 4.2) {
@@ -1119,28 +1088,13 @@ function S3(t) { // 8–14: РЕВИЛ ДЭДА
   const s = lerp(1.55, 1.05, easeOutCubic(clamp(u / 0.7))) * (1 + 0.045 * kick);
   const rot = Math.sin(t * 1.1) * 0.006 + (hash(Math.floor(t * 4)) - 0.5) * 0.008 * kick;
   discordCard(t, CX, H * 0.42, s, rot);
-  // чипсы: свои полосы, плавно входят и уходят
-  const chips = [
-    { t: 8.4, x: 300, y: 120, label: 'В СЕТИ' },
-    { t: 9.0, x: 800, y: 120, label: 'ВАРИТ' },
-    { t: 9.6, x: 268, y: H * 0.645, label: 'НЕ СПИТ' },
-    { t: 10.2, x: 812, y: H * 0.645, label: 'x777' },
-    { t: 11.0, x: 540, y: H * 0.71, label: 'СТАТУС: СУПОВАР' },
-    { t: 11.55, x: 540, y: H * 0.815, label: 'ПИНГ 9999 МС' },
-    { t: 12.0, x: 540, y: 230, label: 'СУПОВАР ВСЕЯ ИМПЕРИУМА' },
-    { t: 13.0, x: 540, y: H * 0.775, label: 'ВАРИТСЯ 28 ЛЕТ' },
-  ];
-  for (const c of chips) {
-    const p = clamp((t - c.t) / 0.4);
-    const out = 1 - smooth(c.t + 1.7, c.t + 2.1, t);
-    if (p > 0 && out > 0) chip(c.x, c.y, c.label, { pop: p, alpha: out });
-  }
-  // нижняя цитата-перевод
-  const q = smooth(10.4, 10.9, t);
-  if (q > 0) {
-    g.globalAlpha = q;
-    rounded(CX - 460, H * 0.855, 920, 96, 48, 'rgba(8,12,28,.78)', 'rgba(255,255,255,.12)', 2);
-    textFit('«они пели про ультрамаринов… а мы услышали суп»', CX, H * 0.855 + 50, 840, 40, '#c9d2ff', F_CONDM, '500');
+  // золотой слэм «ДЭД» на дроп
+  const dedA = 1 - smooth(8.85, 9.12, t);
+  if (dedA > 0) {
+    g.save();
+    g.globalAlpha = dedA;
+    slamWord('ДЭД', t - 8, H * 0.80, { size: 340, max: 520 });
+    g.restore();
     g.globalAlpha = 1;
   }
   // RGB-сдвиг на снейры
@@ -1208,71 +1162,24 @@ function S4(t) { // 14–20: МОНТАЖ
   });
   if (idx === 2) chefHat(CX + (idx % 2 ? 40 : -40) * punch, fy, r, t);
 
+  // ЗОЛОТОЙ слэм-слово на каждый срез — только главный текст
+  slamWord(cur.cap, tIn, H * 0.82, {
+    size: idx === 5 ? 120 : 168,
+    max: idx === 5 ? 300 : 420,
+    tint: '#ffe08a', tint2: '#ff9c3c',
+  });
+  // на срезе «СУП ×9999» сверху сыплются 3D-кубы ультрамаринов
   if (idx === 3) {
-    // сцена рецепта: дед — великий суповар, вот его технология
-    const head = easeOutBack(clamp(tIn / 0.3));
-    g.save();
-    g.translate(CX, H * 0.635);
-    g.scale(head, head);
-    const hs = fitFont('РЕЦЕПТ ДЭДА', W * 0.86, 86);
-    strokeText('РЕЦЕПТ ДЭДА', 0, 0, hs, 'rgba(12,8,20,.92)', hs * 0.16);
-    const gr = g.createLinearGradient(0, -50, 0, 50);
-    gr.addColorStop(0, '#efe2ff'); gr.addColorStop(1, '#b78aff');
-    g.fillStyle = gr;
-    g.font = `900 ${hs}px ${F_DISP}`;
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillText('РЕЦЕПТ ДЭДА', 0, 0);
-    g.restore();
-    const lines = [
-      '1. УЛЬТРАМАРИНЫ — 2 ШТ.',
-      '2. ВОДА (КИПЯТОК)',
-      '3. ???',
-      '4. ВЕЛИКИЙ СУП',
-    ];
-    lines.forEach((line, i) => {
-      const p = easeOutCubic(clamp((tIn - 0.18 - i * 0.16) / 0.28));
-      if (p <= 0) return;
-      const y = H * 0.715 + i * H * 0.065;
-      g.save();
-      g.globalAlpha = p;
-      rounded(CX - 330, y - 42, 660, 84, 42, 'rgba(22,18,38,.88)', 'rgba(180,140,255,.35)', 2);
-      textFit(line, CX, y + 2, 580, 48, i === 3 ? '#ffd98a' : '#d9ccff', F_COND, '700');
-      g.restore();
-    });
-  } else {
-    // подпись-штамп — строго горизонтально
-    const capPop = easeOutBack(clamp(tIn / 0.3));
-    g.save();
-    g.translate(CX, H * 0.82);
-    g.scale(capPop, capPop);
-    const size = fitFont(cur.cap, W * 0.86, idx === 5 ? 120 : 168);
-    strokeText(cur.cap, 0, 0, size, 'rgba(8,8,14,.92)', size * 0.14);
-    const gr = g.createLinearGradient(0, -size * 0.6, 0, size * 0.6);
-    gr.addColorStop(0, '#fff'); gr.addColorStop(1, cur.tint);
-    g.fillStyle = gr;
-    g.font = `900 ${size}px ${F_DISP}`;
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillText(cur.cap, 0, 0);
-    g.restore();
-  }
-
-  if (idx === 4) killfeed(t);
-
-  // гейм-HUD на VICTORY
-  if (idx === 4) {
-    g.strokeStyle = 'rgba(70,240,180,.9)';
-    g.lineWidth = 5;
-    const ch = 46 + 10 * Math.sin(t * 8);
-    g.beginPath();
-    for (const [dx, dy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
-      g.moveTo(CX + dx * ch, H * 0.45 + dy * ch * 0.2);
-      g.lineTo(CX + dx * ch, H * 0.45 + dy * ch);
-      g.moveTo(CX + dx * ch * 0.2, H * 0.45 + dy * ch);
-      g.lineTo(CX + dx * ch, H * 0.45 + dy * ch);
+    for (let i = 0; i < 10; i++) {
+      const t0 = 17.02 + hash(i * 4.4) * 0.6;
+      const a = (t - t0) / 0.95;
+      if (a <= 0 || a > 1) continue;
+      const x = CX + (hash(i * 8.8) - 0.5) * 820;
+      const y = lerp(-80, 1520, a * a);
+      cube3(x, y, 64, t * 2.6 + i, t * 2 + i, '#6f9dff', '#2c4fd0', '#1c36a8', (1 - a) * 260 - 100, '90,140,255');
     }
-    g.stroke();
-    chip(CX, 112, 'КД 777/0 · СУП ГОТОВ', { pop: clamp(tIn / 0.3), bg: 'rgba(10,40,30,.85)', fg: '#b8ffe3' });
   }
+
   // последний срез: белый в упор
   if (idx === 5) {
     const w = smooth(0.55, 1.0, tIn);
@@ -1413,9 +1320,10 @@ function S5(t) { // 20–26: ВЕЛИКИЙ СУП
   // слова гимна
   const word = CHANT.find(w => t >= w.t && t < w.t + 0.85);
   if (word) {
-    slamWord(word.word, t - word.t, H * 0.495, { size: 150, max: 430, tint: '#ffe08a', tint2: '#ff9c3c' });
+    slamWord(word.word, t - word.t, H * 0.495, { size: 180, max: 620, tint: '#ffe08a', tint2: '#ff9c3c' });
     shockwave(t, word.t, CX, H * 0.495, W * 0.9, '255,215,140');
     shockwave(t, word.t + 0.12, CX, H * 0.495, W * 0.75, '255,180,90');
+    splatBurst(t, word.t, CX, H * 0.495, '255,210,120');
   }
   // блок целиком
   const block = smooth(23.95, 24.2, t);
@@ -1423,8 +1331,8 @@ function S5(t) { // 20–26: ВЕЛИКИЙ СУП
     shockwave(t, 23.95, CX, H * 0.545, W * 1.25, '255,235,190');
     shockwave(t, 24.12, CX, H * 0.545, W * 1.1, '255,190,100');
     const p = 1 + 0.05 * hitEnv(t, KICKS, 8);
-    const s1 = fitFont('О ВЕЛИКИЙ СУП', W * 0.92, 128);
-    const s2 = fitFont('НАВАРИЛИ!', W * 0.92, 176);
+    const s1 = fitFont('О ВЕЛИКИЙ СУП', W * 0.94, 140);
+    const s2 = fitFont('НАВАРИЛИ!', W * 0.94, 190);
     g.save();
     g.globalAlpha = block;
     g.translate(CX, H * 0.545); g.scale(p, p);
@@ -1460,44 +1368,12 @@ function S6(t) { // 26–32: АУТРО
   chefHat(CX, H * 0.40, r, t);
   medal(CX, H * 0.40, r, t, (t - 27.6) / 0.45);
 
-  // капчн под лицом
-  const cap = smooth(26.9, 27.3, t);
-  if (cap > 0 && t < 30) {
+  // ЗОЛОТОЙ слэм «СУП СВАРЕН.» на кик 27.0
+  const capA = smooth(26.98, 27.1, t) * (1 - smooth(29.5, 29.9, t));
+  if (capA > 0 && t < 30) {
     g.save();
-    g.globalAlpha = cap;
-    g.translate(CX, H * 0.62);
-    const s = easeOutBack(clamp((t - 26.9) / 0.4));
-    g.scale(s, s);
-    const sS = fitFont('СУП СВАРЕН.', W * 0.9, 120);
-    strokeText('СУП СВАРЕН.', 0, 0, sS, 'rgba(8,8,12,.92)', sS * 0.17);
-    const gr = g.createLinearGradient(0, -70, 0, 70);
-    gr.addColorStop(0, '#fff3d8'); gr.addColorStop(1, '#ffb84e');
-    g.fillStyle = gr;
-    g.font = `900 ${sS}px ${F_DISP}`;
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillText('СУП СВАРЕН.', 0, 0);
-    g.restore();
-    g.globalAlpha = 1;
-  }
-
-  // теги
-  const tags = [
-    { t: 28.0, x: 300, y: H * 0.72, label: 'ЛАЙК' },
-    { t: 28.25, x: 540, y: H * 0.72, label: 'ПОДПИСКА' },
-    { t: 28.5, x: 790, y: H * 0.72, label: 'СУП' },
-  ];
-  for (const c of tags) {
-    const p = clamp((t - c.t) / 0.35);
-    const out = 1 - smooth(29.5, 29.95, t);
-    if (p > 0 && out > 0) chip(c.x, c.y, c.label, { pop: p, alpha: out, size: 44 });
-  }
-  // смешная плашка-угроза
-  const warn = clamp((t - 28.75) / 0.35) * (1 - smooth(29.5, 29.95, t));
-  if (warn > 0) {
-    g.save();
-    g.globalAlpha = warn;
-    rounded(CX - 470, H * 0.79 - 36, 940, 72, 36, 'rgba(150,25,25,.88)', 'rgba(255,255,255,.2)', 2);
-    textFit('ЖМИ ЛАЙК ИЛИ СУП ОСТИНЕТ', CX, H * 0.79 + 3, 860, 44, '#ffd9c9', F_COND, '700');
+    g.globalAlpha = capA;
+    slamWord('СУП СВАРЕН.', t - 27.0, H * 0.62, { size: 150, max: 380, tint: '#ffe08a', tint2: '#ff9c3c' });
     g.restore();
     g.globalAlpha = 1;
   }
@@ -1516,7 +1392,7 @@ function S6(t) { // 26–32: АУТРО
     g.strokeStyle = `rgba(255,245,220,${(1 - clamp((f - 0.1) / 0.85)) * 0.5})`;
     g.lineWidth = 10;
     g.beginPath(); g.arc(CX, H * 0.46, wr * 0.82, 0, TAU); g.stroke();
-    const sF = fitFont('НАВАРИЛИ.', W * 0.92, 190);
+    const sF = fitFont('НАВАРИЛИ.', W * 0.94, 210);
     g.save();
     g.translate(CX, H * 0.46);
     g.scale(p, p);
@@ -1532,8 +1408,6 @@ function S6(t) { // 26–32: АУТРО
   if (f >= 1.15) {
     const fade = 1 - smooth(2.0, 2.9, f);
     embers(t, 24, fade);
-    textFit('sleep9919 · дэд · суповар всех времён', CX, H * 0.46, W * 0.86, 44, `rgba(220,210,190,${0.75 * fade})`, F_CONDM, '500');
-    textFit('shorts 4 · о великий суп наварили', CX, H * 0.53, W * 0.86, 32, `rgba(160,155,145,${0.55 * fade})`, F_CONDM, '500');
     if (f > 2.6) {
       g.fillStyle = `rgba(0,0,0,${clamp((f - 2.6) / 0.3)})`;
       g.fillRect(0, 0, W, H);
