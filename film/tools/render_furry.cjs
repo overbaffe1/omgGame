@@ -24,7 +24,7 @@ const ffmpeg = process.env.FFMPEG_BIN || requireDeps('@ffmpeg-installer/ffmpeg')
 
 const repo = path.resolve(__dirname, '..', '..');
 const fps = Number(process.env.DED_FPS || 30);
-const crf = String(process.env.DED_CRF || 18);
+const crf = String(process.env.DED_CRF || 17);
 const outMp4 = path.join(repo, 'exports', 'furry-ep01.mp4');
 
 // ---- шрифты (те же файлы, что в @font-face браузерной страницы) -------------
@@ -40,7 +40,7 @@ const durationMatch = match[1].match(/const TOTAL = ([\d.]+);/);
 if (!durationMatch) throw new Error('Не найден хронометраж TOTAL в генераторе');
 const TOTAL = Number(durationMatch[1]);
 
-const W = 1080, H = 1920;
+const W = 1920, H = 1080;
 const canvas = createCanvas(W, H);
 const sandbox = {
   document: {
@@ -136,16 +136,12 @@ const arg = (name, def) => { const i = argv.indexOf('--' + name); return i < 0 ?
   ff.stdin.end();
 
   async function thumbs() {
-    // вертикальная обложка: кульминация с блоком слов
-    sandbox.frame(24.55);
+    // широкая обложка 16:9: парад по ПСКОВГУ — МИША БУДРИН и кошкодевочки
+    sandbox.frame(16.4);
     fs.writeFileSync(path.join(repo, 'exports/furry-thumbnail.jpg'), canvas.toBuffer('image/jpeg', 90));
-    // 16:9 — центральный кроп того же кадра
-    const c16 = createCanvas(1920, 1080), g16 = c16.getContext('2d');
-    g16.imageSmoothingQuality = 'high';
-    g16.drawImage(canvas, 0, H / 2 - W * 9 / 32, W, W * 9 / 16, 0, 0, 1920, 1080);
-    fs.writeFileSync(path.join(repo, 'exports/furry-thumb-169.jpg'), c16.toBuffer('image/jpeg', 90));
-    // постер для страницы: ревил ДЭДа
-    sandbox.frame(27.6);
+    fs.writeFileSync(path.join(repo, 'exports/furry-thumb-169.jpg'), canvas.toBuffer('image/jpeg', 90));
+    // постер: панчлайн ОТ ДЭДА
+    sandbox.frame(30.95);
     fs.writeFileSync(path.join(repo, 'exports/furry-poster.jpg'), canvas.toBuffer('image/jpeg', 90));
   }
 })();
